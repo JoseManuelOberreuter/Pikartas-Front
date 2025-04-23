@@ -2,7 +2,7 @@
   <div class="app">
     <!-- Header fijo -->
     <header class="header">
-      <div class="logo">Demoledora Titanes</div>
+      <div class="logo">Demoledora CRRB</div>
       <nav class="nav">
         <a href="#inicio" class="nav-link">Inicio</a>
         <a href="#nosotros" class="nav-link">Sobre Nosotros</a>
@@ -20,7 +20,7 @@
       </div>
       <div class="hero-content">
         <div class="text-container">
-          <h1 class="hero-title">Demoledora Titanes</h1>
+          <h1 class="hero-title">Demoledora CRRB</h1>
           <h2 class="hero-subtitle">Expertos en demoliciones industriales y civiles</h2>
           <a href="#contacto" class="cta-button">Contáctanos</a>
         </div>
@@ -128,7 +128,7 @@
       <div class="container">
         <div class="footer-content">
           <div class="footer-info">
-            <h3>Demoledora Titanes</h3>
+            <h3>Demoledora CRRB</h3>
             <p>&copy; {{ new Date().getFullYear() }} Todos los derechos reservados.</p>
             <p class="legal">Este sitio web y su contenido están protegidos por las leyes de propiedad intelectual.</p>
           </div>
