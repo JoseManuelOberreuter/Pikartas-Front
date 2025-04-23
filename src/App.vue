@@ -168,7 +168,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import Retroexcavadora from './assets/Retroexcavadora.mp4';
+import Retroexcavadora from './assets/Retroexcavadora2.mp4';
 
 // Datos para el carrusel
 const images = [
