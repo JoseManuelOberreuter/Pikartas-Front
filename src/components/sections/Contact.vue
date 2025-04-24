@@ -23,7 +23,17 @@
           <textarea id="mensaje" v-model="formData.mensaje" rows="5" required></textarea>
         </div>
         
-        <button type="submit" class="submit-button">Enviar</button>
+        <div v-if="success" class="alert success">
+          ¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.
+        </div>
+        
+        <div v-if="error" class="alert error">
+          Hubo un error al enviar el mensaje. Por favor, inténtalo de nuevo más tarde.
+        </div>
+        
+        <button type="submit" class="submit-button" :disabled="loading">
+          {{ loading ? 'Enviando...' : 'Enviar' }}
+        </button>
       </form>
     </div>
   </section>
@@ -31,6 +41,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import emailjs from '@emailjs/browser';
 
 const formData = ref({
   nombre: '',
@@ -39,15 +50,41 @@ const formData = ref({
   mensaje: ''
 });
 
-const submitForm = () => {
-  alert('Formulario enviado (simulación)');
-  // Aquí iría la lógica para enviar el formulario
-  formData.value = {
-    nombre: '',
-    email: '',
-    telefono: '',
-    mensaje: ''
-  };
+const loading = ref(false);
+const success = ref(false);
+const error = ref(false);
+
+const submitForm = async () => {
+  loading.value = true;
+  error.value = false;
+  success.value = false;
+
+  try {
+    await emailjs.send(
+      import.meta.env.VITE_EMAILJS_SERVICE_ID,
+      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+      {
+        from_name: formData.value.nombre,
+        from_email: formData.value.email,
+        phone: formData.value.telefono,
+        message: formData.value.mensaje
+      },
+      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+    );
+
+    success.value = true;
+    formData.value = {
+      nombre: '',
+      email: '',
+      telefono: '',
+      mensaje: ''
+    };
+  } catch (err) {
+    console.error('Error al enviar el correo:', err);
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 
@@ -138,6 +175,30 @@ const submitForm = () => {
 
 .submit-button:hover {
   background-color: #e5ac00;
+}
+
+.alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.submit-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
