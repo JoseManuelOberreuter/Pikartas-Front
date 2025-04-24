@@ -31,9 +31,11 @@
         
         <div class="footer-contact">
           <h4>Contacto</h4>
+          <!--! CAMBIAR AQUI -->
           <p>Av. Ejemplo 1234, Santiago, Chile</p>
-          <p>+56 9 1234 5678</p>
-          <p>info@demoledoratitanes.com</p>
+          <p>+569 5703 1528</p>
+          <p>+569 6682 4540</p>
+          <p>carebra@gmail.com</p>
         </div>
       </div>
     </div>
