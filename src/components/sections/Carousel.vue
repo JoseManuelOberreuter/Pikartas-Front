@@ -28,12 +28,16 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import img0 from '../../assets/images/img0-carrusel.png';
+import img1 from '../../assets/images/img1-carrusel.jpg';
+import img2 from '../../assets/images/img2-carrusel.jpg';
+import img3 from '../../assets/images/img3-carrusel.jpg';
 
 const images = [
-  { src: 'https://images.unsplash.com/photo-1541625602330-2277a4c46182?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80', alt: 'Demolición 1' },
-  { src: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80', alt: 'Demolición 2' },
-  { src: 'https://images.unsplash.com/photo-1503387837-b154d5074bd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80', alt: 'Demolición 3' },
-  { src: 'https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80', alt: 'Demolición 4' }
+  { src: img0, alt: 'Demolición 1' },
+  { src: img1, alt: 'Demolición 2' },
+  { src: img2, alt: 'Demolición 3' },
+  { src: img3, alt: 'Demolición 4' }
 ];
 
 const currentSlide = ref(0);
