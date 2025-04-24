@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import Retroexcavadora from '../../assets/Retroexcavadora2.mp4';
+import Retroexcavadora from '../../assets/Retroexcavadora0.mp4';
 </script>
 
 <style scoped>
