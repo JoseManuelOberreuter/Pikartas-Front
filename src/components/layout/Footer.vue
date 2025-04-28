@@ -8,7 +8,7 @@
           <p class="legal">Este sitio web y su contenido están protegidos por las leyes de propiedad intelectual.</p>
         </div>
         
-        <div class="footer-social">
+        <!-- <div class="footer-social">
           <h4>Síguenos</h4>
           <div class="social-links">
             <a href="#" class="social-link" aria-label="Facebook">
@@ -27,15 +27,13 @@
               </svg>
             </a>
           </div>
-        </div>
+        </div> -->
         
         <div class="footer-contact">
           <h4>Contacto</h4>
-          <!--! CAMBIAR AQUI -->
-          <p>Av. Ejemplo 1234, Santiago, Chile</p>
+          <p>carebra@gmail.com</p>
           <p>+569 5703 1528</p>
           <p>+569 6682 4540</p>
-          <p>carebra@gmail.com</p>
         </div>
       </div>
     </div>

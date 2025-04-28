@@ -4,6 +4,7 @@
     <nav class="nav">
       <a href="#inicio" class="nav-link">Inicio</a>
       <a href="#nosotros" class="nav-link">Sobre Nosotros</a>
+      <a href="#proyectos" class="nav-link">Nuestros Proyectos</a>
       <a href="#contacto" class="nav-link">Contáctanos</a>
     </nav>
   </header>

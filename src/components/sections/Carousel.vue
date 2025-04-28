@@ -1,5 +1,5 @@
 <template>
-  <section class="carousel-section">
+  <section id="proyectos" class="carousel-section">
     <div class="container">
       <h2 class="section-title">Nuestros Proyectos</h2>
       <div class="carousel">
@@ -28,16 +28,18 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import img0 from '../../assets/images/img0-carrusel.png';
-import img1 from '../../assets/images/img1-carrusel.jpg';
-import img2 from '../../assets/images/img2-carrusel.jpg';
-import img3 from '../../assets/images/img3-carrusel.jpg';
+import img0 from '../../assets/images/Construccion0.jpeg';
+import img1 from '../../assets/images/Construccion1.jpeg';
+import img2 from '../../assets/images/Construccion2.jpeg';
+import img3 from '../../assets/images/Construccion3.jpg';
+import img4 from '../../assets/images/Construccion4.jpeg';
 
 const images = [
-  { src: img0, alt: 'Demolición 1' },
-  { src: img1, alt: 'Demolición 2' },
-  { src: img2, alt: 'Demolición 3' },
-  { src: img3, alt: 'Demolición 4' }
+  { src: img0, alt: 'Proyecto de Construcción 1' },
+  { src: img1, alt: 'Proyecto de Construcción 2' },
+  { src: img2, alt: 'Proyecto de Construcción 3' },
+  { src: img3, alt: 'Proyecto de Construcción 4' },
+  { src: img4, alt: 'Proyecto de Construcción 5' }
 ];
 
 const currentSlide = ref(0);

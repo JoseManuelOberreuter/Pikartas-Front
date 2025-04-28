@@ -8,7 +8,7 @@
     </div>
     <div class="hero-content">
       <div class="text-container">
-        <h1 class="hero-title">Demoledora CRRB</h1>
+        <h1 class="hero-title">Demoliciones CRRB</h1>
         <h2 class="hero-subtitle">Expertos en demoliciones industriales y civiles</h2>
         <a href="#contacto" class="cta-button">Contáctanos</a>
       </div>
@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import Retroexcavadora from '../../assets/videos/Retroexcavadora0.mp4';
+import Retroexcavadora from '../../assets/videos/Retroexcavadora3.mp4';
 </script>
 
 <style scoped>

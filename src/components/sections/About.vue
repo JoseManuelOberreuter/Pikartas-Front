@@ -4,10 +4,14 @@
       <h2 class="section-title">Sobre Nosotros</h2>
       <div class="about-content">
         <div class="about-text">
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.</p>
-          
+          <p> Somos una empresa dedicada a satisfacer la necesidad del cliente. Buscamos mantener una excelente relacion con los vecinos. Para ello cumplimos con todas las normativas municipales; como referente a cierres y aislacion acustica. En terreno en todo momento se encuentra un profesional de obra atendiendo cualquier solicitud de nuestro mandante o vecinos colindantes al proyecto a demoler.</p>
+          <p> Adicionalmente cumplimos con todas las normas de seguridad y leyes sociales respecto al personal que se encuentra en obra.</p>
           <h3>Nuestros Servicios</h3>
           <ul class="services-list">
+            <li>
+              <span class="icon">🏠</span>
+              <span class="service-text">Demolición residencial controlada</span>
+            </li>
             <li>
               <span class="icon">🏗️</span>
               <span>Demolición de estructuras industriales</span>
@@ -15,10 +19,6 @@
             <li>
               <span class="icon">🏢</span>
               <span>Demolición de edificios comerciales</span>
-            </li>
-            <li>
-              <span class="icon">🏠</span>
-              <span>Demolición residencial controlada</span>
             </li>
             <li>
               <span class="icon">♻️</span>
@@ -83,6 +83,7 @@
   margin-bottom: 1.5rem;
   font-size: 1.1rem;
   color: #333;
+  text-align: justify;
 }
 
 .services-list {
@@ -102,6 +103,11 @@
   font-size: 1.5rem;
   margin-right: 1rem;
   color: #ffc107;
+}
+
+.service-text {
+  font-weight: bold;
+  
 }
 
 @media (max-width: 768px) {
