@@ -31,8 +31,8 @@
         
         <div class="footer-contact">
           <h4>Contacto</h4>
-          <p>Santiago y Valparaíso</p>
-          <p>carebra@gmail.com</p>
+          <p>Santiago, Valparaíso y Concepción</p>
+          <p>demoliciones.crrb@gmail.com</p>
           <p>+569 5703 1528</p>
           <p>+569 6682 4540</p>
         </div>

@@ -4,8 +4,15 @@
       <h2 class="section-title">Sobre Nosotros</h2>
       <div class="about-content">
         <div class="about-text">
-          <p> Somos una empresa dedicada a satisfacer la necesidad del cliente. Buscamos mantener una excelente relacion con los vecinos. Para ello cumplimos con todas las normativas municipales; como referente a cierres y aislacion acustica. En terreno en todo momento se encuentra un profesional de obra atendiendo cualquier solicitud de nuestro mandante o vecinos colindantes al proyecto a demoler.</p>
-          <p> Adicionalmente cumplimos con todas las normas de seguridad y leyes sociales respecto al personal que se encuentra en obra.</p>
+          <p>Somos una empresa dedicada a satisfacer la necesidad del cliente. Buscamos mantener una excelente relación con los vecinos. Para ello cumplimos con todas las normativas municipales, 
+            como referente a cierres y aislación acústica.
+          </p>
+          <p>
+            En terreno en todo momento se encuentra un profesional de obra atendiendo cualquier solicitud de nuestro mandante o vecinos colindantes al proyecto a demoler.
+          </p>
+          <p>
+            Adicionalmente cumplimos con todas las normas de seguridad y leyes sociales respecto al personal que se encuentra en obra.
+          </p>
           <h3>Nuestros Servicios</h3>
           <ul class="services-list">
             <li>

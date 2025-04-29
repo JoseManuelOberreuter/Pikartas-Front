@@ -52,9 +52,9 @@ import Construccion1 from '../../assets/videos/Construccion1.mp4';
 import Construccion2 from '../../assets/videos/Construccion2.mp4';
 
 const videos = [
-  { src: Construccion0, title: 'Proyecto de Construcción 1' },
-  { src: Construccion1, title: 'Proyecto de Construcción 2' },
-  { src: Construccion2, title: 'Proyecto de Construcción 3' }
+  { src: Construccion0, title: 'Proyecto de Demolición 1' },
+  { src: Construccion1, title: 'Proyecto de Demolición 2' },
+  { src: Construccion2, title: 'Proyecto de Demolición 3' }
 ];
 
 const selectedVideo = ref(null);
