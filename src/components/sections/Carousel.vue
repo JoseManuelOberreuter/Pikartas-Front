@@ -22,12 +22,14 @@
           </button>
         </div>
       </div>
+      <VideoGallery />
     </div>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import VideoGallery from './VideoGallery.vue';
 import img0 from '../../assets/images/Construccion0.jpeg';
 import img1 from '../../assets/images/Construccion1.jpeg';
 import img2 from '../../assets/images/Construccion2.jpeg';
