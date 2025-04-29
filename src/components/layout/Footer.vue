@@ -3,7 +3,7 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-info">
-          <h3>Demoledora CRRB</h3>
+          <h3>Demoliciones CRRB</h3>
           <p>&copy; {{ new Date().getFullYear() }} Todos los derechos reservados.</p>
           <p class="legal">Este sitio web y su contenido están protegidos por las leyes de propiedad intelectual.</p>
         </div>

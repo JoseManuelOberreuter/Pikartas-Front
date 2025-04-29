@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <div class="logo">Demoledora CRRB</div>
+    <div class="logo">Demoliciones CRRB</div>
     <nav class="nav">
       <a href="#inicio" class="nav-link">Inicio</a>
       <a href="#nosotros" class="nav-link">Sobre Nosotros</a>
