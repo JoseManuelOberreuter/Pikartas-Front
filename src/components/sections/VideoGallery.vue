@@ -17,7 +17,14 @@
           muted
           loop
           playsinline
+          @error="handleVideoError(index)"
         ></video>
+        <img 
+          v-if="videoErrors[index]" 
+          :src="video.fallbackImage" 
+          :alt="video.title"
+          class="video-thumbnail"
+        >
         <div class="video-overlay">
           <div class="play-button">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
@@ -52,13 +59,30 @@ import Construccion1 from '../../assets/videos/Construccion1.mp4';
 import Construccion2 from '../../assets/videos/Construccion2.mp4';
 
 const videos = [
-  { src: Construccion0, title: 'Proyecto de Demolición 1' },
-  { src: Construccion1, title: 'Proyecto de Demolición 2' },
-  { src: Construccion2, title: 'Proyecto de Demolición 3' }
+  { 
+    src: Construccion0, 
+    title: 'Proyecto de Demolición 1',
+    fallbackImage: '/images/fallback-video.jpg'
+  },
+  { 
+    src: Construccion1, 
+    title: 'Proyecto de Demolición 2',
+    fallbackImage: '/images/fallback-video.jpg'
+  },
+  { 
+    src: Construccion2, 
+    title: 'Proyecto de Demolición 3',
+    fallbackImage: '/images/fallback-video.jpg'
+  }
 ];
 
 const selectedVideo = ref(null);
 const videoRefs = ref([]);
+const videoErrors = ref({});
+
+const handleVideoError = (index) => {
+  videoErrors.value[index] = true;
+};
 
 const startPreview = (index) => {
   if (videoRefs.value[index]) {
@@ -237,21 +261,29 @@ const closeVideo = () => {
   position: absolute;
   top: 15px;
   right: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   color: white;
-  font-size: 2rem;
-  width: 40px;
-  height: 40px;
+  font-size: 2.5rem;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   cursor: pointer;
   z-index: 1;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: rotate(90deg);
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg) scale(1.1);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .popup-video {

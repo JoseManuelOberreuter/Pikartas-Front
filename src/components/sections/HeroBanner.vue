@@ -1,9 +1,10 @@
 <template>
   <section id="inicio" class="hero">
     <div class="video-container">
-      <video autoplay muted loop class="background-video">
+      <video autoplay muted loop playsinline disablePictureInPicture controlsList="nodownload" class="background-video" @error="handleVideoError">
         <source :src="videoSrc" type="video/mp4">
       </video>
+      <img v-if="videoError" :src="fallbackImage" alt="Demoliciones CRRB" class="background-image">
       <div class="overlay"></div>
     </div>
     <div class="hero-content">
@@ -17,14 +18,24 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
 
 const props = defineProps({
   videoSrc: {
     type: String,
     required: true
+  },
+  fallbackImage: {
+    type: String,
+    required: true
   }
 });
+
+const videoError = ref(false);
+
+const handleVideoError = () => {
+  videoError.value = true;
+};
 </script>
 
 <style scoped>
@@ -132,5 +143,15 @@ const props = defineProps({
     padding: 0.8rem 1.5rem;
     font-size: 1rem;
   }
+}
+
+.background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
 }
 </style> 
