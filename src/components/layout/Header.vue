@@ -1,17 +1,34 @@
 <template>
   <header class="header">
     <div class="logo">Demoliciones CRRB</div>
-    <nav class="nav">
-      <a href="#inicio" class="nav-link">Inicio</a>
-      <a href="#nosotros" class="nav-link">Sobre Nosotros</a>
-      <a href="#proyectos" class="nav-link">Nuestros Proyectos</a>
-      <a href="#contacto" class="nav-link">Contáctanos</a>
+    <button class="menu-toggle" @click="toggleMenu" :class="{ 'active': isMenuOpen }">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="nav" :class="{ 'active': isMenuOpen }">
+      <a href="#inicio" class="nav-link" @click="closeMenu">Inicio</a>
+      <a href="#nosotros" class="nav-link" @click="closeMenu">Sobre Nosotros</a>
+      <a href="#proyectos" class="nav-link" @click="closeMenu">Nuestros Proyectos</a>
+      <a href="#contacto" class="nav-link" @click="closeMenu">Contáctanos</a>
     </nav>
   </header>
 </template>
 
 <script setup>
-// No se necesita lógica adicional por ahora
+import { ref } from 'vue';
+
+const isMenuOpen = ref(false);
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+  document.body.style.overflow = isMenuOpen.value ? 'hidden' : '';
+};
+
+const closeMenu = () => {
+  isMenuOpen.value = false;
+  document.body.style.overflow = '';
+};
 </script>
 
 <style scoped>
@@ -34,6 +51,40 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: #ffc107;
+  z-index: 1001;
+}
+
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.menu-toggle span {
+  width: 100%;
+  height: 3px;
+  background-color: #ffc107;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle.active span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
 }
 
 .nav {
@@ -71,15 +122,38 @@
 @media (max-width: 768px) {
   .header {
     padding: 1rem;
-    flex-direction: column;
   }
   
-  .logo {
-    margin-bottom: 1rem;
+  .menu-toggle {
+    display: flex;
   }
   
   .nav {
-    gap: 1rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.95);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+  }
+  
+  .nav.active {
+    transform: translateX(0);
+  }
+  
+  .nav-link {
+    font-size: 1.2rem;
+  }
+  
+  .nav-link::after {
+    bottom: -8px;
   }
 }
 </style> 
