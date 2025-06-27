@@ -1,48 +1,73 @@
 <template>
-  <div class="app">
-    <Header />
-    <Hero />
-    <About />
-    <Carousel />
-    <Contact />
-    <WhatsAppButton />
+  <div id="app">
+    <!-- Header Component -->
+    <Header 
+      @open-login="openLoginModal"
+      @open-register="openRegisterModal"
+    />
+
+    <!-- Auth Modal Component -->
+    <AuthModal
+      :show-login-modal="showLoginModal"
+      :show-register-modal="showRegisterModal"
+      @close-modals="closeModals"
+      @switch-to-register="switchToRegister"
+      @switch-to-login="switchToLogin"
+    />
+
+    <!-- Main Content - Router View -->
+    <main>
+      <router-view />
+    </main>
+
+    <!-- Cart Sidebar Component -->
+    <CartSidebar />
+
+    <!-- Footer Component -->
     <Footer />
   </div>
 </template>
 
 <script setup>
-import Header from './components/layout/Header.vue';
-import Hero from './components/sections/Hero.vue';
-import About from './components/sections/About.vue';
-import Carousel from './components/sections/Carousel.vue';
-import Contact from './components/sections/Contact.vue';
-import Footer from './components/layout/Footer.vue';
-import WhatsAppButton from './components/ui/WhatsAppButton.vue';
+import { ref } from 'vue'
+import Header from './components/Header.vue'
+import CartSidebar from './components/CartSidebar.vue'
+import AuthModal from './components/AuthModal.vue'
+import Footer from './components/Footer.vue'
 
-// Configurar scroll suave
-import { onMounted } from 'vue';
+// Auth modals state
+const showLoginModal = ref(false)
+const showRegisterModal = ref(false)
 
-onMounted(() => {
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      e.preventDefault();
-      
-      const targetId = this.getAttribute('href');
-      const targetElement = document.querySelector(targetId);
-      
-      if (targetElement) {
-        window.scrollTo({
-          top: targetElement.offsetTop - 80, // Ajuste para el header fijo
-          behavior: 'smooth'
-        });
-      }
-    });
-  });
-});
+// Modal functions
+const openLoginModal = () => {
+  showLoginModal.value = true
+  showRegisterModal.value = false
+}
+
+const openRegisterModal = () => {
+  showRegisterModal.value = true
+  showLoginModal.value = false
+}
+
+const closeModals = () => {
+  showLoginModal.value = false
+  showRegisterModal.value = false
+}
+
+const switchToRegister = () => {
+  showLoginModal.value = false
+  showRegisterModal.value = true
+}
+
+const switchToLogin = () => {
+  showRegisterModal.value = false
+  showLoginModal.value = true
+}
 </script>
 
 <style>
-/* Estilos generales */
+/* Reset y estilos base */
 * {
   margin: 0;
   padding: 0;
@@ -54,10 +79,10 @@ html {
 }
 
 body {
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   line-height: 1.6;
-  color: #111;
-  background-color: #e0e0e0;
+  color: #333;
+  background-color: #fff;
 }
 
 .container {
@@ -66,29 +91,10 @@ body {
   padding: 0 20px;
 }
 
-.section-title {
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-  text-align: center;
-  color: #111;
-  position: relative;
-  padding-bottom: 1rem;
-}
-
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 4px;
-  background-color: #ffc107;
-}
-
+/* Responsive Design */
 @media (max-width: 768px) {
-  .section-title {
-    font-size: 2rem;
+  .container {
+    padding: 0 15px;
   }
 }
 </style>

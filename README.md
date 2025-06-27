@@ -1,112 +1,91 @@
-# Demoliciones CRRB - Sitio Web
+# Template Web Simple
 
-## Descripción
-Sitio web profesional para Demoliciones CRRB, una empresa especializada en demoliciones industriales y civiles. El sitio presenta una interfaz moderna y responsiva que muestra los servicios, proyectos y contacto de la empresa.
+Un template moderno y limpio para páginas web creado con Vue.js 3 y Vite.
 
-## Características Principales
-- 🎥 Video de fondo en la sección hero
-- 🖼️ Carrusel de imágenes de proyectos
-- 📹 Galería de videos con vista previa y popup
-- 📱 Diseño completamente responsivo
-- 📞 Sección de contacto con formulario
-- 💬 Botón de WhatsApp flotante
+## Características
 
-## Tecnologías Utilizadas
-- Vue.js 3
-- Vite
-- CSS3
-- HTML5
-- EmailJS (para el formulario de contacto)
+- ✨ Diseño moderno y responsive
+- 🚀 Vue.js 3 con Composition API
+- ⚡ Vite para desarrollo rápido
+- 📱 Completamente responsive
+- 🎨 CSS puro sin dependencias externas
+- 📧 Formulario de contacto funcional
+- 🔄 Navegación suave entre secciones
+
+## Secciones Incluidas
+
+- **Header**: Barra de navegación fija con links suaves
+- **Hero**: Sección principal con call-to-action
+- **Acerca**: Información sobre la empresa/proyecto
+- **Servicios**: Tarjetas con servicios ofrecidos
+- **Contacto**: Formulario de contacto funcional
+- **Footer**: Pie de página simple
+
+## Instalación
+
+1. Clona el repositorio:
+```bash
+git clone <tu-repositorio>
+cd simple-web-template
+```
+
+2. Instala las dependencias:
+```bash
+npm install
+```
+
+3. Inicia el servidor de desarrollo:
+```bash
+npm run dev
+```
+
+4. Abre tu navegador en `http://localhost:5173`
+
+## Comandos Disponibles
+
+- `npm run dev` - Inicia el servidor de desarrollo
+- `npm run build` - Construye la aplicación para producción
+- `npm run preview` - Preview de la build de producción
+
+## Personalización
+
+### Colores
+Los colores principales se pueden cambiar en el archivo `src/App.vue` en la sección de estilos:
+- Color primario: `#007bff`
+- Color de hover: `#0056b3`
+
+### Contenido
+Edita el contenido en `src/App.vue`:
+- Cambia el nombre del sitio en la navegación
+- Modifica los textos de las secciones
+- Actualiza la información de contacto
+
+### Estilos
+Todos los estilos están en `src/App.vue` usando CSS puro. Puedes:
+- Modificar la tipografía
+- Cambiar colores y espaciados
+- Ajustar el diseño responsive
 
 ## Estructura del Proyecto
+
 ```
 src/
-├── assets/
-│   ├── images/      # Imágenes del sitio
-│   └── videos/      # Videos de proyectos
-├── components/
-│   ├── layout/      # Componentes de estructura
-│   │   ├── Header.vue
-│   │   └── Footer.vue
-│   └── sections/    # Secciones principales
-│       ├── Hero.vue
-│       ├── About.vue
-│       ├── Carousel.vue
-│       ├── VideoGallery.vue
-│       └── Contact.vue
-└── App.vue          # Componente principal
+├── App.vue          # Componente principal con todo el contenido
+├── main.js          # Punto de entrada de la aplicación
+└── assets/          # Recursos estáticos (puedes agregar imágenes aquí)
 ```
 
-## Componentes Principales
+## Tecnologías
 
-### Hero
-- Video de fondo con overlay
-- Título y subtítulo animados
-- Botón de llamada a la acción
+- [Vue.js 3](https://vuejs.org/) - Framework JavaScript
+- [Vite](https://vitejs.dev/) - Build tool
+- CSS Grid y Flexbox para layouts
+- CSS puro para estilos
 
-### Carrusel
-- Navegación automática y manual
-- Indicadores de posición
-- Transiciones suaves
-- Imágenes responsivas
+## Licencia
 
-### Galería de Videos
-- Grid de videos con vista previa
-- Popup de video con controles
-- Efectos hover interactivos
-- Diseño responsivo
+Este proyecto es de uso libre. Puedes modificarlo y usarlo para tus propios proyectos.
 
-### Contacto
-- Formulario de contacto
-- Validación de campos
-- Integración con EmailJS
-- Mensajes de éxito/error
+---
 
-## Configuración del Proyecto
-
-### Requisitos
-- Node.js (v14 o superior)
-- npm o yarn
-
-### Instalación
-```bash
-# Clonar el repositorio
-git clone [url-del-repositorio]
-
-# Instalar dependencias
-npm install
-
-# Iniciar servidor de desarrollo
-npm run dev
-
-# Construir para producción
-npm run build
-```
-
-### Variables de Entorno
-Crear un archivo `.env` en la raíz del proyecto:
-```
-VITE_EMAILJS_SERVICE_ID=tu_service_id
-VITE_EMAILJS_TEMPLATE_ID=tu_template_id
-VITE_EMAILJS_PUBLIC_KEY=tu_public_key
-```
-
-## Estilos y Diseño
-- Paleta de colores:
-  - Principal: #ffc107 (amarillo)
-  - Fondo: #f0f0f0 (gris claro)
-  - Texto: #111 (casi negro)
-- Tipografía:
-  - Títulos: 2.5rem
-  - Subtítulos: 1.8rem
-  - Texto normal: 1rem
-- Breakpoints:
-  - Desktop: > 1024px
-  - Tablet: 768px - 1024px
-  - Mobile: < 768px
-
-## Optimizaciones
-- Lazy loading de imágenes y videos
-- Compresión de assets
-- Código modular y reutilizable
-- SEO básico implementado
+¡Perfecto para empezar tu próximo proyecto web! 🚀

@@ -1,0 +1,574 @@
+<template>
+  <div class="cart">
+    <div class="container">
+      <div class="cart-header">
+        <h1>🛒 Mi Carrito</h1>
+        <p v-if="cartItems.length > 0">{{ cartItemCount }} artículos en tu carrito</p>
+      </div>
+
+      <div v-if="cartItems.length === 0" class="empty-cart">
+        <div class="empty-cart-icon">🛒</div>
+        <h2>Tu carrito está vacío</h2>
+        <p>¡Empieza a agregar productos increíbles!</p>
+        <router-link to="/shop" class="btn btn-primary">
+          Ir a la Tienda
+        </router-link>
+      </div>
+
+      <div v-else class="cart-content">
+        <div class="cart-items">
+          <div class="cart-item" v-for="item in cartItems" :key="item.id">
+            <div class="item-image">
+              <img :src="item.image" :alt="item.name" />
+            </div>
+            
+            <div class="item-details">
+              <h3 class="item-name">{{ item.name }}</h3>
+              <p class="item-category">{{ item.category }}</p>
+              <div class="item-rating">
+                <span class="stars">{{ getStarRating(item.rating) }}</span>
+                <span class="rating-value">({{ item.rating }})</span>
+              </div>
+              <p class="item-description">{{ item.description }}</p>
+            </div>
+            
+            <div class="item-controls">
+              <div class="item-price">
+                <span class="price-label">Precio unitario:</span>
+                <span class="price">${{ item.price.toFixed(2) }}</span>
+              </div>
+              
+              <div class="quantity-controls">
+                <label>Cantidad:</label>
+                <div class="quantity-input">
+                  <button 
+                    class="qty-btn" 
+                    @click="decreaseQuantity(item.id)" 
+                    :disabled="item.quantity <= 1"
+                  >
+                    -
+                  </button>
+                  <input 
+                    type="number" 
+                    :value="item.quantity" 
+                    @change="updateItemQuantity(item.id, $event.target.value)"
+                    min="1"
+                    class="qty-input"
+                  >
+                  <button class="qty-btn" @click="increaseQuantity(item.id)">+</button>
+                </div>
+              </div>
+              
+              <div class="item-subtotal">
+                <span class="subtotal-label">Subtotal:</span>
+                <span class="subtotal">${{ (item.price * item.quantity).toFixed(2) }}</span>
+              </div>
+              
+              <button class="remove-btn" @click="removeFromCart(item.id)">
+                🗑️ Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-summary">
+          <div class="summary-card">
+            <h3>Resumen del Pedido</h3>
+            
+            <div class="summary-line">
+              <span>Subtotal ({{ cartItemCount }} artículos):</span>
+              <span>${{ cartTotal.toFixed(2) }}</span>
+            </div>
+            
+            <div class="summary-line">
+              <span>Envío:</span>
+              <span v-if="cartTotal >= 500" class="free-shipping">Gratis</span>
+              <span v-else>$25.00</span>
+            </div>
+            
+            <div class="summary-line">
+              <span>Impuestos (estimado):</span>
+              <span>${{ tax.toFixed(2) }}</span>
+            </div>
+            
+            <hr class="summary-divider">
+            
+            <div class="summary-line total-line">
+              <span>Total:</span>
+              <span class="total-amount">${{ finalTotal.toFixed(2) }}</span>
+            </div>
+            
+            <div v-if="cartTotal < 500" class="shipping-notice">
+              <p>💡 Agrega ${{ (500 - cartTotal).toFixed(2) }} más para obtener envío gratis</p>
+            </div>
+            
+            <div class="cart-actions">
+              <button class="btn btn-outline" @click="clearCart">
+                Limpiar Carrito
+              </button>
+              <router-link to="/shop" class="btn btn-secondary">
+                Seguir Comprando
+              </router-link>
+              <router-link to="/checkout" class="btn btn-primary">
+                Proceder al Pago
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { 
+  cartItems, 
+  cartTotal, 
+  cartItemCount, 
+  removeFromCart as removeItem, 
+  updateQuantity, 
+  clearCart as clearCartItems 
+} from '../stores/cart.js'
+
+// Computed properties
+const tax = computed(() => cartTotal.value * 0.08) // 8% tax
+const shipping = computed(() => cartTotal.value >= 500 ? 0 : 25)
+const finalTotal = computed(() => cartTotal.value + tax.value + shipping.value)
+
+// Methods
+const getStarRating = (rating) => {
+  const fullStars = Math.floor(rating)
+  const hasHalfStar = rating % 1 !== 0
+  let stars = '★'.repeat(fullStars)
+  if (hasHalfStar) stars += '☆'
+  return stars
+}
+
+const removeFromCart = (productId) => {
+  if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
+    removeItem(productId)
+  }
+}
+
+const increaseQuantity = (productId) => {
+  const item = cartItems.value.find(item => item.id === productId)
+  if (item) {
+    updateQuantity(productId, item.quantity + 1)
+  }
+}
+
+const decreaseQuantity = (productId) => {
+  const item = cartItems.value.find(item => item.id === productId)
+  if (item && item.quantity > 1) {
+    updateQuantity(productId, item.quantity - 1)
+  }
+}
+
+const updateItemQuantity = (productId, newQuantity) => {
+  const quantity = parseInt(newQuantity)
+  if (quantity > 0) {
+    updateQuantity(productId, quantity)
+  }
+}
+
+const clearCart = () => {
+  if (confirm('¿Estás seguro de que quieres limpiar todo el carrito?')) {
+    clearCartItems()
+  }
+}
+</script>
+
+<style scoped>
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.cart {
+  padding-top: 120px;
+  padding-bottom: 80px;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.cart-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.cart-header h1 {
+  font-size: 2.5rem;
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-weight: 700;
+}
+
+.cart-header p {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.empty-cart {
+  text-align: center;
+  background: white;
+  padding: 4rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.empty-cart-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.empty-cart h2 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.75rem;
+}
+
+.empty-cart p {
+  margin: 0 0 2rem 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.cart-content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+}
+
+.cart-items {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 120px 1fr 250px;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.item-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.item-category {
+  color: #007bff;
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.item-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.stars {
+  color: #ffc107;
+}
+
+.rating-value {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.item-description {
+  color: #666;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.item-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.item-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.price-label {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #28a745;
+}
+
+.quantity-controls label {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.quantity-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.qty-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #f8f9fa;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.qty-btn:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
+.qty-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.qty-input {
+  width: 60px;
+  text-align: center;
+  border: none;
+  padding: 0.5rem;
+  font-weight: 600;
+}
+
+.qty-input:focus {
+  outline: none;
+}
+
+.item-subtotal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.subtotal-label {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.subtotal {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.remove-btn {
+  background: none;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.3s;
+}
+
+.remove-btn:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.cart-summary {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.free-shipping {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.summary-divider {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 1.5rem 0;
+}
+
+.total-line {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.total-amount {
+  font-size: 1.5rem;
+  color: #007bff;
+}
+
+.shipping-notice {
+  background: #e7f3ff;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #007bff;
+}
+
+.shipping-notice p {
+  margin: 0;
+  color: #0056b3;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.cart-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn {
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s;
+  display: block;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-outline:hover {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  border-color: #5a6268;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .cart-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .cart-summary {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .cart-item {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .item-image {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .cart-header h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 10px;
+  }
+  
+  .cart-items,
+  .summary-card {
+    padding: 1rem;
+  }
+}
+</style> 
