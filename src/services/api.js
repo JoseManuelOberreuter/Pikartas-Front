@@ -109,6 +109,33 @@ export const authService = {
       console.error('Get user profile error:', error);
       throw error.response?.data || { error: error.message };
     }
+  },
+
+  async uploadAvatar(formData) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(routesStore.fullUserRoutes.uploadAvatar, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Upload avatar error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async updateProfile(profileData) {
+    try {
+      const routesStore = useRoutesStore();
+      // Usando la misma ruta de profile pero con método PUT/PATCH
+      const response = await axios.put(routesStore.getUserProfileUrl('me'), profileData);
+      return response.data;
+    } catch (error) {
+      console.error('Update profile error:', error);
+      throw error.response?.data || { error: error.message };
+    }
   }
 };
 
