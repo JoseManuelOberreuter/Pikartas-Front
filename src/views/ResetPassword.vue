@@ -162,117 +162,144 @@ const tryAgain = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f9fa;
-  padding: 2rem;
+  background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-primary-light) 100%);
+  padding: var(--spacing-3xl);
 }
 
 .reset-card {
-  background: white;
-  padding: 3rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: var(--color-white);
+  padding: var(--spacing-5xl);
+  border-radius: var(--border-radius-2xl);
+  box-shadow: var(--shadow-lg);
   text-align: center;
   max-width: 500px;
   width: 100%;
+  border: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+.reset-card h1 {
+  color: var(--color-tertiary);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
 }
 
 .reset-card h2 {
-  margin-bottom: 1rem;
-  color: #333;
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-tertiary);
+  font-weight: var(--font-weight-semibold);
 }
 
 .reset-card p {
-  margin-bottom: 2rem;
-  color: #666;
-  line-height: 1.6;
+  margin-bottom: var(--spacing-3xl);
+  color: var(--color-gray-600);
+  line-height: var(--line-height-relaxed);
+  font-size: var(--font-size-base);
 }
 
 .reset-form {
   text-align: left;
-  margin-top: 2rem;
+  margin-top: var(--spacing-3xl);
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--spacing-xl);
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #333;
-  font-size: 0.875rem;
+  margin-bottom: var(--spacing-sm);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-700);
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-700);
+  background-color: var(--color-white);
+  transition: all var(--transition-normal);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #ff6b35;
-  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(221, 235, 157, 0.15);
+}
+
+.form-group input::placeholder {
+  color: var(--color-gray-400);
 }
 
 .btn {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--border-radius-md);
   text-decoration: none;
-  font-weight: 600;
-  margin: 0.5rem;
-  transition: all 0.3s;
-  border: 1px solid;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  margin: var(--spacing-sm);
+  transition: all var(--transition-normal);
+  border: var(--border-width-thin) solid;
   cursor: pointer;
-  font-size: 1rem;
 }
 
 .btn-primary {
-  background: #ff6b35;
-  color: white;
-  border-color: #ff6b35;
+  background: var(--color-primary);
+  color: var(--color-quaternary);
+  border-color: var(--color-primary);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #e55a2b;
-  border-color: #e55a2b;
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-primary:disabled {
-  background: #6c757d;
-  border-color: #6c757d;
+  background: var(--color-gray-400);
+  border-color: var(--color-gray-400);
+  color: var(--color-gray-600);
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .btn-outline {
   background: transparent;
-  color: #666;
-  border-color: #666;
+  color: var(--color-tertiary);
+  border-color: var(--color-tertiary);
 }
 
 .btn-outline:hover {
-  background: #666;
-  color: white;
+  background: var(--color-tertiary);
+  color: var(--color-white);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-full {
   width: 100%;
-  margin: 1rem 0;
+  margin: var(--spacing-lg) 0;
 }
 
 .spinner {
-  border: 3px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 3px solid #ff6b35;
+  border: 3px solid var(--color-gray-200);
+  border-radius: var(--border-radius-full);
+  border-top: 3px solid var(--color-primary);
   width: 30px;
   height: 30px;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
+  margin: 0 auto var(--spacing-lg);
 }
 
 @keyframes spin {
@@ -281,30 +308,50 @@ const tryAgain = () => {
 }
 
 .success {
-  color: #28a745;
+  color: var(--color-success);
+}
+
+.success h2 {
+  color: var(--color-success);
 }
 
 .error {
-  color: #dc3545;
+  color: var(--color-error);
+}
+
+.error h2 {
+  color: var(--color-error);
 }
 
 .loading {
-  color: #ff6b35;
+  color: var(--color-tertiary);
+}
+
+.loading h2 {
+  color: var(--color-tertiary);
 }
 
 .invalid-token {
-  color: #dc3545;
+  color: var(--color-error);
+}
+
+.invalid-token h2 {
+  color: var(--color-error);
 }
 
 @media (max-width: 768px) {
+  .reset-container {
+    padding: var(--spacing-lg);
+  }
+  
   .reset-card {
-    padding: 2rem;
-    margin: 1rem;
+    padding: var(--spacing-3xl);
+    margin: var(--spacing-lg);
   }
   
   .btn {
     width: 100%;
-    margin: 0.5rem 0;
+    margin: var(--spacing-sm) 0;
   }
 }
 </style> 

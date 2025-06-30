@@ -32,36 +32,40 @@
 </script>
 
 <style scoped>
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
 /* Footer */
 .footer {
-  background: #333;
-  color: white;
-  padding: 3rem 0 1rem;
+  background: linear-gradient(135deg, var(--color-quaternary) 0%, var(--color-tertiary) 100%);
+  color: var(--color-white);
+  padding: var(--spacing-5xl) 0 var(--spacing-lg);
   margin-top: auto;
 }
 
 .footer-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-bottom: 2rem;
+  gap: var(--spacing-3xl);
+  margin-bottom: var(--spacing-3xl);
 }
 
 .footer-section h3,
 .footer-section h4 {
-  margin: 0 0 1rem 0;
-  color: #fff;
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.footer-section h3 {
+  font-size: var(--font-size-xl);
+}
+
+.footer-section h4 {
+  font-size: var(--font-size-lg);
 }
 
 .footer-section p {
-  margin: 0 0 0.5rem 0;
-  color: #ccc;
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--color-gray-200);
+  line-height: var(--line-height-relaxed);
 }
 
 .footer-section ul {
@@ -70,29 +74,32 @@
 }
 
 .footer-section ul li {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--spacing-sm);
 }
 
 .footer-section ul li a {
-  color: #ccc;
+  color: var(--color-gray-200);
   text-decoration: none;
-  transition: color 0.3s;
+  transition: all var(--transition-normal);
+  padding: var(--spacing-xs) 0;
+  display: inline-block;
 }
 
 .footer-section ul li a:hover {
-  color: #007bff;
+  color: var(--color-primary);
+  transform: translateX(var(--spacing-xs));
 }
 
 .footer-bottom {
   text-align: center;
-  padding-top: 2rem;
-  border-top: 1px solid #555;
+  padding-top: var(--spacing-3xl);
+  border-top: var(--border-width-thin) solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-bottom p {
   margin: 0;
-  color: #999;
-  font-size: 0.875rem;
+  color: var(--color-gray-300);
+  font-size: var(--font-size-sm);
 }
 
 /* Responsive Design */
@@ -100,6 +107,10 @@
   .footer-content {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+  
+  .footer {
+    padding: var(--spacing-4xl) 0 var(--spacing-lg);
   }
 }
 </style> 

@@ -3,6 +3,8 @@ import { createPinia } from 'pinia'
 import axios from 'axios'
 import App from './App.vue'
 import router from './router'
+// Importar estilos globales
+import './assets/styles/variables.css'
 
 // Configuración global de axios
 axios.defaults.baseURL = 'http://localhost:4005'

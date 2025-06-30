@@ -3,7 +3,7 @@
     <section class="hero">
       <div class="container">
         <div class="hero-content">
-          <h1>🛒 Bienvenido a ShopVue</h1>
+          <h1>🛒 Bienvenido a ShopNodeCore</h1>
           <p>Descubre los mejores productos de tecnología con la mejor calidad y precios</p>
           <router-link to="/shop" class="btn btn-primary">
             Explorar Tienda
@@ -14,7 +14,7 @@
 
     <section class="features">
       <div class="container">
-        <h2 class="section-title">¿Por qué elegir ShopVue?</h2>
+        <h2 class="section-title">¿Por qué elegir ShopNodeCore?</h2>
         <div class="features-grid">
           <div class="feature-card">
             <div class="feature-icon">🚀</div>
@@ -107,217 +107,296 @@ const subscribeNewsletter = () => {
 </script>
 
 <style scoped>
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  padding: 150px 0 100px;
+  background: linear-gradient(135deg, var(--color-tertiary) 0%, var(--color-quaternary) 100%);
+  color: var(--color-white);
+  padding: var(--spacing-6xl) 0 var(--spacing-5xl);
   text-align: center;
-  margin-top: 80px;
+  margin-top: var(--header-height);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-content h1 {
-  font-size: 3rem;
-  margin: 0 0 1rem 0;
-  font-weight: 700;
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  margin: 0 0 var(--spacing-lg) 0;
+  background: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .hero-content p {
-  font-size: 1.25rem;
-  margin: 0 0 2rem 0;
-  opacity: 0.9;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-normal);
+  margin: 0 0 var(--spacing-3xl) 0;
+  opacity: 0.95;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  line-height: var(--line-height-relaxed);
 }
 
 /* Features Section */
 .features {
-  padding: 80px 0;
-  background: #f8f9fa;
+  padding: var(--spacing-6xl) 0;
+  background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-primary-light) 100%);
 }
 
 .section-title {
   text-align: center;
-  font-size: 2.5rem;
-  margin: 0 0 3rem 0;
-  color: #333;
-  font-weight: 700;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-5xl) 0;
+  color: var(--color-tertiary);
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -var(--spacing-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
+  border-radius: var(--border-radius-full);
 }
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-3xl);
 }
 
 .feature-card {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
+  background: var(--color-white);
+  padding: var(--spacing-3xl);
+  border-radius: var(--border-radius-xl);
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+  border: var(--border-width-thin) solid var(--color-gray-200);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
+  transform: translateX(-100%);
+  transition: transform var(--transition-normal);
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-var(--spacing-sm));
+  box-shadow: var(--shadow-lg);
+}
+
+.feature-card:hover::before {
+  transform: translateX(0);
 }
 
 .feature-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--spacing-lg);
+  filter: grayscale(0.2);
 }
 
 .feature-card h3 {
-  font-size: 1.25rem;
-  margin: 0 0 1rem 0;
-  color: #333;
-  font-weight: 600;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--color-tertiary);
 }
 
 .feature-card p {
-  color: #666;
-  line-height: 1.6;
+  color: var(--color-gray-600);
+  line-height: var(--line-height-relaxed);
   margin: 0;
+  font-size: var(--font-size-base);
 }
 
 /* Featured Products Section */
 .featured-products {
-  padding: 80px 0;
+  padding: var(--spacing-6xl) 0;
+  background: var(--color-white);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 3rem;
+  margin-bottom: var(--spacing-5xl);
 }
 
 .view-all-link {
-  color: #007bff;
+  color: var(--color-tertiary);
   text-decoration: none;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: color 0.3s;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
+  transition: all var(--transition-normal);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  border: var(--border-width-thin) solid transparent;
 }
 
 .view-all-link:hover {
-  color: #0056b3;
+  color: var(--color-white);
+  background: var(--color-tertiary);
+  border-color: var(--color-tertiary);
+  transform: translateX(var(--spacing-xs));
 }
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-3xl);
 }
 
 /* Newsletter Section */
 .newsletter {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
-  padding: 80px 0;
-  color: white;
+  background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-tertiary) 100%);
+  padding: var(--spacing-6xl) 0;
+  color: var(--color-white);
+  position: relative;
+  overflow: hidden;
+}
+
+.newsletter::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  transform: rotate(45deg);
 }
 
 .newsletter-content {
   text-align: center;
   max-width: 600px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .newsletter-content h2 {
-  font-size: 2rem;
-  margin: 0 0 1rem 0;
-  font-weight: 700;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-lg) 0;
 }
 
 .newsletter-content p {
-  font-size: 1.1rem;
-  margin: 0 0 2rem 0;
-  opacity: 0.9;
+  font-size: var(--font-size-lg);
+  margin: 0 0 var(--spacing-3xl) 0;
+  opacity: 0.95;
+  line-height: var(--line-height-relaxed);
 }
 
 .newsletter-form {
   display: flex;
   max-width: 400px;
   margin: 0 auto;
-  gap: 1rem;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
 }
 
 .newsletter-form input {
   flex: 1;
-  padding: 1rem;
+  min-width: 250px;
+  padding: var(--spacing-lg);
   border: none;
-  border-radius: 6px;
-  font-size: 1rem;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  color: var(--color-gray-700);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
 }
 
 .newsletter-form input:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-md), 0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
-/* Buttons */
-.btn {
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  transition: all 0.3s;
-  font-size: 1rem;
-}
-
-.btn-primary {
-  background: #007bff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #0056b3;
-  transform: translateY(-2px);
+.newsletter-form input::placeholder {
+  color: var(--color-gray-400);
 }
 
 .newsletter .btn-primary {
-  background: white;
-  color: #28a745;
+  background: var(--color-primary);
+  color: var(--color-quaternary);
+  border-color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  min-width: 140px;
 }
 
 .newsletter .btn-primary:hover {
-  background: #f8f9fa;
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .hero {
+    padding: var(--spacing-5xl) 0 var(--spacing-4xl);
+  }
+  
   .hero-content h1 {
-    font-size: 2rem;
+    font-size: var(--font-size-3xl);
   }
   
   .hero-content p {
-    font-size: 1rem;
+    font-size: var(--font-size-lg);
   }
   
   .section-title {
-    font-size: 2rem;
+    font-size: var(--font-size-2xl);
   }
   
   .section-header {
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--spacing-lg);
     text-align: center;
   }
   
   .newsletter-form {
     flex-direction: column;
+    align-items: center;
+  }
+  
+  .newsletter-form input {
+    min-width: unset;
+    width: 100%;
   }
   
   .features-grid {
@@ -325,7 +404,28 @@ const subscribeNewsletter = () => {
   }
   
   .products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-xl);
+  }
+  
+  .features,
+  .featured-products,
+  .newsletter {
+    padding: var(--spacing-5xl) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .feature-card {
+    padding: var(--spacing-xl);
+  }
+  
+  .newsletter-content h2 {
+    font-size: var(--font-size-2xl);
   }
 }
 </style> 

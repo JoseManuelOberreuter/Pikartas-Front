@@ -277,68 +277,29 @@ const handleForgotPassword = async () => {
 </script>
 
 <style scoped>
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  animation: fadeIn 0.3s forwards;
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
-}
-
-.modal {
-  background: white;
-  border-radius: 12px;
-  max-width: 400px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  transform: translateY(20px);
-  animation: slideUp 0.3s forwards;
-}
-
-@keyframes slideUp {
-  to {
-    transform: translateY(0);
-  }
-}
-
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #eee;
-  background: #f8f9fa;
-  border-radius: 12px 12px 0 0;
+  padding: var(--spacing-2xl);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+  background: var(--color-gray-100);
+  border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
 }
 
 .modal-header h2 {
   margin: 0;
-  color: #333;
-  font-size: 1.25rem;
+  color: var(--color-tertiary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 2rem;
+  font-size: var(--font-size-3xl);
   cursor: pointer;
-  color: #666;
+  color: var(--color-gray-500);
   line-height: 1;
   padding: 0;
   width: 32px;
@@ -346,109 +307,90 @@ const handleForgotPassword = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: background 0.3s;
+  border-radius: var(--border-radius-full);
+  transition: all var(--transition-normal);
 }
 
 .close-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--color-gray-200);
+  color: var(--color-gray-700);
 }
 
 .auth-form {
-  padding: 2rem;
+  padding: var(--spacing-3xl);
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--spacing-xl);
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #333;
-  font-size: 0.875rem;
+  margin-bottom: var(--spacing-sm);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-700);
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-700);
+  background-color: var(--color-white);
+  transition: all var(--transition-normal);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(221, 235, 157, 0.15);
 }
 
-.btn {
-  padding: 0.75rem 1.5rem;
-  border: 1px solid #007bff;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 1rem;
-}
-
-.btn-primary {
-  background: #007bff;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #0056b3;
-  transform: translateY(-1px);
-}
-
-.btn-primary:disabled {
-  background: #6c757d;
-  border-color: #6c757d;
-  cursor: not-allowed;
-}
-
-.btn-full {
-  width: 100%;
-  margin-bottom: 1rem;
+.form-group input::placeholder {
+  color: var(--color-gray-400);
 }
 
 .auth-switch {
   text-align: center;
   margin: 0;
-  color: #666;
-  font-size: 0.875rem;
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
 }
 
 .auth-switch a {
-  color: #007bff;
+  color: var(--color-tertiary);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
+  transition: color var(--transition-normal);
 }
 
 .auth-switch a:hover {
+  color: var(--color-tertiary-dark);
   text-decoration: underline;
 }
 
 .forgot-password {
   text-align: center;
-  margin: 0 0 1rem 0;
-  color: #666;
-  font-size: 0.875rem;
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
 }
 
 .forgot-password a {
-  color: #007bff;
+  color: var(--color-secondary);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
+  transition: color var(--transition-normal);
 }
 
 .forgot-password a:hover {
+  color: var(--color-secondary-dark);
   text-decoration: underline;
 }
 
@@ -456,11 +398,11 @@ const handleForgotPassword = async () => {
 @media (max-width: 768px) {
   .modal {
     width: 95%;
-    margin: 1rem;
+    margin: var(--spacing-lg);
   }
   
   .auth-form {
-    padding: 1.5rem;
+    padding: var(--spacing-2xl);
   }
 }
 </style> 

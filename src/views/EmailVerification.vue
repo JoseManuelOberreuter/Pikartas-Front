@@ -64,71 +64,83 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f9fa;
-  padding: 2rem;
+  background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-secondary-light) 100%);
+  padding: var(--spacing-3xl);
 }
 
 .verification-card {
-  background: white;
-  padding: 3rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: var(--color-white);
+  padding: var(--spacing-5xl);
+  border-radius: var(--border-radius-2xl);
+  box-shadow: var(--shadow-lg);
   text-align: center;
   max-width: 500px;
   width: 100%;
+  border: var(--border-width-thin) solid var(--color-gray-200);
 }
 
 .verification-card h2 {
-  margin-bottom: 1rem;
-  color: #333;
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-tertiary);
+  font-weight: var(--font-weight-semibold);
 }
 
 .verification-card p {
-  margin-bottom: 2rem;
-  color: #666;
-  line-height: 1.6;
+  margin-bottom: var(--spacing-3xl);
+  color: var(--color-gray-600);
+  line-height: var(--line-height-relaxed);
+  font-size: var(--font-size-base);
 }
 
 .btn {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--border-radius-md);
   text-decoration: none;
-  font-weight: 600;
-  margin-top: 1rem;
-  transition: all 0.3s;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  margin-top: var(--spacing-lg);
+  transition: all var(--transition-normal);
+  border: var(--border-width-thin) solid;
 }
 
 .btn-primary {
-  background: #007bff;
-  color: white;
-  border: 1px solid #007bff;
+  background: var(--color-primary);
+  color: var(--color-quaternary);
+  border-color: var(--color-primary);
 }
 
 .btn-primary:hover {
-  background: #0056b3;
-  border-color: #0056b3;
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-outline {
   background: transparent;
-  color: #666;
-  border: 1px solid #666;
+  color: var(--color-tertiary);
+  border-color: var(--color-tertiary);
 }
 
 .btn-outline:hover {
-  background: #666;
-  color: white;
+  background: var(--color-tertiary);
+  color: var(--color-white);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .spinner {
-  border: 3px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 3px solid #007bff;
+  border: 3px solid var(--color-gray-200);
+  border-radius: var(--border-radius-full);
+  border-top: 3px solid var(--color-secondary);
   width: 30px;
   height: 30px;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
+  margin: 0 auto var(--spacing-lg);
 }
 
 @keyframes spin {
@@ -137,21 +149,37 @@ onMounted(async () => {
 }
 
 .success {
-  color: #28a745;
+  color: var(--color-success);
+}
+
+.success h2 {
+  color: var(--color-success);
 }
 
 .error {
-  color: #dc3545;
+  color: var(--color-error);
+}
+
+.error h2 {
+  color: var(--color-error);
 }
 
 .verifying {
-  color: #007bff;
+  color: var(--color-secondary);
+}
+
+.verifying h2 {
+  color: var(--color-secondary);
 }
 
 @media (max-width: 768px) {
+  .verification-container {
+    padding: var(--spacing-lg);
+  }
+  
   .verification-card {
-    padding: 2rem;
-    margin: 1rem;
+    padding: var(--spacing-3xl);
+    margin: var(--spacing-lg);
   }
 }
 </style> 
