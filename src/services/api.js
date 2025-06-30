@@ -35,15 +35,42 @@ export const authService = {
   async register(userData) {
     try {
       console.log('Sending registration data:', userData);
-      // Ya no necesitamos la URL completa porque está en la configuración global
       const response = await axios.post('/users/register', userData);
+      
+      // Tu backend NO devuelve token inmediatamente, requiere verificación
+      // No guardamos token aquí porque el usuario no está verificado
+      
+      return response.data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      // Propagar el error específico del backend
+      throw error.response?.data || { error: error.message };
+    }
+  },
+  
+  async login(credentials) {
+    try {
+      const response = await axios.post('/users/login', credentials);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
       return response.data;
     } catch (error) {
-      console.error('Registration error:', error);
-      throw error.response?.data || error.message;
+      console.error('Login error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+  
+  async verifyEmail(token) {
+    try {
+      const response = await axios.post('/users/verify', { token });
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+      return response.data;
+    } catch (error) {
+      console.error('Verification error:', error);
+      throw error.response?.data || { error: error.message };
     }
   }
 }; 

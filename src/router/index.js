@@ -5,6 +5,7 @@ import ProductDetail from '../views/ProductDetail.vue'
 import Cart from '../views/Cart.vue'
 import Checkout from '../views/Checkout.vue'
 import RegisterView from '../views/RegisterView.vue'
+import EmailVerification from '../views/EmailVerification.vue'
 
 const routes = [
   {
@@ -37,6 +38,11 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: RegisterView
+  },
+  {
+    path: '/verify-email',
+    name: 'EmailVerification',
+    component: EmailVerification
   }
 ]
 

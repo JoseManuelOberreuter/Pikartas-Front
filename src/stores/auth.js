@@ -19,8 +19,47 @@ export const useAuthStore = defineStore('auth', () => {
       loading.value = true;
       error.value = null;
       const response = await authService.register(userData);
+      
+      // No establecemos usuario como autenticado hasta que verifique email
+      // user.value = response.user;
+      // isAuthenticated.value = false; // Requiere verificación
+      
+      return response;
+    } catch (err) {
+      error.value = err;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function login(credentials) {
+    try {
+      loading.value = true;
+      error.value = null;
+      const response = await authService.login(credentials);
+      
       user.value = response.user;
       isAuthenticated.value = true;
+      
+      return response;
+    } catch (err) {
+      error.value = err;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function verifyEmail(token) {
+    try {
+      loading.value = true;
+      error.value = null;
+      const response = await authService.verifyEmail(token);
+      
+      user.value = response.user;
+      isAuthenticated.value = true;
+      
       return response;
     } catch (err) {
       error.value = err;
@@ -42,6 +81,8 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     isAuthenticated,
     register,
+    login,
+    verifyEmail,
     logout
   };
 }); 

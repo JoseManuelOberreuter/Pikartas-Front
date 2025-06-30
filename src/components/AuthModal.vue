@@ -153,15 +153,26 @@ const switchToLogin = () => {
 }
 
 // Auth form handlers
-const handleLogin = () => {
+const handleLogin = async () => {
   // Basic validation
   if (!loginForm.email || !loginForm.password) {
     alert('Por favor completa todos los campos')
     return
   }
   
-  alert(`¡Bienvenido! Has iniciado sesión con: ${loginForm.email}`)
-  closeModals()
+  try {
+    const response = await authStore.login({
+      email: loginForm.email,
+      password: loginForm.password
+    })
+    
+    alert(`¡Bienvenido ${response.user.name}! Has iniciado sesión exitosamente.`)
+    closeModals()
+  } catch (error) {
+    // Mostrar el error específico del backend
+    const errorMessage = error.error || error.message || 'Error al iniciar sesión'
+    alert('Error: ' + errorMessage)
+  }
 }
 
 const handleRegister = async () => {
@@ -182,15 +193,19 @@ const handleRegister = async () => {
   }
   
   try {
-    await authStore.register({
+    const response = await authStore.register({
       name: registerForm.name,
       email: registerForm.email,
       password: registerForm.password
     })
-    alert(`¡Registro exitoso! Bienvenido ${registerForm.name}`)
+    
+    // Mensaje específico para verificación de email
+    alert(`¡Registro exitoso! ${response.message}\n\nRevisa tu correo electrónico para verificar tu cuenta.`)
     closeModals()
   } catch (error) {
-    alert('Error en el registro: ' + (error.message || 'Intenta nuevamente'))
+    // Mostrar el error específico del backend
+    const errorMessage = error.error || error.message || 'Error en el registro'
+    alert('Error: ' + errorMessage)
   }
 }
 </script>
