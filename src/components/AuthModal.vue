@@ -28,6 +28,9 @@
           >
         </div>
         <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
+        <p class="forgot-password">
+          <a href="#" @click.prevent="switchToForgotPassword">¿Olvidaste tu contraseña?</a>
+        </p>
         <p class="auth-switch">
           ¿No tienes cuenta? 
           <a href="#" @click.prevent="switchToRegister">Regístrate aquí</a>
@@ -99,6 +102,39 @@
       </form>
     </div>
   </div>
+
+  <!-- Forgot Password Modal -->
+  <div v-if="showForgotPasswordModal" class="modal-overlay" @click="closeModals">
+    <div class="modal" @click.stop>
+      <div class="modal-header">
+        <h2>Recuperar Contraseña</h2>
+        <button class="close-btn" @click="closeModals">&times;</button>
+      </div>
+      <form @submit.prevent="handleForgotPassword" class="auth-form">
+        <div class="form-group">
+          <label for="forgotEmail">Email</label>
+          <input 
+            type="email" 
+            id="forgotEmail"
+            v-model="forgotPasswordForm.email" 
+            placeholder="tu@email.com" 
+            required
+          >
+        </div>
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-full"
+          :disabled="authStore.loading"
+        >
+          {{ authStore.loading ? 'Enviando...' : 'Enviar Email de Recuperación' }}
+        </button>
+        <p class="auth-switch">
+          ¿Recordaste tu contraseña? 
+          <a href="#" @click.prevent="switchToLogin">Inicia sesión aquí</a>
+        </p>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -114,11 +150,15 @@ defineProps({
   showRegisterModal: {
     type: Boolean,
     default: false
+  },
+  showForgotPasswordModal: {
+    type: Boolean,
+    default: false
   }
 })
 
 // Emits
-const emit = defineEmits(['close-modals', 'switch-to-register', 'switch-to-login'])
+const emit = defineEmits(['close-modals', 'switch-to-register', 'switch-to-login', 'switch-to-forgot-password'])
 
 // Store
 const authStore = useAuthStore()
@@ -136,12 +176,17 @@ const registerForm = reactive({
   confirmPassword: ''
 })
 
+const forgotPasswordForm = reactive({
+  email: ''
+})
+
 // Modal functions
 const closeModals = () => {
   emit('close-modals')
   // Reset forms
   Object.assign(loginForm, { email: '', password: '' })
   Object.assign(registerForm, { name: '', email: '', password: '', confirmPassword: '' })
+  Object.assign(forgotPasswordForm, { email: '' })
 }
 
 const switchToRegister = () => {
@@ -150,6 +195,10 @@ const switchToRegister = () => {
 
 const switchToLogin = () => {
   emit('switch-to-login')
+}
+
+const switchToForgotPassword = () => {
+  emit('switch-to-forgot-password')
 }
 
 // Auth form handlers
@@ -205,6 +254,23 @@ const handleRegister = async () => {
   } catch (error) {
     // Mostrar el error específico del backend
     const errorMessage = error.error || error.message || 'Error en el registro'
+    alert('Error: ' + errorMessage)
+  }
+}
+
+const handleForgotPassword = async () => {
+  // Basic validation
+  if (!forgotPasswordForm.email) {
+    alert('Por favor ingresa tu email')
+    return
+  }
+
+  try {
+    const response = await authStore.requestPasswordReset(forgotPasswordForm.email)
+    alert(response.message)
+    closeModals()
+  } catch (error) {
+    const errorMessage = error.error || error.message || 'Error al solicitar recuperación'
     alert('Error: ' + errorMessage)
   }
 }
@@ -366,6 +432,23 @@ const handleRegister = async () => {
 }
 
 .auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.forgot-password {
+  text-align: center;
+  margin: 0 0 1rem 0;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.forgot-password a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.forgot-password a:hover {
   text-decoration: underline;
 }
 

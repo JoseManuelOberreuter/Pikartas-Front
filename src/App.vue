@@ -10,9 +10,11 @@
     <AuthModal
       :show-login-modal="showLoginModal"
       :show-register-modal="showRegisterModal"
+      :show-forgot-password-modal="showForgotPasswordModal"
       @close-modals="closeModals"
       @switch-to-register="switchToRegister"
       @switch-to-login="switchToLogin"
+      @switch-to-forgot-password="switchToForgotPassword"
     />
 
     <!-- Main Content - Router View -->
@@ -38,6 +40,7 @@ import Footer from './components/Footer.vue'
 // Auth modals state
 const showLoginModal = ref(false)
 const showRegisterModal = ref(false)
+const showForgotPasswordModal = ref(false)
 
 // Modal functions
 const openLoginModal = () => {
@@ -53,6 +56,7 @@ const openRegisterModal = () => {
 const closeModals = () => {
   showLoginModal.value = false
   showRegisterModal.value = false
+  showForgotPasswordModal.value = false
 }
 
 const switchToRegister = () => {
@@ -62,7 +66,14 @@ const switchToRegister = () => {
 
 const switchToLogin = () => {
   showRegisterModal.value = false
+  showForgotPasswordModal.value = false
   showLoginModal.value = true
+}
+
+const switchToForgotPassword = () => {
+  showLoginModal.value = false
+  showRegisterModal.value = false
+  showForgotPasswordModal.value = true
 }
 </script>
 

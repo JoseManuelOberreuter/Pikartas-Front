@@ -75,6 +75,34 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated.value = false;
   }
 
+  async function requestPasswordReset(email) {
+    try {
+      loading.value = true;
+      error.value = null;
+      const response = await authService.requestPasswordReset(email);
+      return response;
+    } catch (err) {
+      error.value = err;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function resetPassword(token, password) {
+    try {
+      loading.value = true;
+      error.value = null;
+      const response = await authService.resetPassword(token, password);
+      return response;
+    } catch (err) {
+      error.value = err;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     user,
     error,
@@ -83,6 +111,8 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     login,
     verifyEmail,
+    requestPasswordReset,
+    resetPassword,
     logout
   };
 }); 

@@ -72,5 +72,25 @@ export const authService = {
       console.error('Verification error:', error);
       throw error.response?.data || { error: error.message };
     }
+  },
+
+  async requestPasswordReset(email) {
+    try {
+      const response = await axios.post('/users/reset-password-request', { email });
+      return response.data;
+    } catch (error) {
+      console.error('Password reset request error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async resetPassword(token, password) {
+    try {
+      const response = await axios.post(`/users/reset-password/${token}`, { password });
+      return response.data;
+    } catch (error) {
+      console.error('Password reset error:', error);
+      throw error.response?.data || { error: error.message };
+    }
   }
 }; 
