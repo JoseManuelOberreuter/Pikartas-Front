@@ -98,6 +98,17 @@ export const authService = {
       console.error('Password reset error:', error);
       throw error.response?.data || { error: error.message };
     }
+  },
+
+  async getUserProfile(identifier) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.getUserProfileUrl(identifier));
+      return response.data;
+    } catch (error) {
+      console.error('Get user profile error:', error);
+      throw error.response?.data || { error: error.message };
+    }
   }
 };
 

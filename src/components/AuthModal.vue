@@ -215,7 +215,9 @@ const handleLogin = async () => {
       password: loginForm.password
     })
     
-    alert(`¡Bienvenido ${response.user.name}! Has iniciado sesión exitosamente.`)
+    // Usar el nombre del usuario desde el store después del login exitoso
+    const userName = authStore.user?.name || 'Usuario'
+    alert(`¡Bienvenido ${userName}! Has iniciado sesión exitosamente.`)
     closeModals()
   } catch (error) {
     // Mostrar el error específico del backend

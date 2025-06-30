@@ -29,8 +29,67 @@
             </button>
           </div>
           
+          <!-- Auth Section - Mostrar perfil o botones según estado de auth -->
           <div class="auth-section">
-            <div class="auth-buttons">
+            <!-- Usuario autenticado - Mostrar perfil -->
+            <div v-if="authStore.isAuthenticated && !authStore.loading" class="user-profile" @click="toggleUserMenu">
+              <div class="user-avatar">
+                <span class="avatar-icon">👤</span>
+              </div>
+              <div class="user-info">
+                <span class="user-name">{{ getUserDisplayName }}</span>
+                <span class="user-status">En línea</span>
+              </div>
+              <span class="dropdown-arrow" :class="{ 'dropdown-arrow-open': userMenuOpen }">▼</span>
+              
+              <!-- Menú desplegable del usuario -->
+              <div class="user-menu" :class="{ 'user-menu-open': userMenuOpen }">
+                <div class="user-menu-header">
+                  <div class="user-avatar-large">
+                    <span class="avatar-icon-large">👤</span>
+                  </div>
+                  <div class="user-details">
+                    <h3 class="user-menu-name">{{ getUserDisplayName }}</h3>
+                                         <p class="user-menu-email">{{ authStore.user?.email || 'Sin email' }}</p>
+                  </div>
+                </div>
+                <div class="user-menu-separator"></div>
+                <ul class="user-menu-items">
+                  <li>
+                    <button class="user-menu-item" @click="goToProfile">
+                      <span class="menu-icon">👤</span>
+                      <span>Mi Perfil</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button class="user-menu-item" @click="goToOrders">
+                      <span class="menu-icon">📦</span>
+                      <span>Mis Pedidos</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button class="user-menu-item" @click="goToSettings">
+                      <span class="menu-icon">⚙️</span>
+                      <span>Configuración</span>
+                    </button>
+                  </li>
+                </ul>
+                <div class="user-menu-separator"></div>
+                <button class="user-menu-item logout-btn" @click="handleLogout">
+                  <span class="menu-icon">🚪</span>
+                  <span>Cerrar Sesión</span>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Loading state -->
+            <div v-else-if="authStore.loading" class="auth-loading">
+              <span class="loading-spinner">🔄</span>
+              <span class="loading-text">Cargando...</span>
+            </div>
+            
+            <!-- Usuario no autenticado - Mostrar botones -->
+            <div v-else class="auth-buttons">
               <button class="btn btn-outline btn-sm" @click="openLoginModal">
                 <span class="btn-text">Iniciar Sesión</span>
               </button>
@@ -57,13 +116,39 @@
           <li><router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">Inicio</router-link></li>
           <li><router-link to="/shop" class="mobile-nav-link" @click="closeMobileMenu">Tienda</router-link></li>
         </ul>
-        <div class="mobile-auth-buttons">
-          <button class="btn btn-outline btn-full" @click="openLoginModal(); closeMobileMenu()">
-            Iniciar Sesión
-          </button>
-          <button class="btn btn-primary btn-full" @click="openRegisterModal(); closeMobileMenu()">
-            Registrarse
-          </button>
+        
+        <!-- Mobile Auth Section -->
+        <div class="mobile-auth-section">
+          <!-- Usuario autenticado en móvil -->
+          <div v-if="authStore.isAuthenticated && !authStore.loading" class="mobile-user-profile">
+            <div class="mobile-user-info">
+              <div class="user-avatar">
+                <span class="avatar-icon">👤</span>
+              </div>
+              <div class="mobile-user-details">
+                <h3 class="mobile-user-name">{{ getUserDisplayName }}</h3>
+                                 <p class="mobile-user-email">{{ authStore.user?.email || 'Sin email' }}</p>
+              </div>
+            </div>
+            <div class="mobile-user-actions">
+              <button class="btn btn-outline btn-full" @click="goToProfile(); closeMobileMenu()">
+                Mi Perfil
+              </button>
+              <button class="btn btn-tertiary btn-full" @click="handleLogout(); closeMobileMenu()">
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+          
+          <!-- Usuario no autenticado en móvil -->
+          <div v-else class="mobile-auth-buttons">
+            <button class="btn btn-outline btn-full" @click="openLoginModal(); closeMobileMenu()">
+              Iniciar Sesión
+            </button>
+            <button class="btn btn-primary btn-full" @click="openRegisterModal(); closeMobileMenu()">
+              Registrarse
+            </button>
+          </div>
         </div>
       </div>
     </nav>
@@ -71,12 +156,34 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { cartItemCount, toggleCart } from '../stores/cart.js'
+import { useAuthStore } from '../stores/auth.js'
+
+const router = useRouter()
+const authStore = useAuthStore()
 
 const emit = defineEmits(['open-login', 'open-register'])
 const mobileMenuOpen = ref(false)
+const userMenuOpen = ref(false)
 
+// Computed para obtener el nombre del usuario para mostrar
+const getUserDisplayName = computed(() => {
+  try {
+    // Usar operador de encadenamiento opcional para mayor seguridad
+    const userName = authStore?.user?.name
+    if (userName && typeof userName === 'string') {
+      return userName.length > 15 ? userName.split(' ')[0] : userName
+    }
+    return 'Usuario'
+  } catch (error) {
+    console.error('Error getting user display name:', error)
+    return 'Usuario'
+  }
+})
+
+// Funciones de modales
 const openLoginModal = () => {
   emit('open-login')
 }
@@ -85,13 +192,65 @@ const openRegisterModal = () => {
   emit('open-register')
 }
 
+// Funciones de menú móvil
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value
+  // Cerrar menú de usuario si está abierto
+  if (userMenuOpen.value) {
+    userMenuOpen.value = false
+  }
 }
 
 const closeMobileMenu = () => {
   mobileMenuOpen.value = false
 }
+
+// Funciones de menú de usuario
+const toggleUserMenu = () => {
+  userMenuOpen.value = !userMenuOpen.value
+}
+
+const closeUserMenu = () => {
+  userMenuOpen.value = false
+}
+
+// Funciones de navegación del usuario
+const goToProfile = () => {
+  closeUserMenu()
+  router.push('/profile')
+}
+
+const goToOrders = () => {
+  closeUserMenu()
+  router.push('/orders')
+}
+
+const goToSettings = () => {
+  closeUserMenu()
+  router.push('/settings')
+}
+
+const handleLogout = () => {
+  authStore.logout()
+  closeUserMenu()
+  router.push('/')
+}
+
+// Cerrar menú de usuario al hacer clic fuera
+const handleClickOutside = (event) => {
+  const userProfile = document.querySelector('.user-profile')
+  if (userProfile && !userProfile.contains(event.target)) {
+    closeUserMenu()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
@@ -265,8 +424,215 @@ const closeMobileMenu = () => {
 .auth-section {
   border-left: var(--border-width-thin) solid var(--color-gray-200);
   padding-left: var(--spacing-xl);
+  position: relative;
 }
 
+/* === USER PROFILE SECTION === */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border: var(--border-width-thin) solid transparent;
+  background: linear-gradient(135deg, rgba(221, 235, 157, 0.1), rgba(160, 200, 120, 0.05));
+  position: relative;
+}
+
+.user-profile:hover {
+  background: linear-gradient(135deg, rgba(221, 235, 157, 0.15), rgba(160, 200, 120, 0.1));
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--border-radius-full);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.avatar-icon {
+  font-size: var(--font-size-lg);
+  color: var(--color-quaternary);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-quaternary);
+  line-height: 1.2;
+}
+
+.user-status {
+  font-size: var(--font-size-xs);
+  color: var(--color-success);
+  font-weight: var(--font-weight-medium);
+}
+
+.dropdown-arrow {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  transition: transform var(--transition-normal);
+  margin-left: var(--spacing-xs);
+}
+
+.dropdown-arrow-open {
+  transform: rotate(180deg);
+}
+
+/* === USER MENU DROPDOWN === */
+.user-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-xl);
+  border: var(--border-width-thin) solid var(--color-gray-200);
+  min-width: 280px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all var(--transition-normal);
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+}
+
+.user-menu-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-menu-header {
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.user-avatar-large {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius-full);
+  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+}
+
+.avatar-icon-large {
+  font-size: var(--font-size-xl);
+  color: var(--color-quaternary);
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-menu-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-quaternary);
+  margin: 0 0 4px 0;
+}
+
+.user-menu-email {
+  font-size: var(--font-size-xs);
+  color: var(--color-quaternary);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.user-menu-separator {
+  height: 1px;
+  background: var(--color-gray-200);
+  margin: 0;
+}
+
+.user-menu-items {
+  list-style: none;
+  margin: 0;
+  padding: var(--spacing-sm) 0;
+}
+
+.user-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+}
+
+.user-menu-item:hover {
+  background: var(--color-gray-100);
+  color: var(--color-tertiary);
+}
+
+.logout-btn {
+  color: var(--color-error);
+  margin-top: var(--spacing-sm);
+}
+
+.logout-btn:hover {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--color-error);
+}
+
+.menu-icon {
+  font-size: var(--font-size-base);
+  width: 20px;
+  text-align: center;
+}
+
+/* === AUTH LOADING === */
+.auth-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  font-size: var(--font-size-base);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-weight: var(--font-weight-medium);
+}
+
+/* === AUTH BUTTONS === */
 .auth-buttons {
   display: flex;
   gap: var(--spacing-md);
@@ -317,6 +683,24 @@ const closeMobileMenu = () => {
   border-color: var(--color-primary-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+}
+
+.btn-tertiary {
+  background: var(--color-tertiary);
+  color: var(--color-white);
+  border-color: var(--color-tertiary);
+}
+
+.btn-tertiary:hover {
+  background: var(--color-tertiary-dark);
+  border-color: var(--color-tertiary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-full {
+  width: 100%;
+  justify-content: center;
 }
 
 /* === MOBILE MENU === */
@@ -398,6 +782,50 @@ const closeMobileMenu = () => {
   background: rgba(221, 235, 157, 0.1);
 }
 
+/* === MOBILE USER PROFILE === */
+.mobile-auth-section {
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+  padding-top: var(--spacing-xl);
+}
+
+.mobile-user-profile {
+  text-align: center;
+}
+
+.mobile-user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(221, 235, 157, 0.1), rgba(160, 200, 120, 0.05));
+  border-radius: var(--border-radius-lg);
+}
+
+.mobile-user-details {
+  flex: 1;
+  text-align: left;
+}
+
+.mobile-user-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-quaternary);
+  margin: 0 0 4px 0;
+}
+
+.mobile-user-email {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin: 0;
+}
+
+.mobile-user-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
 .mobile-auth-buttons {
   display: flex;
   flex-direction: column;
@@ -439,6 +867,14 @@ const closeMobileMenu = () => {
   .btn {
     min-width: 40px;
     padding: var(--spacing-sm);
+  }
+  
+  .user-info {
+    display: none;
+  }
+  
+  .dropdown-arrow {
+    display: none;
   }
 }
 
@@ -482,6 +918,12 @@ const closeMobileMenu = () => {
   .auth-buttons {
     flex-direction: column;
     gap: var(--spacing-xs);
+  }
+  
+  .user-menu {
+    left: 0;
+    right: 0;
+    min-width: auto;
   }
 }
 </style> 
