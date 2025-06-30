@@ -140,6 +140,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import { useNotifications } from '../composables/useNotifications'
 
 // Props
 defineProps({
@@ -162,6 +163,7 @@ const emit = defineEmits(['close-modals', 'switch-to-register', 'switch-to-login
 
 // Store
 const authStore = useAuthStore()
+const { success, error, warning, info } = useNotifications()
 
 // Auth forms data
 const loginForm = reactive({
@@ -205,7 +207,7 @@ const switchToForgotPassword = () => {
 const handleLogin = async () => {
   // Basic validation
   if (!loginForm.email || !loginForm.password) {
-    alert('Por favor completa todos los campos')
+    warning('Por favor completa todos los campos')
     return
   }
   
@@ -217,29 +219,29 @@ const handleLogin = async () => {
     
     // Usar el nombre del usuario desde el store después del login exitoso
     const userName = authStore.user?.name || 'Usuario'
-    alert(`¡Bienvenido ${userName}! Has iniciado sesión exitosamente.`)
+    success(`¡Bienvenido ${userName}! Has iniciado sesión exitosamente.`)
     closeModals()
-  } catch (error) {
+  } catch (err) {
     // Mostrar el error específico del backend
-    const errorMessage = error.error || error.message || 'Error al iniciar sesión'
-    alert('Error: ' + errorMessage)
+    const errorMessage = err.error || err.message || 'Error al iniciar sesión'
+    error('Error: ' + errorMessage)
   }
 }
 
 const handleRegister = async () => {
   // Basic validation
   if (!registerForm.name || !registerForm.email || !registerForm.password || !registerForm.confirmPassword) {
-    alert('Por favor completa todos los campos')
+    warning('Por favor completa todos los campos')
     return
   }
   
   if (registerForm.password !== registerForm.confirmPassword) {
-    alert('Las contraseñas no coinciden')
+    error('Las contraseñas no coinciden')
     return
   }
   
   if (registerForm.password.length < 6) {
-    alert('La contraseña debe tener al menos 6 caracteres')
+    warning('La contraseña debe tener al menos 6 caracteres')
     return
   }
   
@@ -251,29 +253,29 @@ const handleRegister = async () => {
     })
     
     // Mensaje específico para verificación de email
-    alert(`¡Registro exitoso! ${response.message}\n\nRevisa tu correo electrónico para verificar tu cuenta.`)
+    success(`¡Registro exitoso! ${response.message}\n\nRevisa tu correo electrónico para verificar tu cuenta.`, 8000)
     closeModals()
-  } catch (error) {
+  } catch (err) {
     // Mostrar el error específico del backend
-    const errorMessage = error.error || error.message || 'Error en el registro'
-    alert('Error: ' + errorMessage)
+    const errorMessage = err.error || err.message || 'Error en el registro'
+    error('Error: ' + errorMessage)
   }
 }
 
 const handleForgotPassword = async () => {
   // Basic validation
   if (!forgotPasswordForm.email) {
-    alert('Por favor ingresa tu email')
+    warning('Por favor ingresa tu email')
     return
   }
 
   try {
     const response = await authStore.requestPasswordReset(forgotPasswordForm.email)
-    alert(response.message)
+    success(response.message)
     closeModals()
-  } catch (error) {
-    const errorMessage = error.error || error.message || 'Error al solicitar recuperación'
-    alert('Error: ' + errorMessage)
+  } catch (err) {
+    const errorMessage = err.error || err.message || 'Error al solicitar recuperación'
+    error('Error: ' + errorMessage)
   }
 }
 </script>

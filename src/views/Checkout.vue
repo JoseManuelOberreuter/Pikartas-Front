@@ -249,8 +249,10 @@ import {
   cartItemCount, 
   clearCart 
 } from '../stores/cart.js'
+import { useNotifications } from '../composables/useNotifications'
 
 const router = useRouter()
+const { success, error } = useNotifications()
 
 // Form data
 const shippingForm = reactive({
@@ -304,18 +306,13 @@ const submitOrder = async () => {
     clearCart()
     
     // Show success message
-    alert(`¡Pedido realizado con éxito! 
-    
-Total: $${finalTotal.value.toFixed(2)}
-Envío a: ${shippingForm.address}, ${shippingForm.city}
-
-Recibirás un email de confirmación en ${shippingForm.email}`)
+    success(`¡Pedido realizado con éxito!\n\nTotal: $${finalTotal.value.toFixed(2)}\nEnvío a: ${shippingForm.address}, ${shippingForm.city}\n\nRecibirás un email de confirmación en ${shippingForm.email}`, 8000)
     
     // Redirect to home
     router.push('/')
     
-  } catch (error) {
-    alert('Error al procesar el pedido. Por favor, intenta nuevamente.')
+  } catch (err) {
+    error('Error al procesar el pedido. Por favor, intenta nuevamente.')
   } finally {
     isProcessing.value = false
   }

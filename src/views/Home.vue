@@ -85,8 +85,10 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { products } from '../data/products.js'
 import ProductCard from '../components/ProductCard.vue'
+import { useNotifications } from '../composables/useNotifications'
 
 const router = useRouter()
+const { success } = useNotifications()
 const emailSubscription = ref('')
 
 // Mostrar solo los 4 productos con mejor rating
@@ -101,7 +103,7 @@ const viewProduct = (productId) => {
 }
 
 const subscribeNewsletter = () => {
-  alert(`¡Gracias por suscribirte con ${emailSubscription.value}!`)
+  success(`¡Gracias por suscribirte con ${emailSubscription.value}!`)
   emailSubscription.value = ''
 }
 </script>

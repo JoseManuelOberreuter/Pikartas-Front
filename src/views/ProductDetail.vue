@@ -114,9 +114,11 @@ import { useRoute, useRouter } from 'vue-router'
 import { products } from '../data/products.js'
 import { addToCart as addToCartStore } from '../stores/cart.js'
 import ProductCard from '../components/ProductCard.vue'
+import { useNotifications } from '../composables/useNotifications'
 
 const route = useRoute()
 const router = useRouter()
+const { success } = useNotifications()
 
 const quantity = ref(1)
 
@@ -161,7 +163,7 @@ const addToCart = () => {
     for (let i = 0; i < quantity.value; i++) {
       addToCartStore(product.value)
     }
-    alert(`¡${quantity.value} ${product.value.name} agregado${quantity.value > 1 ? 's' : ''} al carrito!`)
+    success(`¡${quantity.value} ${product.value.name} agregado${quantity.value > 1 ? 's' : ''} al carrito!`)
     quantity.value = 1
   }
 }

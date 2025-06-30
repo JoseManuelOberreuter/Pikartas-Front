@@ -27,6 +27,9 @@
 
     <!-- Footer Component -->
     <Footer />
+
+    <!-- Notification Container -->
+    <NotificationContainer />
   </div>
 </template>
 
@@ -36,6 +39,7 @@ import Header from './components/Header.vue'
 import CartSidebar from './components/CartSidebar.vue'
 import AuthModal from './components/AuthModal.vue'
 import Footer from './components/Footer.vue'
+import NotificationContainer from './components/NotificationContainer.vue'
 
 // Auth modals state
 const showLoginModal = ref(false)
