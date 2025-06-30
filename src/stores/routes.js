@@ -44,6 +44,7 @@ export const useRoutesStore = defineStore('routes', () => {
     resetPasswordRequest: '/users/reset-password-request',
     resetPassword: '/users/reset-password',
     profile: '/users/profile',
+    updateProfile: '/users/profile', // Ruta PUT para actualizar perfil
     uploadAvatar: '/users/upload-avatar'
   });
 

@@ -134,80 +134,41 @@
         <div v-if="activeTab === 'security'" class="tab-content">
           <div class="content-card">
             <div class="card-header">
-              <h2>Seguridad de la cuenta</h2>
+              <h2>🔒 Seguridad de la cuenta</h2>
             </div>
             
-            <form @submit.prevent="changePassword" class="password-form">
+            <div class="security-form">
               <div class="security-item">
                 <div class="security-info">
-                  <h3>Cambiar contraseña</h3>
-                  <p>Mantén tu cuenta segura con una contraseña fuerte</p>
+                  <h3>
+                    <span>🔐</span>
+                    Cambiar contraseña
+                  </h3>
+                  <p>Te enviaremos un enlace seguro a tu email para cambiar tu contraseña</p>
                 </div>
                 <div class="security-actions">
-                  <div v-if="!showPasswordForm" class="password-summary">
+                  <div class="password-summary">
                     <span class="password-status">••••••••</span>
                     <button 
                       type="button" 
-                      @click="showPasswordForm = true" 
-                      class="btn btn-outline btn-sm"
+                      @click="changePassword" 
+                      :disabled="changingPassword"
+                      class="btn btn-primary btn-sm"
                     >
-                      🔑 Cambiar
+                      <span v-if="changingPassword">📧 Enviando...</span>
+                      <span v-else>🔐 Solicitar por email</span>
                     </button>
                   </div>
-                  
-                  <div v-else class="password-form-fields">
-                    <div class="form-group">
-                      <label>Contraseña actual</label>
-                      <input 
-                        v-model="passwordForm.currentPassword"
-                        type="password"
-                        placeholder="Tu contraseña actual"
-                        required
-                      />
-                    </div>
-                    <div class="form-group">
-                      <label>Nueva contraseña</label>
-                      <input 
-                        v-model="passwordForm.newPassword"
-                        type="password"
-                        placeholder="Nueva contraseña"
-                        required
-                      />
-                    </div>
-                    <div class="form-group">
-                      <label>Confirmar nueva contraseña</label>
-                      <input 
-                        v-model="passwordForm.confirmPassword"
-                        type="password"
-                        placeholder="Confirma la nueva contraseña"
-                        required
-                      />
-                    </div>
-                    
-                    <div class="form-actions">
-                      <button 
-                        type="button" 
-                        @click="cancelPasswordChange" 
-                        class="btn btn-outline btn-sm"
-                      >
-                        Cancelar
-                      </button>
-                      <button 
-                        type="submit" 
-                        :disabled="changingPassword" 
-                        class="btn btn-primary btn-sm"
-                      >
-                        <span v-if="changingPassword">🔄 Cambiando...</span>
-                        <span v-else>🔑 Cambiar contraseña</span>
-                      </button>
-                    </div>
-                  </div>
+
                 </div>
               </div>
 
               <div class="security-item">
                 <div class="security-info">
-                  <h3>Verificación de email</h3>
+                  <h3>
+                    <span>📧</span>
+                    Verificación de email
+                  </h3>
                   <p v-if="authStore.user?.isVerified" class="verified-text">
                     ✅ Tu email está verificado
                   </p>
@@ -227,7 +188,7 @@
                   </button>
                 </div>
               </div>
-            </form>
+            </div>
           </div>
         </div>
 
@@ -350,7 +311,7 @@ const activeTab = ref('info')
 const editMode = ref(false)
 const saving = ref(false)
 const loading = ref(false)
-const showPasswordForm = ref(false)
+
 const changingPassword = ref(false)
 const sendingVerification = ref(false)
 
@@ -371,11 +332,7 @@ const profileForm = reactive({
   address: ''
 })
 
-const passwordForm = reactive({
-  currentPassword: '',
-  newPassword: '',
-  confirmPassword: ''
-})
+
 
 const settings = reactive({
   emailNotifications: true,
@@ -477,41 +434,21 @@ const handleAvatarError = (event) => {
 }
 
 const changePassword = async () => {
-  if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-    error('Las contraseñas no coinciden')
-    return
-  }
-
-  if (passwordForm.newPassword.length < 6) {
-    warning('La contraseña debe tener al menos 6 caracteres')
-    return
-  }
-
   changingPassword.value = true
   
   try {
-    // Aquí harías la llamada a la API para cambiar contraseña
-    // await authService.changePassword(passwordForm)
+    // Enviar solicitud de cambio de contraseña por email
+    await authService.requestPasswordReset(authStore.user.email)
     
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    success('Contraseña cambiada exitosamente')
-    cancelPasswordChange()
+    success('Se ha enviado un enlace de cambio de contraseña a tu email. Revisa tu bandeja de entrada y sigue las instrucciones.')
   } catch (err) {
-    error('Error al cambiar contraseña: ' + (err.message || 'Error desconocido'))
+    error('Error al solicitar cambio de contraseña: ' + (err.message || 'Error desconocido'))
   } finally {
     changingPassword.value = false
   }
 }
 
-const cancelPasswordChange = () => {
-  showPasswordForm.value = false
-  Object.assign(passwordForm, {
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  })
-}
+
 
 const resendVerification = async () => {
   sendingVerification.value = true
@@ -798,7 +735,7 @@ onMounted(() => {
 }
 
 /* Security */
-.password-form {
+.security-form {
   padding: 2rem;
 }
 
@@ -806,52 +743,73 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 1.5rem 0;
+  padding: 2rem 0;
   border-bottom: 1px solid var(--color-gray-200);
+  transition: all 0.3s ease;
 }
 
 .security-item:last-child {
   border-bottom: none;
 }
 
+.security-item:hover {
+  background-color: var(--color-gray-50);
+  margin: 0 -2rem;
+  padding: 2rem;
+  border-radius: 12px;
+}
+
+.security-info {
+  flex: 1;
+}
+
 .security-info h3 {
   margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--color-gray-800);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .security-info p {
   margin: 0;
   color: var(--color-gray-600);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
-.verified-text {
-  color: var(--color-success) !important;
-}
-
-.unverified-text {
-  color: var(--color-error) !important;
-}
-
-.password-summary {
+.security-actions {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
+.verified-text {
+  color: var(--color-success) !important;
+  font-weight: 500;
+}
+
+.unverified-text {
+  color: var(--color-error) !important;
+  font-weight: 500;
+}
+
+.password-summary {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
 .password-status {
   font-family: monospace;
   color: var(--color-gray-400);
-}
-
-.password-form-fields {
-  min-width: 300px;
-}
-
-.password-form-fields .form-group {
-  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-gray-100);
+  border-radius: 8px;
+  border: 1px solid var(--color-gray-200);
 }
 
 /* Settings */

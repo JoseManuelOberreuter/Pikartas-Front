@@ -129,8 +129,8 @@ export const authService = {
   async updateProfile(profileData) {
     try {
       const routesStore = useRoutesStore();
-      // Usando la misma ruta de profile pero con método PUT/PATCH
-      const response = await axios.put(routesStore.getUserProfileUrl('me'), profileData);
+      // Usando la ruta updateProfile para PUT /users/profile
+      const response = await axios.put(routesStore.fullUserRoutes.updateProfile, profileData);
       return response.data;
     } catch (error) {
       console.error('Update profile error:', error);
