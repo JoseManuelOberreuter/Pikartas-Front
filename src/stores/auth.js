@@ -27,6 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
               id: userProfile.user.id || null,
               ...userProfile.user
             };
+            isAuthenticated.value = true;
           } else if (userProfile) {
             user.value = {
               name: userProfile.name || 'Usuario',
@@ -34,19 +35,25 @@ export const useAuthStore = defineStore('auth', () => {
               id: userProfile.id || null,
               ...userProfile
             };
+            isAuthenticated.value = true;
+          } else {
+            // Si no hay datos del usuario, limpiar autenticación
+            localStorage.removeItem('token');
+            user.value = null;
+            isAuthenticated.value = false;
           }
+        } else {
+          // Si no hay identificador en el token, limpiar autenticación
+          localStorage.removeItem('token');
+          user.value = null;
+          isAuthenticated.value = false;
         }
-        
-        isAuthenticated.value = true;
       } catch (error) {
         console.error('Error initializing auth:', error);
-        // Si falla, mantener valores por defecto pero seguir autenticado
-        isAuthenticated.value = true;
-        user.value = {
-          name: 'Usuario',
-          email: 'usuario@ejemplo.com',
-          id: null
-        };
+        // Si falla la verificación, limpiar autenticación
+        localStorage.removeItem('token');
+        user.value = null;
+        isAuthenticated.value = false;
       }
     }
   };
