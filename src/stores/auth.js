@@ -22,17 +22,27 @@ export const useAuthStore = defineStore('auth', () => {
           if (userProfile && userProfile.user) {
             // Asegurar que el objeto usuario tenga todas las propiedades necesarias
             user.value = {
+              _id: userProfile.user._id || userProfile.user.id || null,
               name: userProfile.user.name || 'Usuario',
               email: userProfile.user.email || 'usuario@ejemplo.com',
-              id: userProfile.user.id || null,
+              telefono: userProfile.user.telefono || userProfile.user.phone || '',
+              fechaNacimiento: userProfile.user.fechaNacimiento || userProfile.user.birthDate || '',
+              direccion: userProfile.user.direccion || userProfile.user.address || '',
+              avatar: userProfile.user.avatar || '',
+              role: userProfile.user.role || 'user',
               ...userProfile.user
             };
             isAuthenticated.value = true;
           } else if (userProfile) {
             user.value = {
+              _id: userProfile._id || userProfile.id || null,
               name: userProfile.name || 'Usuario',
               email: userProfile.email || 'usuario@ejemplo.com',
-              id: userProfile.id || null,
+              telefono: userProfile.telefono || userProfile.phone || '',
+              fechaNacimiento: userProfile.fechaNacimiento || userProfile.birthDate || '',
+              direccion: userProfile.direccion || userProfile.address || '',
+              avatar: userProfile.avatar || '',
+              role: userProfile.role || 'user',
               ...userProfile
             };
             isAuthenticated.value = true;
@@ -101,25 +111,40 @@ export const useAuthStore = defineStore('auth', () => {
           if (userProfile && userProfile.user) {
             // Asegurar que el objeto usuario tenga todas las propiedades necesarias
             user.value = {
+              _id: userProfile.user._id || userProfile.user.id || null,
               name: userProfile.user.name || 'Usuario',
               email: userProfile.user.email || credentials.email,
-              id: userProfile.user.id || null,
+              telefono: userProfile.user.telefono || userProfile.user.phone || '',
+              fechaNacimiento: userProfile.user.fechaNacimiento || userProfile.user.birthDate || '',
+              direccion: userProfile.user.direccion || userProfile.user.address || '',
+              avatar: userProfile.user.avatar || '',
+              role: userProfile.user.role || 'user',
               ...userProfile.user
             };
           } else if (userProfile) {
             // Si la respuesta es directamente los datos del usuario
             user.value = {
+              _id: userProfile._id || userProfile.id || null,
               name: userProfile.name || 'Usuario',
               email: userProfile.email || credentials.email,
-              id: userProfile.id || null,
+              telefono: userProfile.telefono || userProfile.phone || '',
+              fechaNacimiento: userProfile.fechaNacimiento || userProfile.birthDate || '',
+              direccion: userProfile.direccion || userProfile.address || '',
+              avatar: userProfile.avatar || '',
+              role: userProfile.role || 'user',
               ...userProfile
             };
           } else {
             // Fallback si no hay datos
             user.value = {
+              _id: null,
               name: 'Usuario',
               email: credentials.email,
-              id: null
+              telefono: '',
+              fechaNacimiento: '',
+              direccion: '',
+              avatar: '',
+              role: 'user'
             };
           }
           
@@ -128,9 +153,14 @@ export const useAuthStore = defineStore('auth', () => {
           console.error('Error fetching user profile:', profileError);
           // Aunque falle obtener el perfil, mantenemos autenticado con datos básicos
           user.value = {
+            _id: null,
             name: 'Usuario',
             email: credentials.email,
-            id: null
+            telefono: '',
+            fechaNacimiento: '',
+            direccion: '',
+            avatar: '',
+            role: 'user'
           };
         }
       } else {

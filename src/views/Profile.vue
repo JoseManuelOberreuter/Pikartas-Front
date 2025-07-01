@@ -91,16 +91,16 @@
                 <div class="form-group">
                   <label>Teléfono</label>
                   <input 
-                    v-model="profileForm.phone"
+                    v-model="profileForm.telefono"
                     :disabled="!editMode"
                     type="tel"
-                    placeholder="+1 234 567 8900"
+                    placeholder="+569 1234 5678"
                   />
                 </div>
                 <div class="form-group">
                   <label>Fecha de nacimiento</label>
                   <input 
-                    v-model="profileForm.birthDate"
+                    v-model="profileForm.fechaNacimiento"
                     :disabled="!editMode"
                     type="date"
                   />
@@ -110,10 +110,10 @@
               <div class="form-group">
                 <label>Dirección</label>
                 <textarea 
-                  v-model="profileForm.address"
+                  v-model="profileForm.direccion"
                   :disabled="!editMode"
                   rows="3"
-                  placeholder="Tu dirección completa"
+                  placeholder="Av. Las Condes 123, Santiago"
                 ></textarea>
               </div>
 
@@ -325,11 +325,14 @@ const tabs = [
 
 // Forms
 const profileForm = reactive({
+  _id: '',
   name: '',
   email: '',
-  phone: '',
-  birthDate: '',
-  address: ''
+  telefono: '',
+  fechaNacimiento: '',
+  direccion: '',
+  avatar: '',
+  role: ''
 })
 
 
@@ -355,11 +358,14 @@ const userAvatar = computed(() => {
 // Methods
 const loadUserData = () => {
   if (authStore.user) {
+    profileForm._id = authStore.user._id || authStore.user.id || ''
     profileForm.name = authStore.user.name || ''
     profileForm.email = authStore.user.email || ''
-    profileForm.phone = authStore.user.phone || ''
-    profileForm.birthDate = authStore.user.birthDate || ''
-    profileForm.address = authStore.user.address || ''
+    profileForm.telefono = authStore.user.telefono || authStore.user.phone || ''
+    profileForm.fechaNacimiento = authStore.user.fechaNacimiento || authStore.user.birthDate || ''
+    profileForm.direccion = authStore.user.direccion || authStore.user.address || ''
+    profileForm.avatar = authStore.user.avatar || ''
+    profileForm.role = authStore.user.role || 'user'
   }
 }
 
@@ -376,7 +382,16 @@ const saveProfile = async () => {
   saving.value = true
   
   try {
-    const response = await authService.updateProfile(profileForm)
+    // Crear objeto con solo los campos editables (sin _id ni role)
+    const profileDataToUpdate = {
+      name: profileForm.name,
+      email: profileForm.email,
+      telefono: profileForm.telefono,
+      fechaNacimiento: profileForm.fechaNacimiento,
+      direccion: profileForm.direccion
+    }
+    
+    const response = await authService.updateProfile(profileDataToUpdate)
     
     // Actualizar el store con los nuevos datos
     Object.assign(authStore.user, profileForm)
