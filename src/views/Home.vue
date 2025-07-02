@@ -81,9 +81,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { products } from '../data/products.js'
+import { productService } from '../services/api'
 import ProductCard from '../components/ProductCard.vue'
 import { useNotifications } from '../composables/useNotifications'
 
@@ -91,9 +91,39 @@ const router = useRouter()
 const { success } = useNotifications()
 const emailSubscription = ref('')
 
+// Referencias reactivas para productos
+const products = ref([])
+const loading = ref(false)
+
+// Cargar productos desde el backend
+const loadProducts = async () => {
+  loading.value = true
+  try {
+    const response = await productService.getAllProducts()
+    
+    if (response.success && response.data) {
+      products.value = response.data.map(product => ({
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        description: product.description,
+        category: product.category,
+        stock: product.stock,
+        rating: product.rating || 4.5
+      }))
+    }
+  } catch (error) {
+    console.error('Error loading products:', error)
+    products.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
 // Mostrar solo los 4 productos con mejor rating
 const featuredProducts = computed(() => {
-  return products
+  return products.value
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 4)
 })
@@ -106,6 +136,11 @@ const subscribeNewsletter = () => {
   success(`¡Gracias por suscribirte con ${emailSubscription.value}!`)
   emailSubscription.value = ''
 }
+
+// Cargar productos al montar el componente
+onMounted(() => {
+  loadProducts()
+})
 </script>
 
 <style scoped>

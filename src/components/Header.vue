@@ -158,11 +158,14 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { cartItemCount, toggleCart } from '../stores/cart.js'
+import { useCartStore } from '../stores/cart.js'
+import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth.js'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const cartStore = useCartStore()
+const { cartItemCount } = storeToRefs(cartStore)
 
 const emit = defineEmits(['open-login', 'open-register'])
 const mobileMenuOpen = ref(false)
@@ -234,6 +237,10 @@ const handleLogout = () => {
   authStore.logout()
   closeUserMenu()
   router.push('/')
+}
+
+const toggleCart = () => {
+  cartStore.toggleCart()
 }
 
 // Cerrar menú de usuario al hacer clic fuera

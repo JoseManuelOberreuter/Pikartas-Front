@@ -33,6 +33,15 @@ export const useAuthStore = defineStore('auth', () => {
               ...userProfile.user
             };
             isAuthenticated.value = true;
+            
+            // Inicializar carrito después de autenticación
+            try {
+              const { useCartStore } = await import('./cart');
+              const cartStore = useCartStore();
+              await cartStore.initializeCart();
+            } catch (cartError) {
+              console.error('Error initializing cart:', cartError);
+            }
           } else if (userProfile) {
             user.value = {
               _id: userProfile._id || userProfile.id || null,
@@ -46,6 +55,15 @@ export const useAuthStore = defineStore('auth', () => {
               ...userProfile
             };
             isAuthenticated.value = true;
+            
+            // Inicializar carrito después de autenticación
+            try {
+              const { useCartStore } = await import('./cart');
+              const cartStore = useCartStore();
+              await cartStore.initializeCart();
+            } catch (cartError) {
+              console.error('Error initializing cart:', cartError);
+            }
           } else {
             // Si no hay datos del usuario, limpiar autenticación
             localStorage.removeItem('token');
@@ -163,6 +181,15 @@ export const useAuthStore = defineStore('auth', () => {
             role: 'user'
           };
         }
+        
+        // Inicializar carrito después de autenticación exitosa
+        try {
+          const { useCartStore } = await import('./cart');
+          const cartStore = useCartStore();
+          await cartStore.initializeCart();
+        } catch (cartError) {
+          console.error('Error initializing cart:', cartError);
+        }
       } else {
         throw new Error('Login response does not contain token');
       }
@@ -187,6 +214,15 @@ export const useAuthStore = defineStore('auth', () => {
       
       user.value = response.user;
       isAuthenticated.value = true;
+      
+      // Inicializar carrito después de verificación exitosa
+      try {
+        const { useCartStore } = await import('./cart');
+        const cartStore = useCartStore();
+        await cartStore.initializeCart();
+      } catch (cartError) {
+        console.error('Error initializing cart:', cartError);
+      }
       
       return response;
     } catch (err) {

@@ -50,33 +50,33 @@ export const useRoutesStore = defineStore('routes', () => {
 
   // Rutas de productos
   const productRoutes = ref({
-    getAll: '/products',
-    getById: '/products',
-    create: '/products',
-    update: '/products',
-    delete: '/products',
-    updateStock: '/products'
+    getAll: '/api/products',
+    getById: '/api/products',
+    create: '/api/products',
+    update: '/api/products',
+    delete: '/api/products',
+    updateStock: '/api/products'
   });
 
   // Rutas de órdenes
   const orderRoutes = ref({
-    create: '/orders',
-    getUserOrders: '/orders/my-orders',
-    getById: '/orders',
-    cancel: '/orders',
-    getAllAdmin: '/orders/admin/all',
-    getStatsAdmin: '/orders/admin/stats',
-    updateStatusAdmin: '/orders/admin'
+    create: '/api/orders',
+    getUserOrders: '/api/orders/my-orders',
+    getById: '/api/orders',
+    cancel: '/api/orders',
+    getAllAdmin: '/api/orders/admin/all',
+    getStatsAdmin: '/api/orders/admin/stats',
+    updateStatusAdmin: '/api/orders/admin'
   });
 
   // Rutas de carrito
   const cartRoutes = ref({
-    get: '/cart',
-    getSummary: '/cart/summary',
-    add: '/cart/add',
-    update: '/cart/update',
-    remove: '/cart/remove',
-    clear: '/cart/clear'
+    get: '/api/cart',
+    getSummary: '/api/cart/summary',
+    add: '/api/cart/add',
+    update: '/api/cart/update',
+    remove: '/api/cart/remove',
+    clear: '/api/cart/clear'
   });
 
   // Computed para obtener URLs completas

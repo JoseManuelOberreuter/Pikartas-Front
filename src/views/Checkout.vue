@@ -243,16 +243,14 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { 
-  cartItems, 
-  cartTotal, 
-  cartItemCount, 
-  clearCart 
-} from '../stores/cart.js'
+import { useCartStore } from '../stores/cart.js'
+import { storeToRefs } from 'pinia'
 import { useNotifications } from '../composables/useNotifications'
 
 const router = useRouter()
 const { success, error } = useNotifications()
+const cartStore = useCartStore()
+const { cartItems, cartTotal, cartItemCount } = storeToRefs(cartStore)
 
 // Form data
 const shippingForm = reactive({
@@ -303,7 +301,7 @@ const submitOrder = async () => {
     await new Promise(resolve => setTimeout(resolve, 2000))
     
     // Clear cart
-    clearCart()
+    await cartStore.clearCart()
     
     // Show success message
     success(`¡Pedido realizado con éxito!\n\nTotal: $${finalTotal.value.toFixed(2)}\nEnvío a: ${shippingForm.address}, ${shippingForm.city}\n\nRecibirás un email de confirmación en ${shippingForm.email}`, 8000)

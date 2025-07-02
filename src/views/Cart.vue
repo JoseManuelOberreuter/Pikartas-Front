@@ -122,14 +122,11 @@
 
 <script setup>
 import { computed } from 'vue'
-import { 
-  cartItems, 
-  cartTotal, 
-  cartItemCount, 
-  removeFromCart as removeItem, 
-  updateQuantity, 
-  clearCart as clearCartItems 
-} from '../stores/cart.js'
+import { useCartStore } from '../stores/cart.js'
+import { storeToRefs } from 'pinia'
+
+const cartStore = useCartStore()
+const { cartItems, cartTotal, cartItemCount } = storeToRefs(cartStore)
 
 // Computed properties
 const tax = computed(() => cartTotal.value * 0.08) // 8% tax
@@ -145,36 +142,36 @@ const getStarRating = (rating) => {
   return stars
 }
 
-const removeFromCart = (productId) => {
+const removeFromCart = async (productId) => {
   if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
-    removeItem(productId)
+    await cartStore.removeFromCart(productId)
   }
 }
 
-const increaseQuantity = (productId) => {
+const increaseQuantity = async (productId) => {
   const item = cartItems.value.find(item => item.id === productId)
   if (item) {
-    updateQuantity(productId, item.quantity + 1)
+    await cartStore.updateQuantity(productId, item.quantity + 1)
   }
 }
 
-const decreaseQuantity = (productId) => {
+const decreaseQuantity = async (productId) => {
   const item = cartItems.value.find(item => item.id === productId)
   if (item && item.quantity > 1) {
-    updateQuantity(productId, item.quantity - 1)
+    await cartStore.updateQuantity(productId, item.quantity - 1)
   }
 }
 
-const updateItemQuantity = (productId, newQuantity) => {
+const updateItemQuantity = async (productId, newQuantity) => {
   const quantity = parseInt(newQuantity)
   if (quantity > 0) {
-    updateQuantity(productId, quantity)
+    await cartStore.updateQuantity(productId, quantity)
   }
 }
 
-const clearCart = () => {
+const clearCart = async () => {
   if (confirm('¿Estás seguro de que quieres limpiar todo el carrito?')) {
-    clearCartItems()
+    await cartStore.clearCart()
   }
 }
 </script>

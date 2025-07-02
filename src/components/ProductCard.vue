@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { addToCart as addToCartStore } from '../stores/cart.js'
+import { useCartStore } from '../stores/cart.js'
 
 const props = defineProps({
   product: {
@@ -45,10 +45,11 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['view-product'])
+const cartStore = useCartStore()
 
-const addToCart = () => {
+const addToCart = async () => {
   if (props.product.stock > 0) {
-    addToCartStore(props.product)
+    await cartStore.addToCart(props.product)
     // Aquí podrías agregar una notificación o feedback visual
   }
 }

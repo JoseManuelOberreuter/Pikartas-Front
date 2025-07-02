@@ -7,7 +7,12 @@
       </div>
       
       <div class="cart-content">
-        <div v-if="cartItems.length === 0" class="empty-cart">
+        <div v-if="loading && cartItems.length === 0" class="loading-state">
+          <div class="loading-spinner">🔄</div>
+          <p>Cargando carrito...</p>
+        </div>
+
+        <div v-else-if="cartItems.length === 0" class="empty-cart">
           <div class="empty-cart-icon">🛒</div>
           <p>Tu carrito está vacío</p>
           <router-link to="/shop" class="btn btn-primary" @click="closeCart">
@@ -66,39 +71,38 @@
 </template>
 
 <script setup>
-import { 
-  cartItems, 
-  cartTotal, 
-  cartItemCount, 
-  isCartOpen, 
-  closeCart, 
-  removeFromCart as removeItem, 
-  updateQuantity, 
-  clearCart as clearCartItems 
-} from '../stores/cart.js'
+import { useCartStore } from '../stores/cart.js'
+import { storeToRefs } from 'pinia'
 
-const removeFromCart = (productId) => {
-  removeItem(productId)
+const cartStore = useCartStore()
+const { cartItems, cartTotal, cartItemCount, isCartOpen, loading } = storeToRefs(cartStore)
+
+const removeFromCart = async (productId) => {
+  await cartStore.removeFromCart(productId)
 }
 
-const increaseQuantity = (productId) => {
+const increaseQuantity = async (productId) => {
   const item = cartItems.value.find(item => item.id === productId)
   if (item) {
-    updateQuantity(productId, item.quantity + 1)
+    await cartStore.updateQuantity(productId, item.quantity + 1)
   }
 }
 
-const decreaseQuantity = (productId) => {
+const decreaseQuantity = async (productId) => {
   const item = cartItems.value.find(item => item.id === productId)
   if (item && item.quantity > 1) {
-    updateQuantity(productId, item.quantity - 1)
+    await cartStore.updateQuantity(productId, item.quantity - 1)
   }
 }
 
-const clearCart = () => {
+const clearCart = async () => {
   if (confirm('¿Estás seguro de que quieres limpiar el carrito?')) {
-    clearCartItems()
+    await cartStore.clearCart()
   }
+}
+
+const closeCart = () => {
+  cartStore.closeCart()
 }
 </script>
 
@@ -180,6 +184,7 @@ const clearCart = () => {
   overflow-y: auto;
 }
 
+.loading-state,
 .empty-cart {
   display: flex;
   flex-direction: column;
@@ -188,6 +193,23 @@ const clearCart = () => {
   height: 100%;
   padding: 2rem;
   text-align: center;
+}
+
+.loading-spinner {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
 }
 
 .empty-cart-icon {

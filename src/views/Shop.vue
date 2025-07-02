@@ -54,10 +54,22 @@
       </div>
 
       <div class="results-info">
-        <p>Mostrando {{ filteredProducts.length }} productos</p>
+        <p v-if="!loading">Mostrando {{ filteredProducts.length }} productos</p>
+        <p v-else>Cargando productos...</p>
       </div>
 
-      <div class="products-grid" v-if="filteredProducts.length > 0">
+      <div v-if="loading" class="loading-state">
+        <div class="loading-spinner">🔄</div>
+        <p>Cargando productos desde el servidor...</p>
+      </div>
+
+      <div v-else-if="products.length === 0" class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h3>No hay productos disponibles</h3>
+        <p>No se pudieron cargar los productos del servidor.</p>
+      </div>
+
+      <div v-else class="products-grid">
         <ProductCard 
           v-for="product in filteredProducts" 
           :key="product.id" 
@@ -81,20 +93,58 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { products, categories } from '../data/products.js'
+import { productService } from '../services/api'
 import ProductCard from '../components/ProductCard.vue'
 
 const router = useRouter()
 
-// Reactive data
+// Referencias reactivas
+const products = ref([])
+const loading = ref(false)
 const selectedCategory = ref('Todos')
 const sortBy = ref('name')
 const maxPrice = ref(2000)
 const searchQuery = ref('')
 
+// Categorías (se pueden cargar desde el backend también)
+const categories = ref([
+  'Todos',
+  'Electrónicos', 
+  'Accesorios',
+  'Fotografía'
+])
+
+// Cargar productos desde el backend
+const loadProducts = async () => {
+  loading.value = true
+  try {
+    const response = await productService.getAllProducts()
+    
+    // Mapear la respuesta del backend al formato esperado
+    if (response.success && response.data) {
+      products.value = response.data.map(product => ({
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        description: product.description,
+        category: product.category,
+        stock: product.stock,
+        rating: product.rating || 4.5
+      }))
+    }
+  } catch (error) {
+    console.error('Error loading products:', error)
+    // Fallback a productos mock si falla
+    products.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
 // Computed properties
 const filteredProducts = computed(() => {
-  let result = [...products]
+  let result = [...products.value]
   
   // Filter by category
   if (selectedCategory.value !== 'Todos') {
@@ -156,10 +206,15 @@ const resetFilters = () => {
   searchQuery.value = ''
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Cargar productos primero
+  await loadProducts()
+  
   // Set initial max price based on the highest product price
-  const highestPrice = Math.max(...products.map(p => p.price))
-  maxPrice.value = Math.ceil(highestPrice / 100) * 100
+  if (products.value.length > 0) {
+    const highestPrice = Math.max(...products.value.map(p => p.price))
+    maxPrice.value = Math.ceil(highestPrice / 100) * 100
+  }
 })
 </script>
 
@@ -277,9 +332,50 @@ onMounted(() => {
   font-weight: 500;
 }
 
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.loading-spinner {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  margin: 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+}
+
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
 }
 

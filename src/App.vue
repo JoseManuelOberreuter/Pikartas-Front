@@ -34,17 +34,29 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Header from './components/Header.vue'
 import CartSidebar from './components/CartSidebar.vue'
 import AuthModal from './components/AuthModal.vue'
 import Footer from './components/Footer.vue'
 import NotificationContainer from './components/NotificationContainer.vue'
+import { useAuthStore } from './stores/auth'
+import { useCartStore } from './stores/cart'
+
+const authStore = useAuthStore()
+const cartStore = useCartStore()
 
 // Auth modals state
 const showLoginModal = ref(false)
 const showRegisterModal = ref(false)
 const showForgotPasswordModal = ref(false)
+
+// Inicializar carrito cuando el usuario esté autenticado
+watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
+  if (isAuthenticated) {
+    await cartStore.initializeCart()
+  }
+}, { immediate: true })
 
 // Modal functions
 const openLoginModal = () => {

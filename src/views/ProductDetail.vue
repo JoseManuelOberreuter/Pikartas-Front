@@ -1,15 +1,23 @@
 <template>
   <div class="product-detail">
     <div class="container">
-      <div v-if="!product" class="not-found">
+      <div v-if="loading" class="loading-state">
+        <div class="loading-spinner">🔄</div>
+        <h2>Cargando producto...</h2>
+      </div>
+
+      <div v-else-if="!product" class="not-found">
         <h2>Producto no encontrado</h2>
-        <router-link to="/shop" class="btn btn-primary">Volver a la tienda</router-link>
+        <p>El producto que buscas no existe o no está disponible.</p>
+        <router-link to="/shop" class="btn btn-primary">
+          ← Volver a la tienda
+        </router-link>
       </div>
 
       <div v-else class="product-content">
         <div class="product-gallery">
           <div class="main-image">
-            <img :src="product.image" :alt="product.name" />
+                <img :src="product.image" :alt="product.name" />
           </div>
         </div>
 
@@ -109,30 +117,79 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { products } from '../data/products.js'
-import { addToCart as addToCartStore } from '../stores/cart.js'
+import { productService } from '../services/api'
+import { useCartStore } from '../stores/cart.js'
 import ProductCard from '../components/ProductCard.vue'
 import { useNotifications } from '../composables/useNotifications'
 
 const route = useRoute()
 const router = useRouter()
 const { success } = useNotifications()
+const cartStore = useCartStore()
 
 const quantity = ref(1)
+const product = ref(null)
+const loading = ref(false)
+const allProducts = ref([])
 
-// Find product by ID
-const product = computed(() => {
-  const id = parseInt(route.params.id)
-  return products.find(p => p.id === id) || null
-})
+// Cargar producto específico por ID
+const loadProduct = async (productId) => {
+  loading.value = true
+  try {
+    const response = await productService.getProductById(productId)
+    
+    if (response.success && response.data) {
+      product.value = {
+        id: response.data._id,
+        name: response.data.name,
+        price: response.data.price,
+        image: response.data.image,
+        description: response.data.description,
+        category: response.data.category,
+        stock: response.data.stock,
+        rating: response.data.rating || 4.5
+      }
+    } else {
+      product.value = null
+    }
+  } catch (error) {
+    console.error('Error loading product:', error)
+    product.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+// Cargar todos los productos para mostrar relacionados
+const loadAllProducts = async () => {
+  try {
+    const response = await productService.getAllProducts()
+    
+    if (response.success && response.data) {
+      allProducts.value = response.data.map(p => ({
+        id: p._id,
+        name: p.name,
+        price: p.price,
+        image: p.image,
+        description: p.description,
+        category: p.category,
+        stock: p.stock,
+        rating: p.rating || 4.5
+      }))
+    }
+  } catch (error) {
+    console.error('Error loading all products:', error)
+    allProducts.value = []
+  }
+}
 
 // Get related products (same category, excluding current product)
 const relatedProducts = computed(() => {
   if (!product.value) return []
   
-  return products
+  return allProducts.value
     .filter(p => p.category === product.value.category && p.id !== product.value.id)
     .slice(0, 4)
 })
@@ -158,10 +215,10 @@ const decreaseQuantity = () => {
   }
 }
 
-const addToCart = () => {
+const addToCart = async () => {
   if (product.value && product.value.stock > 0) {
     for (let i = 0; i < quantity.value; i++) {
-      addToCartStore(product.value)
+      await cartStore.addToCart(product.value)
     }
     success(`¡${quantity.value} ${product.value.name} agregado${quantity.value > 1 ? 's' : ''} al carrito!`)
     quantity.value = 1
@@ -176,7 +233,23 @@ const viewProduct = (productId) => {
   router.push(`/product/${productId}`)
 }
 
-onMounted(() => {
+// Observar cambios en la ruta para cargar el producto correcto
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    loadProduct(newId)
+    quantity.value = 1
+  }
+}, { immediate: true })
+
+onMounted(async () => {
+  // Cargar el producto actual
+  if (route.params.id) {
+    await loadProduct(route.params.id)
+  }
+  
+  // Cargar todos los productos para mostrar relacionados
+  await loadAllProducts()
+  
   // Reset quantity when component mounts
   quantity.value = 1
 })
@@ -193,6 +266,28 @@ onMounted(() => {
   padding-top: 120px;
   padding-bottom: 80px;
   min-height: 100vh;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.loading-spinner {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
 }
 
 .not-found {
