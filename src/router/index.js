@@ -8,6 +8,8 @@ import RegisterView from '../views/RegisterView.vue'
 import EmailVerification from '../views/EmailVerification.vue'
 import ResetPassword from '../views/ResetPassword.vue'
 import Profile from '../views/Profile.vue'
+import AdminDashboard from '../views/AdminDashboard.vue'
+import AdminProducts from '../views/AdminProducts.vue'
 
 const routes = [
   {
@@ -56,6 +58,36 @@ const routes = [
     name: 'Profile',
     component: Profile,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin',
+    name: 'AdminDashboard',
+    component: AdminDashboard,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/products',
+    name: 'AdminProducts',
+    component: AdminProducts,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/products/new',
+    name: 'AdminCreateProduct',
+    component: AdminProducts,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/orders',
+    name: 'AdminOrders',
+    component: () => import('../views/AdminOrders.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/analytics',
+    name: 'AdminAnalytics',
+    component: () => import('../views/AdminAnalytics.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 ]
 
@@ -65,13 +97,33 @@ const router = createRouter({
 })
 
 // Navigation guard para rutas que requieren autenticación
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth) {
     const token = localStorage.getItem('token')
     if (!token) {
       // Redirigir al home si no está autenticado
       next('/')
       return
+    }
+    
+    // Si requiere permisos de admin
+    if (to.meta.requiresAdmin) {
+      try {
+        // Importar dinámicamente el store de auth
+        const { useAuthStore } = await import('../stores/auth')
+        const authStore = useAuthStore()
+        
+        // Verificar si el usuario es admin
+        if (!authStore.user || authStore.user.role !== 'admin') {
+          // Redirigir al home si no es admin
+          next('/')
+          return
+        }
+      } catch (error) {
+        console.error('Error checking admin permissions:', error)
+        next('/')
+        return
+      }
     }
   }
   next()

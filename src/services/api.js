@@ -166,11 +166,8 @@ export const productService = {
   async createProduct(productData) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.post(routesStore.fullProductRoutes.create, productData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      console.log('Creating product with data:', productData);
+      const response = await axios.post(routesStore.fullProductRoutes.create, productData);
       return response.data;
     } catch (error) {
       console.error('Create product error:', error);
@@ -181,11 +178,8 @@ export const productService = {
   async updateProduct(id, productData) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.put(routesStore.getUpdateProductUrl(id), productData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      console.log('Updating product with ID:', id, 'Data:', productData);
+      const response = await axios.put(routesStore.getUpdateProductUrl(id), productData);
       return response.data;
     } catch (error) {
       console.error('Update product error:', error);
@@ -327,6 +321,102 @@ export const cartService = {
       return response.data;
     } catch (error) {
       console.error('Clear cart error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  }
+};
+
+// Servicios de administración
+export const adminService = {
+  // Gestión de productos
+  async createProduct(productData) {
+    try {
+      const routesStore = useRoutesStore();
+      console.log('Admin creating product with data:', productData);
+      const response = await axios.post(routesStore.fullProductRoutes.create, productData);
+      return response.data;
+    } catch (error) {
+      console.error('Create product error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async updateProduct(id, productData) {
+    try {
+      const routesStore = useRoutesStore();
+      console.log('Admin updating product with ID:', id, 'Data:', productData);
+      const response = await axios.put(routesStore.getUpdateProductUrl(id), productData);
+      return response.data;
+    } catch (error) {
+      console.error('Update product error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async deleteProduct(id) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.delete(routesStore.getDeleteProductUrl(id));
+      return response.data;
+    } catch (error) {
+      console.error('Delete product error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async updateProductStock(id, stock) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.patch(routesStore.getUpdateStockUrl(id), { stock });
+      return response.data;
+    } catch (error) {
+      console.error('Update stock error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async getAllProducts() {
+    try {
+      const routesStore = useRoutesStore();
+      console.log('Admin getting all products from:', routesStore.fullProductRoutes.getAllAdmin);
+      const response = await axios.get(routesStore.fullProductRoutes.getAllAdmin);
+      return response.data;
+    } catch (error) {
+      console.error('Admin get all products error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  // Gestión de órdenes
+  async getAllOrders() {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.fullOrderRoutes.getAllAdmin);
+      return response.data;
+    } catch (error) {
+      console.error('Get all orders error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async getOrderStats() {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.fullOrderRoutes.getStatsAdmin);
+      return response.data;
+    } catch (error) {
+      console.error('Get order stats error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async updateOrderStatus(orderId, status) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.patch(routesStore.getUpdateOrderStatusUrl(orderId), { status });
+      return response.data;
+    } catch (error) {
+      console.error('Update order status error:', error);
       throw error.response?.data || { error: error.message };
     }
   }

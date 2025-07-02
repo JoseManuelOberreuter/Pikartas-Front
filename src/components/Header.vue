@@ -67,6 +67,12 @@
                       <span>Mis Pedidos</span>
                     </button>
                   </li>
+                  <li v-if="isAdmin">
+                    <button class="user-menu-item admin-menu-item" @click="goToAdmin">
+                      <span class="menu-icon">🛠️</span>
+                      <span>Panel Admin</span>
+                    </button>
+                  </li>
                   <li>
                     <button class="user-menu-item" @click="goToSettings">
                       <span class="menu-icon">⚙️</span>
@@ -134,6 +140,9 @@
               <button class="btn btn-outline btn-full" @click="goToProfile(); closeMobileMenu()">
                 Mi Perfil
               </button>
+              <button v-if="isAdmin" class="btn btn-admin btn-full" @click="goToAdmin(); closeMobileMenu()">
+                🛠️ Panel Admin
+              </button>
               <button class="btn btn-tertiary btn-full" @click="handleLogout(); closeMobileMenu()">
                 Cerrar Sesión
               </button>
@@ -186,6 +195,16 @@ const getUserDisplayName = computed(() => {
   }
 })
 
+// Computed para verificar si el usuario es administrador
+const isAdmin = computed(() => {
+  try {
+    return authStore?.user?.role === 'admin'
+  } catch (error) {
+    console.error('Error checking admin status:', error)
+    return false
+  }
+})
+
 // Funciones de modales
 const openLoginModal = () => {
   emit('open-login')
@@ -231,6 +250,11 @@ const goToOrders = () => {
 const goToSettings = () => {
   closeUserMenu()
   router.push('/settings')
+}
+
+const goToAdmin = () => {
+  closeUserMenu()
+  router.push('/admin')
 }
 
 const handleLogout = () => {
@@ -703,6 +727,30 @@ onUnmounted(() => {
   border-color: var(--color-tertiary-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+}
+
+.btn-admin {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: var(--color-white);
+  border: 1px solid #ff6b35;
+  font-weight: 600;
+}
+
+.btn-admin:hover {
+  background: linear-gradient(135deg, #e55a2e, #e68619);
+  border-color: #e55a2e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.admin-menu-item {
+  background: linear-gradient(90deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.1));
+  border: 1px solid rgba(255, 107, 53, 0.2);
+}
+
+.admin-menu-item:hover {
+  background: linear-gradient(90deg, rgba(255, 107, 53, 0.15), rgba(247, 147, 30, 0.15));
+  border-color: rgba(255, 107, 53, 0.3);
 }
 
 .btn-full {
