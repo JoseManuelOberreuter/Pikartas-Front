@@ -69,6 +69,15 @@
         <p>No se pudieron cargar los productos del servidor.</p>
       </div>
 
+      <div v-else-if="filteredProducts.length === 0" class="no-results">
+        <div class="no-results-icon">😔</div>
+        <h3>No se encontraron productos</h3>
+        <p>Intenta ajustar los filtros o buscar con otros términos</p>
+        <button @click="resetFilters" class="btn btn-primary">
+          Limpiar Filtros
+        </button>
+      </div>
+
       <div v-else class="products-grid">
         <ProductCard 
           v-for="product in filteredProducts" 
@@ -76,15 +85,6 @@
           :product="product"
           @view-product="viewProduct"
         />
-      </div>
-
-      <div v-else class="no-results">
-        <div class="no-results-icon">😔</div>
-        <h3>No se encontraron productos</h3>
-        <p>Intenta ajustar los filtros o buscar con otros términos</p>
-        <button @click="resetFilters" class="btn btn-primary">
-          Limpiar Filtros
-        </button>
       </div>
     </div>
   </div>
@@ -118,27 +118,35 @@ const categories = ref([
 const loadProducts = async () => {
   loading.value = true
   try {
+    console.log('🔍 Shop: Cargando productos desde el backend...');
     const response = await productService.getAllProducts()
+    console.log('📦 Shop: Respuesta del servidor:', response);
     
     // Mapear la respuesta del backend al formato esperado
     if (response.success && response.data) {
+      console.log(`✅ Shop: ${response.data.length} productos recibidos del servidor`);
       products.value = response.data.map(product => ({
         id: product._id,
         name: product.name,
         price: product.price,
-        image: product.image,
+        image: product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: product.description,
         category: product.category,
         stock: product.stock,
         rating: product.rating || 4.5
       }))
+      console.log('🎯 Shop: Productos mapeados:', products.value);
+    } else {
+      console.warn('⚠️ Shop: Respuesta inválida del servidor:', response);
+      products.value = []
     }
   } catch (error) {
-    console.error('Error loading products:', error)
+    console.error('❌ Shop: Error cargando productos:', error)
     // Fallback a productos mock si falla
     products.value = []
   } finally {
     loading.value = false
+    console.log(`📊 Shop: Carga finalizada. Total productos: ${products.value.length}`);
   }
 }
 

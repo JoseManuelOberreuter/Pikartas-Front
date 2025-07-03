@@ -106,7 +106,7 @@ const loadProducts = async () => {
         id: product._id,
         name: product.name,
         price: product.price,
-        image: product.image,
+        image: product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: product.description,
         category: product.category,
         stock: product.stock,
