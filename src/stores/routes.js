@@ -56,7 +56,8 @@ export const useRoutesStore = defineStore('routes', () => {
     update: '/api/products',
     delete: '/api/products',
     updateStock: '/api/products',
-    getAllAdmin: '/api/products/admin/all'
+    getAllAdmin: '/api/products/admin/all',
+    getCategories: '/api/products/categories'
   });
 
   // Rutas de órdenes

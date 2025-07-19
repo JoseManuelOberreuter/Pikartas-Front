@@ -167,7 +167,16 @@ export const productService = {
     try {
       const routesStore = useRoutesStore();
       console.log('Creating product with data:', productData);
-      const response = await axios.post(routesStore.fullProductRoutes.create, productData);
+      
+      // Configurar headers para FormData si es necesario
+      const config = {}
+      if (productData instanceof FormData) {
+        config.headers = {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+      
+      const response = await axios.post(routesStore.fullProductRoutes.create, productData, config);
       return response.data;
     } catch (error) {
       console.error('Create product error:', error);
@@ -179,7 +188,16 @@ export const productService = {
     try {
       const routesStore = useRoutesStore();
       console.log('Updating product with ID:', id, 'Data:', productData);
-      const response = await axios.put(routesStore.getUpdateProductUrl(id), productData);
+      
+      // Configurar headers para FormData si es necesario
+      const config = {}
+      if (productData instanceof FormData) {
+        config.headers = {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+      
+      const response = await axios.put(routesStore.getUpdateProductUrl(id), productData, config);
       return response.data;
     } catch (error) {
       console.error('Update product error:', error);
@@ -205,6 +223,17 @@ export const productService = {
       return response.data;
     } catch (error) {
       console.error('Update stock error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async getCategories() {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.fullProductRoutes.getCategories);
+      return response.data;
+    } catch (error) {
+      console.error('Get categories error:', error);
       throw error.response?.data || { error: error.message };
     }
   }
@@ -333,7 +362,16 @@ export const adminService = {
     try {
       const routesStore = useRoutesStore();
       console.log('Admin creating product with data:', productData);
-      const response = await axios.post(routesStore.fullProductRoutes.create, productData);
+      
+      // Configurar headers para FormData si es necesario
+      const config = {}
+      if (productData instanceof FormData) {
+        config.headers = {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+      
+      const response = await axios.post(routesStore.fullProductRoutes.create, productData, config);
       return response.data;
     } catch (error) {
       console.error('Create product error:', error);
@@ -345,7 +383,16 @@ export const adminService = {
     try {
       const routesStore = useRoutesStore();
       console.log('Admin updating product with ID:', id, 'Data:', productData);
-      const response = await axios.put(routesStore.getUpdateProductUrl(id), productData);
+      
+      // Configurar headers para FormData si es necesario
+      const config = {}
+      if (productData instanceof FormData) {
+        config.headers = {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+      
+      const response = await axios.put(routesStore.getUpdateProductUrl(id), productData, config);
       return response.data;
     } catch (error) {
       console.error('Update product error:', error);

@@ -177,30 +177,69 @@
 
             <div class="form-group">
               <label>Categoría *</label>
-              <select v-model="productForm.category" required class="form-select">
-                <option value="">Seleccionar categoría</option>
-                <option value="Electrónicos">Electrónicos</option>
-                <option value="Ropa">Ropa</option>
-                <option value="Hogar">Hogar</option>
-                <option value="Deportes">Deportes</option>
-                <option value="Libros">Libros</option>
-                <option value="Juguetes">Juguetes</option>
-                <option value="Belleza">Belleza</option>
-                <option value="Automóviles">Automóviles</option>
-                <option value="Otros">Otros</option>
-              </select>
+              <div class="category-selector">
+                <select v-model="productForm.category" required class="form-select">
+                  <option value="">Seleccionar categoría</option>
+                  <option v-for="category in availableCategories" :key="category" :value="category">
+                    {{ category }}
+                  </option>
+                  <option value="__new__">➕ Crear nueva categoría</option>
+                </select>
+                
+                <div v-if="productForm.category === '__new__'" class="new-category-input">
+                  <input 
+                    v-model="newCategoryName" 
+                    type="text" 
+                    placeholder="Nombre de la nueva categoría"
+                    class="form-input"
+                    @keyup.enter="addNewCategory"
+                  />
+                  <button 
+                    type="button" 
+                    @click="addNewCategory" 
+                    class="btn btn-sm btn-primary"
+                    :disabled="!newCategoryName.trim()"
+                  >
+                    Agregar
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="form-group">
-              <label>URL de la Imagen *</label>
-              <input 
-                v-model="productForm.image" 
-                type="url" 
-                required 
-                placeholder="https://ejemplo.com/imagen.jpg"
-                class="form-input"
-              />
-              <small class="form-help">Proporciona una URL válida de la imagen del producto</small>
+              <label>Imagen del Producto *</label>
+              <div class="image-upload-container">
+                <input 
+                  type="file" 
+                  @change="handleImageUpload" 
+                  accept="image/*"
+                  class="file-input"
+                  id="product-image"
+                />
+                <label for="product-image" class="file-input-label">
+                  <span class="upload-icon">📷</span>
+                  <span class="upload-text">
+                    {{ selectedImage ? selectedImage.name : 'Seleccionar imagen' }}
+                  </span>
+                </label>
+                
+                <div v-if="selectedImage" class="image-preview">
+                  <img :src="imagePreviewUrl" alt="Preview" class="preview-image" />
+                  <button 
+                    type="button" 
+                    @click="removeImage" 
+                    class="remove-image-btn"
+                  >
+                    ✕
+                  </button>
+                </div>
+                
+                <div v-if="productForm.image && !selectedImage" class="current-image">
+                  <img :src="productForm.image" alt="Current" class="preview-image" />
+                  <span class="current-image-label">Imagen actual</span>
+                </div>
+              </div>
+              <small class="form-help">Selecciona una imagen para el producto (JPG, PNG, GIF)</small>
             </div>
 
             <div class="form-actions">
@@ -233,6 +272,10 @@ const isEditing = ref(false)
 const submitting = ref(false)
 const searchTerm = ref('')
 const selectedCategory = ref('')
+const availableCategories = ref([])
+const newCategoryName = ref('')
+const selectedImage = ref(null)
+const imagePreviewUrl = ref('')
 
 // Form
 const productForm = ref({
@@ -273,6 +316,56 @@ const filteredProducts = computed(() => {
 })
 
 // Methods
+const loadCategories = async () => {
+  try {
+    // Intentar cargar categorías desde el endpoint específico
+    const response = await productService.getCategories()
+    console.log('Categories loaded from endpoint:', response);
+    if (response.success && response.data) {
+      availableCategories.value = response.data
+    } else {
+      // Si no hay endpoint específico, extraer categorías de productos existentes
+      await loadCategoriesFromProducts()
+    }
+  } catch (err) {
+    console.error('Error loading categories from endpoint:', err)
+    // Fallback: extraer categorías de productos existentes
+    await loadCategoriesFromProducts()
+  }
+}
+
+const loadCategoriesFromProducts = async () => {
+  try {
+    const response = await adminService.getAllProducts()
+    if (response.success && response.data) {
+      // Extraer categorías únicas de los productos
+      const categories = [...new Set(response.data.map(p => p.category).filter(Boolean))]
+      availableCategories.value = categories.sort()
+      console.log('Categories extracted from products:', availableCategories.value);
+    } else {
+      // Fallback a categorías básicas
+      availableCategories.value = ['Electrónicos', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes', 'Belleza', 'Automóviles', 'Otros', 'Plantas']
+    }
+  } catch (err) {
+    console.error('Error loading categories from products:', err)
+    // Fallback a categorías básicas
+    availableCategories.value = ['Electrónicos', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes', 'Belleza', 'Automóviles', 'Otros', 'Plantas']
+  }
+}
+
+const addNewCategory = () => {
+  const categoryName = newCategoryName.value.trim()
+  if (!categoryName) return
+  
+  if (!availableCategories.value.includes(categoryName)) {
+    availableCategories.value.push(categoryName)
+    availableCategories.value.sort()
+  }
+  
+  productForm.value.category = categoryName
+  newCategoryName.value = ''
+}
+
 const loadProducts = async () => {
   loading.value = true
   try {
@@ -287,6 +380,24 @@ const loadProducts = async () => {
   }
 }
 
+const handleImageUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    selectedImage.value = file
+    imagePreviewUrl.value = URL.createObjectURL(file)
+    // Limpiar la URL de imagen anterior si existe
+    productForm.value.image = ''
+  }
+}
+
+const removeImage = () => {
+  selectedImage.value = null
+  imagePreviewUrl.value = ''
+  // Limpiar el input file
+  const fileInput = document.getElementById('product-image')
+  if (fileInput) fileInput.value = ''
+}
+
 const openCreateModal = () => {
   isEditing.value = false
   productForm.value = {
@@ -297,28 +408,52 @@ const openCreateModal = () => {
     category: '',
     image: ''
   }
+  selectedImage.value = null
+  imagePreviewUrl.value = ''
   showModal.value = true
 }
 
 const editProduct = (product) => {
   isEditing.value = true
   productForm.value = { ...product }
+  selectedImage.value = null
+  imagePreviewUrl.value = ''
   showModal.value = true
 }
 
 const closeModal = () => {
   showModal.value = false
   isEditing.value = false
+  selectedImage.value = null
+  imagePreviewUrl.value = ''
 }
 
 const submitProduct = async () => {
   submitting.value = true
   try {
+    // Crear FormData para enviar archivos
+    const formData = new FormData()
+    
+    // Agregar campos del formulario
+    formData.append('name', productForm.value.name)
+    formData.append('description', productForm.value.description)
+    formData.append('price', productForm.value.price)
+    formData.append('stock', productForm.value.stock)
+    formData.append('category', productForm.value.category)
+    
+    // Agregar imagen si se seleccionó una nueva
+    if (selectedImage.value) {
+      formData.append('image', selectedImage.value)
+    } else if (productForm.value.image && !isEditing.value) {
+      // Si no hay imagen nueva pero hay URL, enviar la URL
+      formData.append('image', productForm.value.image)
+    }
+    
     if (isEditing.value) {
-      await adminService.updateProduct(productForm.value._id, productForm.value)
+      await adminService.updateProduct(productForm.value._id, formData)
       success('Producto actualizado correctamente')
     } else {
-      await adminService.createProduct(productForm.value)
+      await adminService.createProduct(formData)
       success('Producto creado correctamente')
     }
     
@@ -360,8 +495,9 @@ const deleteProduct = async (productId) => {
 }
 
 // Lifecycle
-onMounted(() => {
-  loadProducts()
+onMounted(async () => {
+  await loadProducts()
+  await loadCategories()
 })
 </script>
 
@@ -724,5 +860,114 @@ th {
   .form-actions {
     flex-direction: column;
   }
+}
+
+.category-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.new-category-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+.new-category-input input {
+  flex: 1;
+  margin: 0;
+}
+
+.new-category-input .btn {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.image-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-input-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #f8f9fa;
+}
+
+.file-input-label:hover {
+  border-color: #007bff;
+  background: #e3f2fd;
+}
+
+.upload-icon {
+  font-size: 1.5rem;
+}
+
+.upload-text {
+  color: #666;
+  font-weight: 500;
+}
+
+.image-preview, .current-image {
+  position: relative;
+  display: inline-block;
+  max-width: 200px;
+}
+
+.preview-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #dc3545;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.remove-image-btn:hover {
+  background: #c82333;
+}
+
+.current-image-label {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
 }
 </style> 
