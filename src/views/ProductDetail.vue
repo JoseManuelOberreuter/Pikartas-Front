@@ -30,11 +30,6 @@
 
           <h1 class="product-title">{{ product.name }}</h1>
           
-          <div class="product-rating">
-            <span class="stars">{{ getStarRating(product.rating) }}</span>
-            <span class="rating-value">({{ product.rating }} de 5)</span>
-          </div>
-
           <div class="product-price">
             <span class="price">${{ product.price.toFixed(2) }}</span>
           </div>
@@ -138,24 +133,31 @@ const allProducts = ref([])
 const loadProduct = async (productId) => {
   loading.value = true
   try {
+    console.log('🔍 ProductDetail: Cargando producto con ID:', productId);
     const response = await productService.getProductById(productId)
+    console.log('📦 ProductDetail: Respuesta del servidor:', response);
     
     if (response.success && response.data) {
+      // Manejar tanto _id como id del backend
+      const productId = response.data._id || response.data.id;
+      console.log('🎯 ProductDetail: ID del producto:', productId);
+      
       product.value = {
-        id: response.data._id,
+        id: productId,
         name: response.data.name,
         price: response.data.price,
         image: response.data.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: response.data.description,
         category: response.data.category,
-        stock: response.data.stock,
-        rating: response.data.rating || 4.5
+        stock: response.data.stock
       }
+      console.log('✅ ProductDetail: Producto cargado:', product.value);
     } else {
+      console.warn('⚠️ ProductDetail: Respuesta inválida del servidor:', response);
       product.value = null
     }
   } catch (error) {
-    console.error('Error loading product:', error)
+    console.error('❌ ProductDetail: Error cargando producto:', error)
     product.value = null
   } finally {
     loading.value = false
@@ -169,14 +171,13 @@ const loadAllProducts = async () => {
     
     if (response.success && response.data) {
       allProducts.value = response.data.map(p => ({
-        id: p._id,
+        id: p._id || p.id, // Manejar tanto _id como id
         name: p.name,
         price: p.price,
         image: p.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: p.description,
         category: p.category,
-        stock: p.stock,
-        rating: p.rating || 4.5
+        stock: p.stock
       }))
     }
   } catch (error) {
@@ -195,14 +196,6 @@ const relatedProducts = computed(() => {
 })
 
 // Methods
-const getStarRating = (rating) => {
-  const fullStars = Math.floor(rating)
-  const hasHalfStar = rating % 1 !== 0
-  let stars = '★'.repeat(fullStars)
-  if (hasHalfStar) stars += '☆'
-  return stars
-}
-
 const increaseQuantity = () => {
   if (quantity.value < product.value.stock) {
     quantity.value++
@@ -350,23 +343,6 @@ onMounted(async () => {
   font-weight: 700;
   margin: 0 0 1rem 0;
   color: #333;
-}
-
-.product-rating {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.stars {
-  color: #ffc107;
-  font-size: 1.25rem;
-}
-
-.rating-value {
-  color: #666;
-  font-size: 0.95rem;
 }
 
 .product-price {

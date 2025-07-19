@@ -23,7 +23,6 @@
               <option value="name">Nombre</option>
               <option value="price-low">Precio: Menor a Mayor</option>
               <option value="price-high">Precio: Mayor a Menor</option>
-              <option value="rating">Rating</option>
             </select>
           </div>
           
@@ -126,14 +125,13 @@ const loadProducts = async () => {
     if (response.success && response.data) {
       console.log(`✅ Shop: ${response.data.length} productos recibidos del servidor`);
       products.value = response.data.map(product => ({
-        id: product._id,
+        id: product._id || product.id, // Manejar tanto _id como id
         name: product.name,
         price: product.price,
         image: product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: product.description,
         category: product.category,
-        stock: product.stock,
-        rating: product.rating || 4.5
+        stock: product.stock
       }))
       console.log('🎯 Shop: Productos mapeados:', products.value);
     } else {
@@ -180,9 +178,6 @@ const filteredProducts = computed(() => {
     case 'price-high':
       result.sort((a, b) => b.price - a.price)
       break
-    case 'rating':
-      result.sort((a, b) => b.rating - a.rating)
-      break
     case 'name':
     default:
       result.sort((a, b) => a.name.localeCompare(b.name))
@@ -194,6 +189,7 @@ const filteredProducts = computed(() => {
 
 // Methods
 const viewProduct = (productId) => {
+  console.log('🔍 Shop: Navegando a producto con ID:', productId);
   router.push(`/product/${productId}`)
 }
 

@@ -103,14 +103,13 @@ const loadProducts = async () => {
     
     if (response.success && response.data) {
       products.value = response.data.map(product => ({
-        id: product._id,
+        id: product._id || product.id, // Manejar tanto _id como id
         name: product.name,
         price: product.price,
         image: product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: product.description,
         category: product.category,
-        stock: product.stock,
-        rating: product.rating || 4.5
+        stock: product.stock
       }))
     }
   } catch (error) {
@@ -121,14 +120,13 @@ const loadProducts = async () => {
   }
 }
 
-// Mostrar solo los 4 productos con mejor rating
+// Mostrar solo los 4 primeros productos
 const featuredProducts = computed(() => {
-  return products.value
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 4)
+  return products.value.slice(0, 4)
 })
 
 const viewProduct = (productId) => {
+  console.log('🔍 Home: Navegando a producto con ID:', productId);
   router.push(`/product/${productId}`)
 }
 

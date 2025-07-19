@@ -155,10 +155,20 @@ export const productService = {
   async getProductById(id) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.get(routesStore.getProductByIdUrl(id));
+      const url = routesStore.getProductByIdUrl(id);
+      console.log('🔍 API: Consultando producto con URL:', url);
+      
+      const response = await axios.get(url);
+      console.log('📦 API: Respuesta del servidor para producto:', response.data);
+      
       return response.data;
     } catch (error) {
-      console.error('Get product error:', error);
+      console.error('❌ API: Error obteniendo producto por ID:', error);
+      console.error('❌ API: Detalles del error:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      });
       throw error.response?.data || { error: error.message };
     }
   },

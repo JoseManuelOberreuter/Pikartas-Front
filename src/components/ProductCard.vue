@@ -14,10 +14,6 @@
     
     <div class="product-info">
       <h3 class="product-name">{{ product.name }}</h3>
-      <div class="product-rating">
-        <span class="stars">{{ getStarRating(product.rating) }}</span>
-        <span class="rating-value">({{ product.rating }})</span>
-      </div>
       <p class="product-category">{{ product.category }}</p>
       <div class="product-price">
         ${{ product.price.toFixed(2) }}
@@ -55,15 +51,9 @@ const addToCart = async () => {
 }
 
 const viewProduct = () => {
+  console.log('🔍 ProductCard: Producto completo:', props.product);
+  console.log('🎯 ProductCard: ID del producto:', props.product.id);
   emit('view-product', props.product.id)
-}
-
-const getStarRating = (rating) => {
-  const fullStars = Math.floor(rating)
-  const hasHalfStar = rating % 1 !== 0
-  let stars = '★'.repeat(fullStars)
-  if (hasHalfStar) stars += '☆'
-  return stars
 }
 </script>
 
@@ -165,23 +155,6 @@ const getStarRating = (rating) => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.product-rating {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.stars {
-  color: #ffc107;
-  font-size: 1rem;
-}
-
-.rating-value {
-  font-size: 0.875rem;
-  color: #666;
 }
 
 .product-category {
