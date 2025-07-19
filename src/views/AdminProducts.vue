@@ -75,7 +75,7 @@
                   <div class="stock-control">
                     <input 
                       :value="product.stock" 
-                      @change="updateStock(product._id, $event.target.value)"
+                      @change="updateStock(product._id || product.id, $event.target.value)"
                       type="number" 
                       min="0" 
                       class="stock-input"
@@ -372,6 +372,18 @@ const loadProducts = async () => {
     const response = await adminService.getAllProducts()
     console.log('Admin products loaded:', response);
     products.value = response.data || []
+    
+    // Verificar la estructura de los productos
+    if (products.value.length > 0) {
+      console.log('First product structure:', products.value[0])
+      console.log('First product ID:', products.value[0]._id)
+      console.log('First product ID (id):', products.value[0].id)
+      console.log('All product IDs:', products.value.map(p => ({ 
+        _id: p._id, 
+        id: p.id, 
+        name: p.name 
+      })))
+    }
   } catch (err) {
     console.error('Error loading products:', err)
     error('Error al cargar productos')
@@ -414,8 +426,34 @@ const openCreateModal = () => {
 }
 
 const editProduct = (product) => {
+  console.log('Editing product:', product)
+  console.log('Product ID:', product._id)
+  console.log('Product ID (id):', product.id)
+  
+  // Verificar que el producto tenga un ID válido (probar diferentes nombres)
+  const productId = product._id || product.id
+  if (!productId) {
+    console.error('Product has no valid ID:', product)
+    error('Error: Producto sin ID válido')
+    return
+  }
+  
   isEditing.value = true
-  productForm.value = { ...product }
+  
+  // Copiar todos los campos del producto
+  productForm.value = {
+    _id: productId,
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    stock: product.stock,
+    category: product.category,
+    image: product.image
+  }
+  
+  console.log('Product form after copy:', productForm.value)
+  console.log('Product form ID:', productForm.value._id)
+  
   selectedImage.value = null
   imagePreviewUrl.value = ''
   showModal.value = true
@@ -450,6 +488,13 @@ const submitProduct = async () => {
     }
     
     if (isEditing.value) {
+      console.log('Submitting product update with ID:', productForm.value._id)
+      console.log('Product form data:', productForm.value)
+      
+      if (!productForm.value._id) {
+        throw new Error('ID de producto no encontrado')
+      }
+      
       await adminService.updateProduct(productForm.value._id, formData)
       success('Producto actualizado correctamente')
     } else {
@@ -469,10 +514,25 @@ const submitProduct = async () => {
 
 const updateStock = async (productId, newStock) => {
   try {
-    const stockValue = parseInt(newStock)
-    if (stockValue < 0) return
+    console.log('Updating stock for product:', productId, 'New stock:', newStock)
     
-    await adminService.updateProductStock(productId, stockValue)
+    // Verificar que el ID sea válido
+    if (!productId) {
+      console.error('Invalid product ID:', productId)
+      error('Error: ID de producto inválido')
+      return
+    }
+    
+    const stockValue = parseInt(newStock)
+    if (stockValue < 0) {
+      console.log('Invalid stock value:', stockValue)
+      return
+    }
+    
+    console.log('Calling updateProductStock with:', { productId, stockValue })
+    const result = await adminService.updateProductStock(productId, stockValue)
+    console.log('Update stock result:', result)
+    
     success('Stock actualizado')
     await loadProducts()
   } catch (err) {

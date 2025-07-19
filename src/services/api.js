@@ -424,10 +424,31 @@ export const adminService = {
   async updateProductStock(id, stock) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.patch(routesStore.getUpdateStockUrl(id), { stock });
+      const url = routesStore.getUpdateStockUrl(id);
+      const data = { stock };
+      
+      console.log('Update stock request:', {
+        url,
+        method: 'PATCH',
+        data,
+        id,
+        stock
+      });
+      
+      // Verificar si hay token de autenticación
+      const token = localStorage.getItem('token');
+      console.log('Auth token present:', !!token);
+      
+      const response = await axios.patch(url, data);
+      console.log('Update stock response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Update stock error:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
       throw error.response?.data || { error: error.message };
     }
   },
