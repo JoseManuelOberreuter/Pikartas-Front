@@ -56,13 +56,6 @@
             <div class="action-button">Ir a Órdenes</div>
           </div>
 
-          <div class="action-card" @click="navigateTo('/admin/products/new')">
-            <div class="action-icon">➕</div>
-            <h3>Agregar Producto</h3>
-            <p>Crear un nuevo producto rápidamente</p>
-            <div class="action-button">Crear Producto</div>
-          </div>
-
           <div class="action-card" @click="navigateTo('/admin/analytics')">
             <div class="action-icon">📊</div>
             <h3>Estadísticas</h3>
