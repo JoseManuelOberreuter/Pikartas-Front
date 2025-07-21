@@ -31,11 +31,6 @@
             <h3>Calidad Garantizada</h3>
             <p>Productos originales con garantía oficial y soporte técnico especializado.</p>
           </div>
-          <div class="feature-card">
-            <div class="feature-icon">💬</div>
-            <h3>Atención 24/7</h3>
-            <p>Soporte al cliente disponible las 24 horas, los 7 días de la semana.</p>
-          </div>
         </div>
       </div>
     </section>
