@@ -3,13 +3,41 @@
     <div class="cart-sidebar" @click.stop :class="{ 'is-open': isCartOpen }" >
       <div class="cart-header">
         <h2>🛒 Carrito de Compras</h2>
-        <button class="close-btn" @click="closeCart">&times;</button>
+        <button class="close-btn" @click="closeCart" title="Cerrar carrito">
+          <span class="close-icon">×</span>
+        </button>
       </div>
       
       <div class="cart-content">
         <div v-if="loading && cartItems.length === 0" class="loading-state">
           <div class="loading-spinner">🔄</div>
           <p>Cargando carrito...</p>
+        </div>
+
+        <div v-else-if="error && cartItems.length === 0" class="error-state">
+          <div class="error-icon">⚠️</div>
+          <p>{{ error }}</p>
+          <button class="action-btn retry-btn" @click="retryLoadCart">
+            <span class="btn-icon">🔄</span>
+            <span class="btn-text">Reintentar</span>
+          </button>
+        </div>
+
+        <!-- Mensaje cuando no hay items en el carrito -->
+        <div v-if="cartItems.length === 0 && !loading && !error" class="empty-cart">
+          <div class="empty-cart-icon">🛒</div>
+          <p v-if="isAuthenticated">No tienes nada en el carrito. ¡Agrega algo!</p>
+          <p v-else>Debes tener sesión iniciada para usar el carrito</p>
+          <div class="empty-cart-actions">
+            <router-link v-if="isAuthenticated" to="/shop" class="action-btn shop-btn" @click="closeCart">
+              <span class="btn-icon">🛍️</span>
+              <span class="btn-text">Ir a la tienda</span>
+            </router-link>
+                      <button v-else class="action-btn login-btn" @click="openLoginModal">
+            <span class="btn-icon">🔐</span>
+            <span class="btn-text">Iniciar Sesión</span>
+          </button>
+          </div>
         </div>
 
         <div v-else-if="cartItems.length === 0" class="empty-cart">
@@ -31,9 +59,13 @@
               <div class="item-price">${{ item.price.toFixed(2) }}</div>
               
               <div class="quantity-controls">
-                <button class="qty-btn" @click="decreaseQuantity(item.id)" :disabled="item.quantity <= 1">-</button>
+                <button class="qty-btn decrease" @click="decreaseQuantity(item.id)" :disabled="item.quantity <= 1">
+                  <span class="qty-icon">−</span>
+                </button>
                 <span class="quantity">{{ item.quantity }}</span>
-                <button class="qty-btn" @click="increaseQuantity(item.id)">+</button>
+                <button class="qty-btn increase" @click="increaseQuantity(item.id)">
+                  <span class="qty-icon">+</span>
+                </button>
               </div>
               
               <div class="item-total">
@@ -41,8 +73,8 @@
               </div>
             </div>
             
-            <button class="remove-btn" @click="removeFromCart(item.id)">
-              🗑️
+            <button class="remove-btn" @click="removeFromCart(item.id)" title="Eliminar producto">
+              <span class="remove-icon">🗑️</span>
             </button>
           </div>
         </div>
@@ -55,15 +87,20 @@
         </div>
         
         <div class="cart-actions">
-          <button class="btn btn-outline" @click="clearCart">
-            Limpiar Carrito
+          <div class="action-buttons">
+            <button class="action-btn clear-btn" @click="clearCart">
+              <span class="btn-icon">🗑️</span>
+              <span class="btn-text">Limpiar</span>
           </button>
-          <router-link to="/cart" class="btn btn-primary" @click="closeCart">
-            Ver Carrito
+            <router-link to="/cart" class="action-btn view-btn" @click="closeCart">
+              <span class="btn-icon">👁️</span>
+              <span class="btn-text">Ver Carrito</span>
           </router-link>
-          <router-link to="/checkout" class="btn btn-success" @click="closeCart">
-            Finalizar Compra
+            <router-link to="/checkout" class="action-btn checkout-btn" @click="closeCart">
+              <span class="btn-icon">💳</span>
+              <span class="btn-text">Comprar</span>
           </router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -73,9 +110,15 @@
 <script setup>
 import { useCartStore } from '../stores/cart.js'
 import { storeToRefs } from 'pinia'
+import { useAuthStore } from '../stores/auth.js'
 
 const cartStore = useCartStore()
-const { cartItems, cartTotal, cartItemCount, isCartOpen, loading } = storeToRefs(cartStore)
+const authStore = useAuthStore()
+const { cartItems, cartTotal, cartItemCount, isCartOpen, loading, error } = storeToRefs(cartStore)
+const { isAuthenticated } = storeToRefs(authStore)
+
+// Emits
+const emit = defineEmits(['open-login-modal'])
 
 const removeFromCart = async (productId) => {
   await cartStore.removeFromCart(productId)
@@ -103,6 +146,16 @@ const clearCart = async () => {
 
 const closeCart = () => {
   cartStore.closeCart()
+}
+
+const retryLoadCart = async () => {
+  await cartStore.loadCart()
+}
+
+const openLoginModal = () => {
+  closeCart() // Cerrar el carrito primero
+  // Emitir evento para abrir el modal de login
+  emit('open-login-modal')
 }
 </script>
 
@@ -159,24 +212,32 @@ const closeCart = () => {
 }
 
 .close-btn {
-  background: none;
+  background: rgba(0, 0, 0, 0.05);
   border: none;
-  font-size: 2rem;
   cursor: pointer;
   color: #666;
   line-height: 1;
   padding: 0;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .close-btn:hover {
   background: rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+  color: #333;
+}
+
+.close-icon {
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1;
 }
 
 .cart-content {
@@ -185,7 +246,8 @@ const closeCart = () => {
 }
 
 .loading-state,
-.empty-cart {
+.empty-cart,
+.error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -193,6 +255,7 @@ const closeCart = () => {
   height: 100%;
   padding: 2rem;
   text-align: center;
+  gap: 1rem;
 }
 
 .loading-spinner {
@@ -213,16 +276,37 @@ const closeCart = () => {
 }
 
 .empty-cart-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
   opacity: 0.5;
 }
 
 .empty-cart p {
-  margin: 0 0 1.5rem 0;
+  margin: 0;
   color: #666;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.empty-cart-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.error-state p {
+  margin: 0 0 1.5rem 0;
+  color: #dc3545;
   font-size: 1.1rem;
 }
+
+
 
 .cart-items {
   padding: 1rem;
@@ -252,6 +336,7 @@ const closeCart = () => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 6px;
 }
 
 .item-details {
@@ -281,36 +366,67 @@ const closeCart = () => {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 20px;
+  padding: 0.25rem;
 }
 
 .qty-btn {
-  width: 28px;
-  height: 28px;
-  border: 1px solid #ddd;
+  width: 32px;
+  height: 32px;
+  border: none;
   background: white;
-  border-radius: 4px;
+  border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .qty-btn:hover:not(:disabled) {
-  background: #f8f9fa;
-  border-color: #007bff;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.qty-btn:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 .qty-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
+}
+
+.qty-btn.decrease:hover:not(:disabled) {
+  background: #ff6b6b;
+  color: white;
+}
+
+.qty-btn.increase:hover:not(:disabled) {
+  background: #4ecdc4;
+  color: white;
+}
+
+.qty-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+  line-height: 1;
 }
 
 .quantity {
-  min-width: 30px;
+  min-width: 40px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #333;
+  background: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .item-total {
@@ -321,20 +437,34 @@ const closeCart = () => {
 
 .remove-btn {
   position: absolute;
-  top: 1rem;
-  right: 0;
-  background: none;
+  top: 0.75rem;
+  right: 0.5rem;
+  background: rgba(220, 53, 69, 0.1);
   border: none;
   cursor: pointer;
-  font-size: 1.2rem;
-  color: #dc3545;
-  padding: 0.25rem;
-  border-radius: 4px;
-  transition: background 0.3s;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
 }
 
 .remove-btn:hover {
-  background: rgba(220, 53, 69, 0.1);
+  background: rgba(220, 53, 69, 0.2);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.remove-icon {
+  font-size: 1rem;
+  color: #dc3545;
+  transition: color 0.3s;
+}
+
+.remove-btn:hover .remove-icon {
+  color: #c82333;
 }
 
 .cart-footer {
@@ -365,49 +495,134 @@ const closeCart = () => {
   gap: 0.75rem;
 }
 
-.btn {
-  padding: 0.75rem 1rem;
-  border: 1px solid;
-  border-radius: 6px;
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   text-align: center;
   text-decoration: none;
-  transition: all 0.3s;
-  display: block;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  position: relative;
+  overflow: hidden;
+  min-height: 44px;
+  max-width: 200px;
 }
 
-.btn-outline {
-  background: transparent;
-  color: #6c757d;
-  border-color: #6c757d;
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
-.btn-outline:hover {
-  background: #6c757d;
+.action-btn:hover::before {
+  left: 100%;
+}
+
+.btn-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.btn-text {
+  font-weight: 600;
+}
+
+/* Botón Limpiar */
+.clear-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
   color: white;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
 }
 
-.btn-primary {
-  background: #007bff;
+.clear-btn:hover {
+  background: linear-gradient(135deg, #ff5252, #d32f2f);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* Botón Ver Carrito */
+.view-btn {
+  background: linear-gradient(135deg, #4ecdc4, #44a08d);
   color: white;
-  border-color: #007bff;
+  box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
 }
 
-.btn-primary:hover {
-  background: #0056b3;
-  border-color: #0056b3;
+.view-btn:hover {
+  background: linear-gradient(135deg, #26a69a, #00897b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
 }
 
-.btn-success {
-  background: #28a745;
+/* Botón Comprar */
+.checkout-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  border-color: #28a745;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.btn-success:hover {
-  background: #1e7e34;
-  border-color: #1e7e34;
+.checkout-btn:hover {
+  background: linear-gradient(135deg, #5a6fd8, #6a4c93);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Botón Ir a la tienda */
+.shop-btn {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  color: white;
+  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+}
+
+.shop-btn:hover {
+  background: linear-gradient(135deg, #e91e63, #c2185b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+}
+
+/* Botón Iniciar Sesión */
+.login-btn {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+}
+
+.login-btn:hover {
+  background: linear-gradient(135deg, #2196f3, #00bcd4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+}
+
+/* Botón Reintentar */
+.retry-btn {
+  background: linear-gradient(135deg, #ffecd2, #fcb69f);
+  color: #333;
+  box-shadow: 0 4px 15px rgba(255, 236, 210, 0.3);
+}
+
+.retry-btn:hover {
+  background: linear-gradient(135deg, #ffd89b, #19547b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 236, 210, 0.4);
 }
 
 @media (max-width: 480px) {

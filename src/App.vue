@@ -23,7 +23,7 @@
     </main>
 
     <!-- Cart Sidebar Component -->
-    <CartSidebar />
+    <CartSidebar @open-login-modal="openLoginModal" />
 
     <!-- Footer Component -->
     <Footer />

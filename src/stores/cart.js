@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { cartService } from '../services/api';
+import { cartService, productService } from '../services/api';
 import { useAuthStore } from './auth';
 import { useNotifications } from '../composables/useNotifications';
 
@@ -13,6 +13,44 @@ export const useCartStore = defineStore('cart', () => {
 
   // Composables
   const { success, error: errorNotification } = useNotifications();
+
+  // Función para obtener información completa de productos
+  async function getProductDetails(productIds) {
+    const productDetails = {};
+    
+    try {
+      // Obtener detalles de cada producto
+      const promises = productIds.map(async (productId) => {
+        try {
+          const product = await productService.getProductById(productId);
+          if (product.success && product.data) {
+            productDetails[productId] = product.data;
+          } else if (product.product) {
+            productDetails[productId] = product.product;
+          } else {
+            productDetails[productId] = product;
+          }
+        } catch (error) {
+          console.warn(`No se pudo obtener detalles del producto ${productId}:`, error);
+          // Usar datos por defecto si falla
+          productDetails[productId] = {
+            id: productId,
+            name: `Producto ${productId}`,
+            image: '/placeholder-product.svg',
+            category: 'General',
+            rating: 5,
+            description: ''
+          };
+        }
+      });
+      
+      await Promise.all(promises);
+      return productDetails;
+    } catch (error) {
+      console.error('Error obteniendo detalles de productos:', error);
+      return {};
+    }
+  }
 
   // Computed (mantenemos la misma API que antes)
   const cartItems = computed(() => items.value);
@@ -38,29 +76,159 @@ export const useCartStore = defineStore('cart', () => {
     error.value = null;
     
     try {
+      // Intentar obtener el carrito completo primero
       const response = await cartService.getCart();
       
+              // Si no hay items en la respuesta principal, intentar con el summary
+        if (!response.data || (!response.data.items && !Array.isArray(response.data))) {
+          const summaryResponse = await cartService.getCartSummary();
+        
+        if (summaryResponse.success && summaryResponse.data && summaryResponse.data.items) {
+                // Obtener IDs únicos de productos
+      const productIds = [...new Set(summaryResponse.data.items.map(item => item.productId))];
+      
+      // Obtener detalles de productos
+      const productDetails = await getProductDetails(productIds);
+      
+      items.value = summaryResponse.data.items.map(item => {
+            
+            const productDetail = productDetails[item.productId] || {};
+            
+            return {
+              id: item.productId,
+              _id: item.productId,
+              name: item.productName,
+              price: item.price,
+              image: productDetail.image || '/placeholder-product.svg',
+              stock: productDetail.stock || 999,
+              quantity: item.quantity,
+              category: productDetail.category || 'General',
+              rating: productDetail.rating || 5,
+              description: productDetail.description || '',
+              subtotal: item.subtotal
+            };
+          });
+        } else if (summaryResponse.data && Array.isArray(summaryResponse.data)) {
+          // Obtener IDs únicos de productos
+          const productIds = [...new Set(summaryResponse.data.map(item => item.productId))];
+          
+          // Obtener detalles de productos
+          const productDetails = await getProductDetails(productIds);
+          
+          items.value = summaryResponse.data.map(item => {
+            
+            const productDetail = productDetails[item.productId] || {};
+            
+            return {
+              id: item.productId,
+              _id: item.productId,
+              name: item.productName,
+              price: item.price,
+              image: productDetail.image || '/placeholder-product.svg',
+              stock: productDetail.stock || 999,
+              quantity: item.quantity,
+              category: productDetail.category || 'General',
+              rating: productDetail.rating || 5,
+              description: productDetail.description || '',
+              subtotal: item.subtotal
+            };
+          });
+        } else {
+          items.value = [];
+        }
+      } else {
       // Mapear la respuesta del backend al formato esperado por el frontend
       if (response.success && response.data && response.data.items) {
-        items.value = response.data.items.map(item => ({
-          id: item.product._id,
-          _id: item._id,
-          name: item.product.name,
-          price: item.product.price,
-          image: item.product.image,
-          stock: item.product.stock,
+          // Obtener IDs únicos de productos
+          const productIds = [...new Set(response.data.items.map(item => item.productId))];
+          
+          // Obtener detalles de productos
+          const productDetails = await getProductDetails(productIds);
+          
+          items.value = response.data.items.map(item => {
+            
+            const productDetail = productDetails[item.productId] || {};
+            
+            return {
+              id: item.productId,
+              _id: item.productId,
+              name: item.productName,
+              price: item.price,
+              image: productDetail.image || '/placeholder-product.svg',
+              stock: productDetail.stock || 999,
+              quantity: item.quantity,
+              category: productDetail.category || 'General',
+              rating: productDetail.rating || 5,
+              description: productDetail.description || '',
+              subtotal: item.subtotal
+            };
+          });
+        } else if (response.data && Array.isArray(response.data)) {
+          // Obtener IDs únicos de productos
+          const productIds = [...new Set(response.data.map(item => item.productId))];
+          
+          // Obtener detalles de productos
+          const productDetails = await getProductDetails(productIds);
+          
+          items.value = response.data.map(item => {
+            
+            const productDetail = productDetails[item.productId] || {};
+            
+            return {
+              id: item.productId,
+              _id: item.productId,
+              name: item.productName,
+              price: item.price,
+              image: productDetail.image || '/placeholder-product.svg',
+              stock: productDetail.stock || 999,
+              quantity: item.quantity,
+              category: productDetail.category || 'General',
+              rating: productDetail.rating || 5,
+              description: productDetail.description || '',
+              subtotal: item.subtotal
+            };
+          });
+        } else if (response.success && response.data && response.data.cartItems) {
+          // Obtener IDs únicos de productos
+          const productIds = [...new Set(response.data.cartItems.map(item => item.productId))];
+          
+          // Obtener detalles de productos
+          const productDetails = await getProductDetails(productIds);
+          
+          items.value = response.data.cartItems.map(item => {
+            
+            const productDetail = productDetails[item.productId] || {};
+            
+            return {
+              id: item.productId,
+              _id: item.productId,
+              name: item.productName,
+              price: item.price,
+              image: productDetail.image || '/placeholder-product.svg',
+              stock: productDetail.stock || 999,
           quantity: item.quantity,
-          category: item.product.category || 'General',
-          rating: item.product.rating || 5,
-          description: item.product.description || ''
-        }));
+              category: productDetail.category || 'General',
+              rating: productDetail.rating || 5,
+              description: productDetail.description || '',
+              subtotal: item.subtotal
+            };
+          });
       } else {
         items.value = [];
+        }
       }
     } catch (err) {
       console.error('Error loading cart:', err);
+      
+      // Manejar errores específicos de autenticación
+      if (err.status === 401 || err.statusCode === 401) {
+        error.value = 'Debes iniciar sesión para ver tu carrito';
+        // Limpiar carrito local si no está autenticado
+        items.value = [];
+      } else {
       error.value = err.message || 'Error al cargar el carrito';
       items.value = [];
+      }
     } finally {
       loading.value = false;
     }
@@ -91,8 +259,15 @@ export const useCartStore = defineStore('cart', () => {
       
     } catch (err) {
       console.error('Error adding to cart:', err);
+      
+      // Manejar errores específicos de autenticación
+      if (err.status === 401 || err.statusCode === 401) {
+        error.value = 'Debes iniciar sesión para agregar productos al carrito';
+        errorNotification(error.value);
+      } else {
       error.value = err.message || 'Error al agregar producto al carrito';
       errorNotification(error.value);
+      }
     } finally {
       loading.value = false;
     }
@@ -117,8 +292,15 @@ export const useCartStore = defineStore('cart', () => {
       
     } catch (err) {
       console.error('Error removing from cart:', err);
+      
+      // Manejar errores específicos de autenticación
+      if (err.status === 401 || err.statusCode === 401) {
+        error.value = 'Debes iniciar sesión para modificar el carrito';
+        errorNotification(error.value);
+      } else {
       error.value = err.message || 'Error al eliminar producto del carrito';
       errorNotification(error.value);
+      }
     } finally {
       loading.value = false;
     }
@@ -152,8 +334,15 @@ export const useCartStore = defineStore('cart', () => {
       
     } catch (err) {
       console.error('Error updating cart item:', err);
+      
+      // Manejar errores específicos de autenticación
+      if (err.status === 401 || err.statusCode === 401) {
+        error.value = 'Debes iniciar sesión para modificar el carrito';
+        errorNotification(error.value);
+      } else {
       error.value = err.message || 'Error al actualizar cantidad';
       errorNotification(error.value);
+      }
     } finally {
       loading.value = false;
     }
@@ -177,8 +366,15 @@ export const useCartStore = defineStore('cart', () => {
       
     } catch (err) {
       console.error('Error clearing cart:', err);
+      
+      // Manejar errores específicos de autenticación
+      if (err.status === 401 || err.statusCode === 401) {
+        error.value = 'Debes iniciar sesión para vaciar el carrito';
+        errorNotification(error.value);
+      } else {
       error.value = err.message || 'Error al vaciar el carrito';
       errorNotification(error.value);
+      }
     } finally {
       loading.value = false;
     }

@@ -305,7 +305,11 @@ export const cartService = {
       return response.data;
     } catch (error) {
       console.error('Get cart error:', error);
-      throw error.response?.data || { error: error.message };
+      // Agregar información del status code al error
+      const errorWithStatus = error.response?.data || { error: error.message };
+      errorWithStatus.status = error.response?.status;
+      errorWithStatus.statusCode = error.response?.status;
+      throw errorWithStatus;
     }
   },
 
@@ -316,7 +320,10 @@ export const cartService = {
       return response.data;
     } catch (error) {
       console.error('Get cart summary error:', error);
-      throw error.response?.data || { error: error.message };
+      const errorWithStatus = error.response?.data || { error: error.message };
+      errorWithStatus.status = error.response?.status;
+      errorWithStatus.statusCode = error.response?.status;
+      throw errorWithStatus;
     }
   },
 
@@ -327,7 +334,10 @@ export const cartService = {
       return response.data;
     } catch (error) {
       console.error('Add to cart error:', error);
-      throw error.response?.data || { error: error.message };
+      const errorWithStatus = error.response?.data || { error: error.message };
+      errorWithStatus.status = error.response?.status;
+      errorWithStatus.statusCode = error.response?.status;
+      throw errorWithStatus;
     }
   },
 
@@ -338,7 +348,10 @@ export const cartService = {
       return response.data;
     } catch (error) {
       console.error('Update cart item error:', error);
-      throw error.response?.data || { error: error.message };
+      const errorWithStatus = error.response?.data || { error: error.message };
+      errorWithStatus.status = error.response?.status;
+      errorWithStatus.statusCode = error.response?.status;
+      throw errorWithStatus;
     }
   },
 
@@ -349,7 +362,10 @@ export const cartService = {
       return response.data;
     } catch (error) {
       console.error('Remove from cart error:', error);
-      throw error.response?.data || { error: error.message };
+      const errorWithStatus = error.response?.data || { error: error.message };
+      errorWithStatus.status = error.response?.status;
+      errorWithStatus.statusCode = error.response?.status;
+      throw errorWithStatus;
     }
   },
 
@@ -360,7 +376,10 @@ export const cartService = {
       return response.data;
     } catch (error) {
       console.error('Clear cart error:', error);
-      throw error.response?.data || { error: error.message };
+      const errorWithStatus = error.response?.data || { error: error.message };
+      errorWithStatus.status = error.response?.status;
+      errorWithStatus.statusCode = error.response?.status;
+      throw errorWithStatus;
     }
   }
 };
