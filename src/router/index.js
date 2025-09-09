@@ -88,6 +88,37 @@ const routes = [
     name: 'AdminAnalytics',
     component: () => import('../views/AdminAnalytics.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  // Transbank Payment Routes
+  {
+    path: '/payment/processing',
+    name: 'PaymentProcessing',
+    component: () => import('../views/PaymentProcessing.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/payment/success',
+    name: 'PaymentSuccess',
+    component: () => import('../views/PaymentSuccess.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/payment/error',
+    name: 'PaymentError',
+    component: () => import('../views/PaymentError.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/payment/return',
+    name: 'PaymentReturn',
+    component: () => import('../views/PaymentReturn.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/orders',
+    name: 'UserOrders',
+    component: () => import('../views/UserOrders.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

@@ -100,54 +100,30 @@
             <div class="form-section">
               <h2>💳 Información de Pago</h2>
               
-              <div class="form-group">
-                <label for="cardNumber">Número de Tarjeta *</label>
-                <input 
-                  type="text" 
-                  id="cardNumber"
-                  v-model="paymentForm.cardNumber" 
-                  placeholder="1234 5678 9012 3456"
-                  maxlength="19"
-                  @input="formatCardNumber"
-                  required
-                />
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="expiryDate">Fecha de Expiración *</label>
-                  <input 
-                    type="text" 
-                    id="expiryDate"
-                    v-model="paymentForm.expiryDate" 
-                    placeholder="MM/AA"
-                    maxlength="5"
-                    @input="formatExpiryDate"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="cvv">CVV *</label>
-                  <input 
-                    type="text" 
-                    id="cvv"
-                    v-model="paymentForm.cvv" 
-                    placeholder="123"
-                    maxlength="4"
-                    required
-                  />
+              <div class="payment-method-selection">
+                <div class="payment-option selected">
+                  <div class="payment-icon">🏦</div>
+                  <div class="payment-info">
+                    <h3>Transbank Webpay Plus</h3>
+                    <p>Pago seguro con tarjeta de crédito o débito</p>
+                  </div>
+                  <div class="payment-check">✓</div>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label for="cardName">Nombre en la Tarjeta *</label>
-                <input 
-                  type="text" 
-                  id="cardName"
-                  v-model="paymentForm.cardName" 
-                  placeholder="Como aparece en la tarjeta"
-                  required
-                />
+              <div class="payment-info-card">
+                <div class="info-item">
+                  <span class="info-icon">🔒</span>
+                  <span>Pago 100% seguro con Transbank</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-icon">💳</span>
+                  <span>Acepta todas las tarjetas principales</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-icon">⚡</span>
+                  <span>Procesamiento instantáneo</span>
+                </div>
               </div>
             </div>
 
@@ -263,12 +239,7 @@ const shippingForm = reactive({
   zipCode: ''
 })
 
-const paymentForm = reactive({
-  cardNumber: '',
-  expiryDate: '',
-  cvv: '',
-  cardName: ''
-})
+// Payment form removed - using Transbank instead
 
 const orderNotes = ref('')
 const isProcessing = ref(false)
@@ -279,38 +250,37 @@ const shipping = computed(() => cartTotal.value >= 500 ? 0 : 25)
 const finalTotal = computed(() => cartTotal.value + tax.value + shipping.value)
 
 // Methods
-const formatCardNumber = (event) => {
-  let value = event.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '')
-  let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value
-  paymentForm.cardNumber = formattedValue
-}
-
-const formatExpiryDate = (event) => {
-  let value = event.target.value.replace(/\D/g, '')
-  if (value.length >= 2) {
-    value = value.substring(0, 2) + '/' + value.substring(2, 4)
-  }
-  paymentForm.expiryDate = value
-}
 
 const submitOrder = async () => {
   isProcessing.value = true
   
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    // Clear cart
-    await cartStore.clearCart()
-    
-    // Show success message
-    success(`¡Pedido realizado con éxito!\n\nTotal: $${finalTotal.value.toFixed(2)}\nEnvío a: ${shippingForm.address}, ${shippingForm.city}\n\nRecibirás un email de confirmación en ${shippingForm.email}`, 8000)
-    
-    // Redirect to home
-    router.push('/')
+    // Validate shipping form
+    if (!shippingForm.firstName || !shippingForm.lastName || !shippingForm.email || 
+        !shippingForm.phone || !shippingForm.address || !shippingForm.city || !shippingForm.zipCode) {
+      throw new Error('Por favor completa todos los campos obligatorios')
+    }
+
+    // Redirect to payment processing
+    router.push({
+      name: 'PaymentProcessing',
+      query: {
+        // Pass shipping data for payment initiation
+        shippingData: JSON.stringify({
+          firstName: shippingForm.firstName,
+          lastName: shippingForm.lastName,
+          email: shippingForm.email,
+          phone: shippingForm.phone,
+          address: shippingForm.address,
+          city: shippingForm.city,
+          zipCode: shippingForm.zipCode,
+          orderNotes: orderNotes.value
+        })
+      }
+    })
     
   } catch (err) {
-    error('Error al procesar el pedido. Por favor, intenta nuevamente.')
+    error(err.message || 'Error al procesar el pedido. Por favor, intenta nuevamente.')
   } finally {
     isProcessing.value = false
   }
@@ -442,6 +412,85 @@ const submitOrder = async () => {
 .form-group textarea {
   resize: vertical;
   min-height: 80px;
+}
+
+.payment-method-selection {
+  margin-bottom: 1.5rem;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: white;
+}
+
+.payment-option.selected {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.payment-icon {
+  font-size: 2rem;
+  margin-right: 1rem;
+}
+
+.payment-info {
+  flex: 1;
+}
+
+.payment-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.payment-info p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.payment-check {
+  width: 24px;
+  height: 24px;
+  background: #007bff;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.payment-info-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+.info-icon {
+  font-size: 1rem;
 }
 
 .form-actions {
