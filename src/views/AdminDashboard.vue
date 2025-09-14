@@ -18,7 +18,7 @@
         <div class="stat-card">
           <div class="stat-icon">🛒</div>
           <div class="stat-info">
-            <h3>{{ stats.totalOrders || 0 }}</h3>
+            <h3>{{ stats.totalOrders || 0 }}</h3> 
             <p>Total Órdenes</p>
           </div>
         </div>
@@ -36,6 +36,38 @@
           <div class="stat-info">
             <h3>{{ stats.totalUsers || 0 }}</h3>
             <p>Total Usuarios</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">💳</div>
+          <div class="stat-info">
+            <h3>{{ stats.paidOrders || 0 }}</h3>
+            <p>Órdenes Pagadas</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <h3>{{ stats.pendingPayments || 0 }}</h3>
+            <p>Pagos Pendientes</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🔄</div>
+          <div class="stat-info">
+            <h3>{{ stats.refundedOrders || 0 }}</h3>
+            <p>Reembolsos</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-info">
+            <h3>{{ stats.conversionRate || 0 }}%</h3>
+            <p>Tasa de Conversión</p>
           </div>
         </div>
       </div>
@@ -62,6 +94,32 @@
             <p>Ver reportes y analíticas</p>
             <div class="action-button">Ver Estadísticas</div>
           </div>
+
+          <div class="action-card" @click="navigateTo('/admin/orders')">
+            <div class="action-icon">💳</div>
+            <h3>Gestionar Pagos</h3>
+            <p>Reembolsos y estado de pagos</p>
+            <div class="action-button">Gestionar Pagos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Alerts -->
+      <div class="payment-alerts" v-if="paymentAlerts.length > 0">
+        <h2>🚨 Alertas de Pago</h2>
+        <div class="alerts-list">
+          <div class="alert-item" v-for="alert in paymentAlerts" :key="alert.id" :class="`alert-${alert.type}`">
+            <div class="alert-icon">{{ alert.icon }}</div>
+            <div class="alert-content">
+              <h4>{{ alert.title }}</h4>
+              <p>{{ alert.message }}</p>
+            </div>
+            <div class="alert-actions">
+              <button @click="handleAlert(alert)" class="btn btn-sm btn-outline">
+                {{ alert.actionText }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -73,6 +131,14 @@
             <div class="activity-info">
               <h4>Nueva orden #{{ order._id?.slice(-8) }}</h4>
               <p>{{ formatDate(order.createdAt) }} - ${{ order.totalAmount }}</p>
+              <div class="payment-info" v-if="order.paymentStatus">
+                <span class="payment-badge" :class="`payment-${order.paymentStatus}`">
+                  {{ getPaymentStatusText(order.paymentStatus) }}
+                </span>
+                <span v-if="order.authorizationCode" class="auth-code">
+                  Auth: {{ order.authorizationCode }}
+                </span>
+              </div>
             </div>
             <div class="activity-status" :class="`status-${order.status}`">
               {{ getStatusText(order.status) }}
@@ -98,6 +164,7 @@ const { error } = useNotifications()
 
 const stats = ref(null)
 const recentOrders = ref([])
+const paymentAlerts = ref([])
 const loading = ref(false)
 
 const loadDashboardData = async () => {
@@ -115,11 +182,22 @@ const loadDashboardData = async () => {
       ? allProducts.data.filter(p => p.isActive !== false)
       : []
 
+    // Calculate payment statistics
+    const allOrders = Array.isArray(orders.data) ? orders.data : []
+    const paidOrders = allOrders.filter(order => order.paymentStatus === 'paid').length
+    const pendingPayments = allOrders.filter(order => order.paymentStatus === 'pending').length
+    const refundedOrders = allOrders.filter(order => order.paymentStatus === 'refunded').length
+    const conversionRate = allOrders.length > 0 ? Math.round((paidOrders / allOrders.length) * 100) : 0
+
     stats.value = {
       totalProducts: activeProducts.length,
       totalOrders: ordersStats.data?.totalOrders || 0,
       totalRevenue: ordersStats.data?.totalRevenue || 0,
-      totalUsers: ordersStats.data?.totalUsers || 0
+      totalUsers: ordersStats.data?.totalUsers || 0,
+      paidOrders,
+      pendingPayments,
+      refundedOrders,
+      conversionRate
     }
 
     // Obtener órdenes recientes (últimas 5)
@@ -128,6 +206,9 @@ const loadDashboardData = async () => {
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 5)
     }
+
+    // Generate payment alerts
+    generatePaymentAlerts(allOrders)
 
   } catch (err) {
     console.error('Error loading dashboard data:', err)
@@ -161,6 +242,79 @@ const getStatusText = (status) => {
     cancelled: 'Cancelado'
   }
   return statusMap[status] || status
+}
+
+const getPaymentStatusText = (status) => {
+  const statusMap = {
+    pending: 'Pendiente',
+    paid: 'Pagado',
+    failed: 'Fallido',
+    refunded: 'Reembolsado'
+  }
+  return statusMap[status] || status
+}
+
+const generatePaymentAlerts = (orders) => {
+  const alerts = []
+  
+  // Check for failed payments
+  const failedPayments = orders.filter(order => order.paymentStatus === 'failed')
+  if (failedPayments.length > 0) {
+    alerts.push({
+      id: 'failed-payments',
+      type: 'warning',
+      icon: '⚠️',
+      title: 'Pagos Fallidos',
+      message: `${failedPayments.length} órdenes con pagos fallidos requieren atención`,
+      actionText: 'Ver Órdenes',
+      action: () => navigateTo('/admin/orders?filter=failed')
+    })
+  }
+  
+  // Check for pending payments older than 1 hour
+  const oldPendingPayments = orders.filter(order => {
+    if (order.paymentStatus !== 'pending') return false
+    const orderDate = new Date(order.createdAt)
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+    return orderDate < oneHourAgo
+  })
+  
+  if (oldPendingPayments.length > 0) {
+    alerts.push({
+      id: 'old-pending-payments',
+      type: 'info',
+      icon: '⏰',
+      title: 'Pagos Pendientes Antiguos',
+      message: `${oldPendingPayments.length} órdenes con pagos pendientes por más de 1 hora`,
+      actionText: 'Revisar',
+      action: () => navigateTo('/admin/orders?filter=pending')
+    })
+  }
+  
+  // Check for high refund rate
+  const totalOrders = orders.length
+  const refundedOrders = orders.filter(order => order.paymentStatus === 'refunded').length
+  const refundRate = totalOrders > 0 ? (refundedOrders / totalOrders) * 100 : 0
+  
+  if (refundRate > 10 && totalOrders > 10) {
+    alerts.push({
+      id: 'high-refund-rate',
+      type: 'danger',
+      icon: '📉',
+      title: 'Alta Tasa de Reembolsos',
+      message: `Tasa de reembolsos del ${refundRate.toFixed(1)}% - Revisar calidad del servicio`,
+      actionText: 'Analizar',
+      action: () => navigateTo('/admin/analytics')
+    })
+  }
+  
+  paymentAlerts.value = alerts
+}
+
+const handleAlert = (alert) => {
+  if (alert.action) {
+    alert.action()
+  }
 }
 
 onMounted(() => {
@@ -371,6 +525,135 @@ onMounted(() => {
   color: #666;
 }
 
+/* Payment Alerts */
+.payment-alerts {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.payment-alerts h2 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+}
+
+.alert-item.alert-warning {
+  background: #fff3cd;
+  border-left-color: #ffc107;
+}
+
+.alert-item.alert-info {
+  background: #d1ecf1;
+  border-left-color: #17a2b8;
+}
+
+.alert-item.alert-danger {
+  background: #f8d7da;
+  border-left-color: #dc3545;
+}
+
+.alert-icon {
+  font-size: 1.5rem;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-content h4 {
+  margin: 0 0 0.25rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.alert-content p {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.alert-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Payment Info in Activity */
+.payment-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.payment-badge {
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  display: inline-block;
+  min-width: 50px;
+}
+
+.payment-badge.payment-pending { background: #fff3cd; color: #856404; }
+.payment-badge.payment-paid { background: #d4edda; color: #155724; }
+.payment-badge.payment-failed { background: #f8d7da; color: #721c24; }
+.payment-badge.payment-refunded { background: #d1ecf1; color: #0c5460; }
+
+.auth-code {
+  font-size: 0.7rem;
+  color: #666;
+  font-family: monospace;
+}
+
+/* Button Styles */
+.btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-outline:hover {
+  background: #6c757d;
+  color: white;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-stats {
@@ -387,6 +670,23 @@ onMounted(() => {
   
   .action-card {
     padding: 1.5rem;
+  }
+  
+  .alert-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .alert-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .payment-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
   }
 }
 </style> 

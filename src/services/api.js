@@ -516,5 +516,38 @@ export const adminService = {
       console.error('Update order status error:', error);
       throw error.response?.data || { error: error.message };
     }
+  },
+
+  // Transbank Payment Management
+  async getPaymentStatus(orderId) {
+    try {
+      const response = await axios.get(`/api/payments/status/${orderId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get payment status error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async refundPayment(orderId, amount = null) {
+    try {
+      const body = amount ? { amount } : {};
+      const response = await axios.post(`/api/payments/refund/${orderId}`, body);
+      return response.data;
+    } catch (error) {
+      console.error('Refund payment error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async getOrderDetails(orderId) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.getOrderByIdUrl(orderId));
+      return response.data;
+    } catch (error) {
+      console.error('Get order details error:', error);
+      throw error.response?.data || { error: error.message };
+    }
   }
 }; 
