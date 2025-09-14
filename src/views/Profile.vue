@@ -151,31 +151,6 @@
                 </div>
               </div>
 
-              <div class="security-item">
-                <div class="security-info">
-                  <h3>
-                    <span>📧</span>
-                    Verificación de email
-                  </h3>
-                  <p v-if="authStore.user?.isVerified" class="verified-text">
-                    ✅ Tu email está verificado
-                  </p>
-                  <p v-else class="unverified-text">
-                    ❌ Tu email no está verificado
-                  </p>
-                </div>
-                <div class="security-actions">
-                  <button 
-                    v-if="!authStore.user?.isVerified"
-                    @click="resendVerification" 
-                    :disabled="sendingVerification"
-                    class="btn btn-outline btn-sm"
-                  >
-                    <span v-if="sendingVerification">📧 Enviando...</span>
-                    <span v-else>📧 Reenviar verificación</span>
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -201,7 +176,6 @@ const editMode = ref(false)
 const saving = ref(false)
 
 const changingPassword = ref(false)
-const sendingVerification = ref(false)
 
 // Forms
 const profileForm = reactive({
@@ -333,19 +307,6 @@ const changePassword = async () => {
 
 
 
-const resendVerification = async () => {
-  sendingVerification.value = true
-  
-  try {
-    // Aquí harías la llamada para reenviar verificación
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    success('Email de verificación enviado')
-  } catch (err) {
-    error('Error al enviar verificación')
-  } finally {
-    sendingVerification.value = false
-  }
-}
 
 
 // Lifecycle
@@ -622,15 +583,6 @@ onMounted(() => {
   gap: 1rem;
 }
 
-.verified-text {
-  color: var(--color-success) !important;
-  font-weight: 500;
-}
-
-.unverified-text {
-  color: var(--color-error) !important;
-  font-weight: 500;
-}
 
 .password-summary {
   display: flex;
