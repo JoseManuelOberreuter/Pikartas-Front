@@ -8,6 +8,7 @@ import RegisterView from '../views/RegisterView.vue'
 import EmailVerification from '../views/EmailVerification.vue'
 import ResetPassword from '../views/ResetPassword.vue'
 import Profile from '../views/Profile.vue'
+import Settings from '../views/Settings.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
 import AdminProducts from '../views/AdminProducts.vue'
 
@@ -57,6 +58,12 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: Profile,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
     meta: { requiresAuth: true }
   },
   {
