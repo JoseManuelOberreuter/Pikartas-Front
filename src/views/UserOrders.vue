@@ -3,10 +3,6 @@
     <div class="container">
       <div class="orders-header">
         <h1>📦 Mis Pedidos</h1>
-        <p>Gestiona y revisa el estado de tus pedidos</p>
-        <button @click="testEndpoint" class="btn btn-outline" style="margin-top: 1rem;">
-          🔍 Probar Endpoint
-        </button>
       </div>
 
       <!-- Loading State -->
@@ -20,9 +16,11 @@
         <div class="empty-icon">📦</div>
         <h2>No tienes pedidos aún</h2>
         <p>Cuando realices tu primera compra, aparecerá aquí</p>
-        <router-link to="/shop" class="btn btn-primary">
-          Ir a la Tienda
-        </router-link>
+        <div class="empty-actions">
+          <router-link to="/shop" class="btn btn-primary">
+            Ir a la Tienda
+          </router-link>
+        </div>
       </div>
 
       <!-- Orders List -->
@@ -49,7 +47,7 @@
           >
             <div class="order-header">
               <div class="order-info">
-                <h3>Pedido #{{ order._id?.slice(-8) }}</h3>
+                <h3>Pedido #{{ getOrderNumber(order._id) }}</h3>
                 <p class="order-date">{{ formatDate(order.createdAt) }}</p>
               </div>
               <div class="order-status">
@@ -66,11 +64,15 @@
                   :key="item._id" 
                   class="order-item"
                 >
-                  <img :src="item.product?.image || '/placeholder.jpg'" :alt="item.product?.name" />
+                  <img 
+                    :src="getProductImage(item.product)" 
+                    :alt="getProductName(item.product)"
+                    @error="handleImageError"
+                  />
                   <div class="item-info">
-                    <h4>{{ item.product?.name || 'Producto' }}</h4>
+                    <h4>{{ getProductName(item.product) }}</h4>
                     <p>Cantidad: {{ item.quantity }}</p>
-                    <p class="item-price">${{ item.price?.toFixed(2) }}</p>
+                    <p class="item-price">${{ formatPrice(item.price) }}</p>
                   </div>
                 </div>
               </div>
@@ -78,21 +80,21 @@
               <div class="order-summary">
                 <div class="summary-line">
                   <span>Subtotal:</span>
-                  <span>${{ order.subtotal?.toFixed(2) || '0.00' }}</span>
+                  <span>${{ formatPrice(order.subtotal) }}</span>
                 </div>
                 <div class="summary-line">
                   <span>Envío:</span>
-                  <span v-if="order.shippingCost > 0">${{ order.shippingCost?.toFixed(2) }}</span>
+                  <span v-if="order.shippingCost > 0">${{ formatPrice(order.shippingCost) }}</span>
                   <span v-else class="free-shipping">Gratis</span>
                 </div>
                 <div class="summary-line">
                   <span>Impuestos:</span>
-                  <span>${{ order.tax?.toFixed(2) || '0.00' }}</span>
+                  <span>${{ formatPrice(order.tax) }}</span>
                 </div>
                 <hr class="summary-divider">
                 <div class="summary-line total-line">
                   <span>Total:</span>
-                  <span class="total-amount">${{ order.totalAmount?.toFixed(2) || '0.00' }}</span>
+                  <span class="total-amount">${{ formatPrice(order.totalAmount) }}</span>
                 </div>
               </div>
             </div>
@@ -137,7 +139,7 @@
         <!-- Pagination -->
         <div v-if="totalPages > 1" class="pagination">
           <button 
-            @click="currentPage--" 
+            @click="goToPage(currentPage - 1)" 
             :disabled="currentPage === 1"
             class="btn btn-outline"
           >
@@ -147,7 +149,7 @@
             Página {{ currentPage }} de {{ totalPages }}
           </span>
           <button 
-            @click="currentPage++" 
+            @click="goToPage(currentPage + 1)" 
             :disabled="currentPage === totalPages"
             class="btn btn-outline"
           >
@@ -161,12 +163,71 @@
     <div v-if="selectedOrder" class="modal-overlay" @click="closeOrderDetails">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
-          <h2>Detalles del Pedido #{{ selectedOrder._id?.slice(-8) }}</h2>
+          <h2>Detalles del Pedido #{{ getOrderNumber(selectedOrder._id) }}</h2>
           <button @click="closeOrderDetails" class="close-btn">×</button>
         </div>
         <div class="modal-body">
-          <!-- Order details content here -->
-          <p>Detalles completos del pedido...</p>
+          <div class="order-details-modal">
+            <div class="detail-section">
+              <h3>Información del Pedido</h3>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="label">Número:</span>
+                  <span class="value">#{{ getOrderNumber(selectedOrder._id) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Fecha:</span>
+                  <span class="value">{{ formatDate(selectedOrder.createdAt) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Estado:</span>
+                  <span :class="['status-badge', `status-${selectedOrder.status}`]">
+                    {{ getStatusLabel(selectedOrder.status) }}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Total:</span>
+                  <span class="value total">${{ formatPrice(selectedOrder.totalAmount) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3>Productos</h3>
+              <div class="products-list">
+                <div 
+                  v-for="item in selectedOrder.items" 
+                  :key="item._id" 
+                  class="product-item"
+                >
+                  <img 
+                    :src="getProductImage(item.product)" 
+                    :alt="getProductName(item.product)"
+                    @error="handleImageError"
+                  />
+                  <div class="product-info">
+                    <h4>{{ getProductName(item.product) }}</h4>
+                    <p>Cantidad: {{ item.quantity }}</p>
+                    <p class="price">${{ formatPrice(item.price) }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="selectedOrder.paymentInfo" class="detail-section">
+              <h3>Información de Pago</h3>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="label">Estado:</span>
+                  <span class="value">{{ getPaymentStatusLabel(selectedOrder.paymentInfo.status) }}</span>
+                </div>
+                <div v-if="selectedOrder.paymentInfo.authorizationCode" class="detail-item">
+                  <span class="label">Código de Autorización:</span>
+                  <span class="value">{{ selectedOrder.paymentInfo.authorizationCode }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -174,7 +235,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useNotifications } from '../composables/useNotifications'
 import { orderService } from '../services/api.js'
 
@@ -221,24 +282,38 @@ const totalPages = computed(() => {
   return Math.ceil(filtered.length / itemsPerPage)
 })
 
+// Watch for filter changes to reset pagination
+watch(activeFilter, () => {
+  currentPage.value = 1
+})
+
 // Methods
 const loadOrders = async () => {
   loading.value = true
   try {
-    console.log('Loading user orders...')
     const response = await orderService.getUserOrders()
-    console.log('Orders response:', response)
-    orders.value = response.data || []
-    console.log('Orders loaded:', orders.value.length, 'orders')
+    
+    // Handle different response structures
+    if (response?.data && Array.isArray(response.data)) {
+      orders.value = response.data
+    } else if (Array.isArray(response)) {
+      orders.value = response
+    } else {
+      orders.value = []
+    }
   } catch (err) {
     console.error('Error loading orders:', err)
-    error('Error al cargar tus pedidos')
+    error('Error al cargar tus pedidos. Por favor, intenta de nuevo.')
+    orders.value = []
   } finally {
     loading.value = false
   }
 }
 
 const getOrdersByStatus = (status) => {
+  if (!Array.isArray(orders.value)) {
+    return []
+  }
   if (status === 'all') return orders.value
   return orders.value.filter(order => order.status === status)
 }
@@ -292,41 +367,59 @@ const cancelOrder = async (orderId) => {
     await loadOrders()
   } catch (err) {
     console.error('Error cancelling order:', err)
-    error('Error al cancelar el pedido')
+    error('Error al cancelar el pedido. Por favor, intenta de nuevo.')
   } finally {
     cancellingOrder.value = null
   }
 }
 
 const trackOrder = (order) => {
-  // TODO: Implementar rastreo de pedidos
-  alert(`Rastrear pedido #${order._id?.slice(-8)}`)
+  // TODO: Implement order tracking functionality
+  alert(`Funcionalidad de rastreo para el pedido #${getOrderNumber(order._id)} estará disponible próximamente.`)
 }
 
 const formatDate = (dateString) => {
   if (!dateString) return 'Fecha no disponible'
-  return new Date(dateString).toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  
+  try {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch (err) {
+    console.error('Error formatting date:', err)
+    return 'Fecha inválida'
+  }
 }
 
-const testEndpoint = async () => {
-  try {
-    console.log('Testing orders endpoint...')
-    const response = await fetch('http://localhost:4005/api/orders/my-orders', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    console.log('Response status:', response.status)
-    const data = await response.json()
-    console.log('Raw response:', data)
-  } catch (err) {
-    console.error('Error testing endpoint:', err)
+const formatPrice = (price) => {
+  if (typeof price !== 'number' || isNaN(price)) return '0.00'
+  return price.toFixed(2)
+}
+
+const getOrderNumber = (orderId) => {
+  if (!orderId) return 'N/A'
+  return orderId.slice(-8)
+}
+
+const getProductName = (product) => {
+  return product?.name || 'Producto no disponible'
+}
+
+const getProductImage = (product) => {
+  return product?.image || '/placeholder.jpg'
+}
+
+const handleImageError = (event) => {
+  event.target.src = '/placeholder.jpg'
+}
+
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
   }
 }
 
@@ -352,7 +445,7 @@ onMounted(() => {
 
 .orders-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
 }
 
 .orders-header h1 {
@@ -412,6 +505,13 @@ onMounted(() => {
   margin: 0 0 2rem 0;
   color: #666;
   font-size: 1.1rem;
+}
+
+.empty-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .filter-tabs {
@@ -684,7 +784,7 @@ onMounted(() => {
   border-color: #6c757d;
 }
 
-.btn-outline:hover {
+.btn-outline:hover:not(:disabled) {
   background: #6c757d;
   color: white;
 }
@@ -698,6 +798,17 @@ onMounted(() => {
 .btn-danger:hover:not(:disabled) {
   background: #c82333;
   border-color: #c82333;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #545b62;
+  border-color: #545b62;
 }
 
 /* Modal */
@@ -748,6 +859,91 @@ onMounted(() => {
   padding: 1.5rem;
 }
 
+.order-details-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.detail-section h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.25rem;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 600;
+  color: #666;
+}
+
+.value {
+  color: #333;
+}
+
+.value.total {
+  font-weight: 700;
+  color: #007bff;
+  font-size: 1.1rem;
+}
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.product-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-info h4 {
+  margin: 0 0 0.25rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.product-info p {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.product-info .price {
+  font-weight: 600;
+  color: #28a745;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .orders-header h1 {
@@ -776,6 +972,17 @@ onMounted(() => {
   .pagination {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .product-item {
+    flex-direction: column;
+    text-align: center;
   }
 }
 </style>
