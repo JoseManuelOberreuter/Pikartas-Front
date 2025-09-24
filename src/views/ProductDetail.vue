@@ -31,7 +31,7 @@
           <h1 class="product-title">{{ product.name }}</h1>
           
           <div class="product-price">
-            <span class="price">${{ product.price.toFixed(2) }}</span>
+            <span class="price">${{ product.price }}</span>
           </div>
 
           <div class="product-description">
