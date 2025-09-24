@@ -549,5 +549,33 @@ export const adminService = {
       console.error('Get order details error:', error);
       throw error.response?.data || { error: error.message };
     }
+  },
+
+  // Gestión de usuarios
+  async getAllUsers() {
+    try {
+      // Usar la URL correcta del backend (sin /api)
+      const response = await axios.get('http://localhost:4005/users/all');
+      console.log('✅ Users API Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Get all users error:', error);
+      console.error('❌ Error details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async getUserStats() {
+    try {
+      const response = await axios.get('/api/users/stats');
+      return response.data;
+    } catch (error) {
+      console.error('Get user stats error:', error);
+      throw error.response?.data || { error: error.message };
+    }
   }
 }; 

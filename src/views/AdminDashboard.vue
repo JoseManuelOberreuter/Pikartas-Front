@@ -95,6 +95,13 @@
             <div class="action-button">Ver Estadísticas</div>
           </div>
 
+          <div class="action-card" @click="navigateTo('/admin/users')">
+            <div class="action-icon">👥</div>
+            <h3>Gestionar Usuarios</h3>
+            <p>Ver y administrar usuarios registrados</p>
+            <div class="action-button">Gestionar Usuarios</div>
+          </div>
+
           <div class="action-card" @click="navigateTo('/admin/orders')">
             <div class="action-icon">💳</div>
             <h3>Gestionar Pagos</h3>
@@ -170,12 +177,21 @@ const loading = ref(false)
 const loadDashboardData = async () => {
   loading.value = true
   try {
-    // Cargar estadísticas de órdenes
-    const [ordersStats, allProducts, orders] = await Promise.all([
+    // Cargar estadísticas de órdenes y usuarios
+    const [ordersStats, allProducts, orders, usersData] = await Promise.all([
       adminService.getOrderStats().catch(() => ({ data: {} })),
       adminService.getAllProducts().catch(() => ({ data: [] })),
-      adminService.getAllOrders().catch(() => ({ data: [] }))
+      adminService.getAllOrders().catch(() => ({ data: [] })),
+      adminService.getAllUsers().catch((error) => {
+        console.error('Error loading users:', error)
+        return { data: [], total: 0 }
+      })
     ])
+
+    // 🔍 DEBUG: Ver qué está devolviendo el endpoint de usuarios
+    console.log('usersData:', usersData)
+    console.log('usersData.total:', usersData.total)
+    console.log('usersData.data:', usersData.data)
 
     // 🎯 CONTAR SOLO PRODUCTOS ACTIVOS
     const activeProducts = Array.isArray(allProducts.data) 
@@ -193,12 +209,18 @@ const loadDashboardData = async () => {
       totalProducts: activeProducts.length,
       totalOrders: ordersStats.data?.totalOrders || 0,
       totalRevenue: ordersStats.data?.totalRevenue || 0,
-      totalUsers: ordersStats.data?.totalUsers || 0,
+      totalUsers: usersData.total || 0, // Usar el total del endpoint de usuarios
       paidOrders,
       pendingPayments,
       refundedOrders,
       conversionRate
     }
+
+    // 🔍 DEBUG: Verificar las estadísticas calculadas
+    console.log('Stats calculadas:', stats.value)
+    console.log('Total usuarios en stats:', stats.value.totalUsers)
+    console.log('usersData.total:', usersData.total)
+    console.log('usersData:', usersData)
 
     // Obtener órdenes recientes (últimas 5)
     if (Array.isArray(orders.data)) {

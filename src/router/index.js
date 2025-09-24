@@ -96,6 +96,12 @@ const routes = [
     component: () => import('../views/AdminAnalytics.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
+  {
+    path: '/admin/users',
+    name: 'AdminUsers',
+    component: () => import('../views/AdminUsers.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
   // Transbank Payment Routes
   {
     path: '/payment/processing',
