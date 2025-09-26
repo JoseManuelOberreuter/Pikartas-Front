@@ -40,11 +40,6 @@ const routes = [
     component: Checkout
   },
   {
-    path: '/register',
-    name: 'Register',
-    component: RegisterView
-  },
-  {
     path: '/verify-email',
     name: 'EmailVerification',
     component: EmailVerification
