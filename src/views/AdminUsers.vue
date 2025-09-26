@@ -2,15 +2,18 @@
   <div class="admin-users">
     <div class="container">
       <div class="users-header">
-        <h1>👥 Gestión de Usuarios</h1>
+        <h1>
+          <font-awesome-icon icon="users" class="header-icon" />
+          Gestión de Usuarios
+        </h1>
         <div class="header-actions">
           <button @click="exportUsers" class="btn btn-export" :disabled="loading || filteredUsers.length === 0">
-            <span class="btn-icon">📊</span>
+            <font-awesome-icon icon="chart-bar" class="btn-icon" />
             <span class="btn-text">Exportar CSV</span>
             <span class="btn-count" v-if="filteredUsers.length > 0">({{ filteredUsers.length }})</span>
           </button>
           <router-link to="/admin" class="btn btn-back">
-            <span class="btn-icon">←</span>
+            <font-awesome-icon icon="arrow-left" class="btn-icon" />
             <span class="btn-text">Dashboard</span>
           </router-link>
         </div>
@@ -19,28 +22,36 @@
       <!-- Stats Cards -->
       <div class="stats-grid" v-if="stats">
         <div class="stat-card">
-          <div class="stat-icon">👥</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="users" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.totalUsers || 0 }}</h3>
             <p>Total Usuarios</p>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="check-circle" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.verifiedUsers || 0 }}</h3>
             <p>Verificados</p>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🆕</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="user-plus" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.newUsersThisMonth || 0 }}</h3>
             <p>Este Mes</p>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🕒</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="clock" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.activeUsers || 0 }}</h3>
             <p>Activos (30 días)</p>
@@ -87,7 +98,7 @@
 
       <!-- Loading -->
       <div v-if="loading" class="loading">
-        <div class="spinner"></div>
+        <font-awesome-icon icon="spinner" spin class="loading-icon" />
         <p>Cargando usuarios...</p>
       </div>
 
@@ -149,7 +160,9 @@
         
         <div v-if="filteredUsers.length === 0" class="no-users">
           <div class="empty-state">
-            <div class="empty-icon">👥</div>
+            <div class="empty-icon">
+              <font-awesome-icon icon="users" class="empty-icon-svg" />
+            </div>
             <h3>No hay usuarios</h3>
             <p>No se encontraron usuarios con los filtros seleccionados</p>
           </div>

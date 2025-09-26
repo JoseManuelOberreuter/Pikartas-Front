@@ -2,7 +2,7 @@
   <div class="shop">
     <div class="container">
       <div class="shop-header">
-        <h1>🛍️ Nuestra Tienda</h1>
+        <h1><font-awesome-icon icon="store" class="shop-header-icon" /> Nuestra Tienda</h1>
         <p>Explora nuestra colección de productos tecnológicos</p>
       </div>
 
@@ -48,7 +48,7 @@
             placeholder="Buscar productos..."
             class="search-input"
           >
-          <span class="search-icon">🔍</span>
+          <font-awesome-icon icon="search" class="search-icon" />
         </div>
       </div>
 
@@ -58,18 +58,18 @@
       </div>
 
       <div v-if="loading" class="loading-state">
-        <div class="loading-spinner">🔄</div>
+        <font-awesome-icon icon="spinner" class="loading-spinner" spin />
         <p>Cargando productos desde el servidor...</p>
       </div>
 
       <div v-else-if="products.length === 0" class="empty-state">
-        <div class="empty-icon">📦</div>
+        <font-awesome-icon icon="box" class="empty-icon" />
         <h3>No hay productos disponibles</h3>
         <p>No se pudieron cargar los productos del servidor.</p>
       </div>
 
       <div v-else-if="filteredProducts.length === 0" class="no-results">
-        <div class="no-results-icon">😔</div>
+        <font-awesome-icon icon="times-circle" class="no-results-icon" />
         <h3>No se encontraron productos</h3>
         <p>Intenta ajustar los filtros o buscar con otros términos</p>
         <button @click="resetFilters" class="btn btn-primary">
@@ -245,6 +245,20 @@ onMounted(async () => {
   margin: 0 0 1rem 0;
   color: #333;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.shop-header-icon {
+  color: var(--icon-shop-header);
+  font-size: 0.9em;
+  transition: all var(--transition-normal);
+}
+
+.shop-header h1:hover .shop-header-icon {
+  transform: scale(1.1);
 }
 
 .shop-header p {
@@ -319,7 +333,14 @@ onMounted(async () => {
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #666;
+  color: var(--icon-shop-search);
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.search-input:focus + .search-icon {
+  color: var(--icon-shop-search-focus);
+  transform: translateY(-50%) scale(1.1);
 }
 
 .results-info {
@@ -345,6 +366,7 @@ onMounted(async () => {
 .loading-spinner {
   font-size: 3rem;
   margin-bottom: 1rem;
+  color: var(--icon-shop-loading);
   animation: spin 2s linear infinite;
 }
 
@@ -362,7 +384,14 @@ onMounted(async () => {
 .empty-icon {
   font-size: 4rem;
   margin-bottom: 1.5rem;
+  color: var(--icon-shop-empty);
   opacity: 0.5;
+  transition: all var(--transition-normal);
+}
+
+.empty-state:hover .empty-icon {
+  opacity: 0.7;
+  transform: scale(1.05);
 }
 
 .empty-state h3 {
@@ -394,6 +423,12 @@ onMounted(async () => {
 .no-results-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
+  color: var(--icon-shop-no-results);
+  transition: all var(--transition-normal);
+}
+
+.no-results:hover .no-results-icon {
+  transform: scale(1.05);
 }
 
 .no-results h3 {

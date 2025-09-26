@@ -5,7 +5,7 @@
       <div class="settings-header">
         <div class="header-content">
           <div class="header-icon">
-            <span class="icon">⚙️</span>
+            <font-awesome-icon icon="cog" class="icon" />
           </div>
           <div class="header-info">
             <h1 class="page-title">Configuración</h1>
@@ -21,7 +21,7 @@
         <div class="settings-section">
           <div class="section-header">
             <h2 class="section-title">
-              <span class="section-icon">🎨</span>
+              <font-awesome-icon icon="palette" class="section-icon" />
               Preferencias
             </h2>
             <p class="section-description">Personaliza tu experiencia en la tienda</p>
@@ -85,7 +85,9 @@
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <h3 class="modal-title">Cambiar Contraseña</h3>
-          <button class="modal-close" @click="closeChangePasswordModal">×</button>
+          <button class="modal-close" @click="closeChangePasswordModal">
+            <font-awesome-icon icon="times" class="close-icon" />
+          </button>
         </div>
         <div class="modal-body">
           <form @submit.prevent="changePassword" class="password-form">
@@ -307,6 +309,19 @@ const changePassword = async () => {
 .header-icon {
   font-size: 3rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-icon .icon {
+  color: var(--icon-settings-header);
+  font-size: 1em;
+  transition: all var(--transition-normal);
+}
+
+.header-content:hover .header-icon .icon {
+  transform: rotate(15deg) scale(1.1);
 }
 
 .header-info {
@@ -360,6 +375,12 @@ const changePassword = async () => {
 
 .section-icon {
   font-size: 1.25rem;
+  color: var(--icon-settings-prefs);
+  transition: all var(--transition-normal);
+}
+
+.section-title:hover .section-icon {
+  transform: scale(1.1);
 }
 
 .section-description {
@@ -552,14 +573,27 @@ const changePassword = async () => {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: var(--color-gray-500);
+  color: var(--icon-settings-close);
   cursor: pointer;
   padding: 0.25rem;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-normal);
 }
 
 .modal-close:hover {
-  color: var(--color-gray-700);
+  color: var(--icon-settings-close-hover);
+}
+
+.close-icon {
+  font-size: 1rem;
+  transition: color var(--transition-normal);
+}
+
+.modal-close:hover .close-icon {
+  color: var(--icon-settings-close-hover);
 }
 
 .modal-body {

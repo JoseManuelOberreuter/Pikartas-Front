@@ -3,7 +3,9 @@
     <div class="container">
       <div class="processing-content">
         <div class="processing-icon">
-          <div class="spinner"></div>
+          <div class="spinner">
+            <font-awesome-icon icon="spinner" class="spinner-icon" :spin="true" />
+          </div>
         </div>
         
         <h1>Procesando Pago</h1>
@@ -25,21 +27,27 @@
         </div>
 
         <div v-if="error" class="error-message">
-          <div class="error-icon">❌</div>
+          <div class="error-icon">
+            <font-awesome-icon icon="times-circle" class="error-icon-svg" />
+          </div>
           <h3>Error en el Procesamiento</h3>
           <p>{{ error }}</p>
           <div class="error-actions">
             <button @click="retryPayment" class="btn btn-primary">
+              <font-awesome-icon icon="redo" class="btn-icon" />
               Intentar Nuevamente
             </button>
             <router-link to="/checkout" class="btn btn-outline">
+              <font-awesome-icon icon="arrow-left" class="btn-icon" />
               Volver al Checkout
             </router-link>
           </div>
         </div>
 
         <div v-if="isRedirecting" class="redirect-message">
-          <div class="redirect-icon">🔄</div>
+          <div class="redirect-icon">
+            <font-awesome-icon icon="sync-alt" class="redirect-icon-svg" :spin="true" />
+          </div>
           <h3>Redirigiendo a Transbank...</h3>
           <p>Serás redirigido automáticamente en unos segundos</p>
         </div>
@@ -279,6 +287,14 @@ const retryPayment = () => {
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-icon {
+  font-size: 1.5rem;
+  color: var(--icon-payment-processing-spinner);
 }
 
 @keyframes spin {
@@ -376,6 +392,19 @@ const retryPayment = () => {
 .error-icon {
   font-size: 2rem;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-icon-svg {
+  font-size: 1em;
+  color: var(--icon-payment-processing-error);
+  transition: all var(--transition-normal);
+}
+
+.error-message:hover .error-icon-svg {
+  transform: scale(1.1) rotate(10deg);
 }
 
 .error-message h3 {
@@ -407,6 +436,14 @@ const retryPayment = () => {
   font-size: 2rem;
   margin-bottom: 1rem;
   animation: pulse 1.5s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.redirect-icon-svg {
+  font-size: 1em;
+  color: var(--icon-payment-processing-redirect);
 }
 
 @keyframes pulse {
@@ -436,7 +473,26 @@ const retryPayment = () => {
   text-decoration: none;
   transition: all 0.3s;
   font-size: 1rem;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-payment-processing-retry-btn);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-payment-processing-back-btn);
 }
 
 .btn-primary {

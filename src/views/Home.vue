@@ -3,7 +3,7 @@
     <section class="hero">
       <div class="container">
         <div class="hero-content">
-          <h1>🛒 Bienvenido a ShopNodeCore</h1>
+          <h1><font-awesome-icon icon="shopping-cart" class="hero-icon" /> Bienvenido a ShopNodeCore</h1>
           <p>Descubre los mejores productos de tecnología con la mejor calidad y precios</p>
           <router-link to="/shop" class="btn btn-primary">
             Explorar Tienda
@@ -17,17 +17,17 @@
         <h2 class="section-title">¿Por qué elegir ShopNodeCore?</h2>
         <div class="features-grid">
           <div class="feature-card">
-            <div class="feature-icon">🚀</div>
+            <font-awesome-icon icon="truck" class="feature-icon" />
             <h3>Envío Rápido</h3>
             <p>Envío gratuito en compras mayores a $500. Entrega en 24-48 horas.</p>
           </div>
           <div class="feature-card">
-            <div class="feature-icon">🔒</div>
+            <font-awesome-icon icon="shield-alt" class="feature-icon" />
             <h3>Compra Segura</h3>
             <p>Pagos 100% seguros con encriptación SSL y múltiples métodos de pago.</p>
           </div>
           <div class="feature-card">
-            <div class="feature-icon">🎯</div>
+            <font-awesome-icon icon="star" class="feature-icon" />
             <h3>Calidad Garantizada</h3>
             <p>Productos originales con garantía oficial y soporte técnico especializado.</p>
           </div>
@@ -39,7 +39,9 @@
       <div class="container">
         <div class="section-header">
           <h2 class="section-title">Productos Destacados</h2>
-          <router-link to="/shop" class="view-all-link">Ver todos →</router-link>
+          <router-link to="/shop" class="view-all-link">
+            Ver todos <font-awesome-icon icon="chevron-down" class="arrow-icon" />
+          </router-link>
         </div>
         
         <div class="products-grid">
@@ -173,6 +175,21 @@ onMounted(() => {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.hero-icon {
+  color: var(--icon-home-hero);
+  font-size: 1.1em;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: all var(--transition-normal);
+}
+
+.hero-content h1:hover .hero-icon {
+  transform: scale(1.1);
 }
 
 .hero-content p {
@@ -255,7 +272,14 @@ onMounted(() => {
 .feature-icon {
   font-size: var(--font-size-4xl);
   margin-bottom: var(--spacing-lg);
-  filter: grayscale(0.2);
+  color: var(--icon-home-feature);
+  transition: all var(--transition-normal);
+  display: block;
+}
+
+.feature-card:hover .feature-icon {
+  color: var(--icon-home-feature-hover);
+  transform: scale(1.1);
 }
 
 .feature-card h3 {
@@ -294,6 +318,9 @@ onMounted(() => {
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--border-radius-md);
   border: var(--border-width-thin) solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .view-all-link:hover {
@@ -301,6 +328,18 @@ onMounted(() => {
   background: var(--color-tertiary);
   border-color: var(--color-tertiary);
   transform: translateX(var(--spacing-xs));
+}
+
+.arrow-icon {
+  color: var(--icon-home-arrow);
+  font-size: 0.8em;
+  transition: all var(--transition-normal);
+  transform: rotate(-90deg);
+}
+
+.view-all-link:hover .arrow-icon {
+  color: var(--icon-home-arrow-hover);
+  transform: rotate(-90deg) translateX(2px);
 }
 
 .products-grid {

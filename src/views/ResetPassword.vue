@@ -1,29 +1,48 @@
 <template>
+
+<!-- TODO: verificar seguridad de la password y mejorar UI -->
+
   <div class="reset-container">
     <div class="reset-card">
       <div v-if="!validToken && !loading" class="invalid-token">
         <div style="text-align: center; margin-bottom: 20px;">
-          <h1 style="color: #333; margin-bottom: 10px;">🛒 ShopNodeCore</h1>
+          <h1 style="color: #333; margin-bottom: 10px;">
+            <font-awesome-icon icon="shopping-cart" class="brand-icon" />
+            ShopNodeCore
+          </h1>
         </div>
-        <h2>❌ Token Inválido</h2>
+        <h2>
+          <font-awesome-icon icon="times-circle" class="error-icon" />
+          Token Inválido
+        </h2>
         <p>El enlace de recuperación es inválido o ha expirado.</p>
         <div style="background: #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <p style="color: #e74c3c; margin: 0;">
-            ⚠️ <strong>Importante:</strong> Los enlaces de recuperación son válidos por 1 hora solamente.
+            <font-awesome-icon icon="exclamation-triangle" class="warning-icon" />
+            <strong>Importante:</strong> Los enlaces de recuperación son válidos por 1 hora solamente.
           </p>
         </div>
-        <router-link to="/" class="btn btn-outline">Volver al Inicio</router-link>
+        <router-link to="/" class="btn btn-outline">
+          <font-awesome-icon icon="home" class="btn-icon" />
+          Volver al Inicio
+        </router-link>
       </div>
       
       <div v-if="loading" class="loading">
-        <div class="spinner"></div>
-        <h2>⏳ Cargando...</h2>
+        <font-awesome-icon icon="spinner" spin class="loading-icon" />
+        <h2>Cargando...</h2>
       </div>
       
       <div v-if="validToken && !resetSuccess && !loading" class="reset-form-container">
         <div style="text-align: center; margin-bottom: 20px;">
-          <h1 style="color: #333; margin-bottom: 10px;">🛒 ShopNodeCore</h1>
-          <h2 style="color: #ff6b35;">🔐 Restablecer Contraseña</h2>
+          <h1 style="color: #333; margin-bottom: 10px;">
+            <font-awesome-icon icon="shopping-cart" class="brand-icon" />
+            ShopNodeCore
+          </h1>
+          <h2 style="color: #ff6b35;">
+            <font-awesome-icon icon="lock" class="lock-icon" />
+            Restablecer Contraseña
+          </h2>
         </div>
         <p>Ingresa tu nueva contraseña para restablecer el acceso a tu cuenta.</p>
         
@@ -63,18 +82,36 @@
       
       <div v-if="resetSuccess" class="success">
         <div style="text-align: center; margin-bottom: 20px;">
-          <h1 style="color: #333; margin-bottom: 10px;">🛒 ShopNodeCore</h1>
+          <h1 style="color: #333; margin-bottom: 10px;">
+            <font-awesome-icon icon="shopping-cart" class="brand-icon" />
+            ShopNodeCore
+          </h1>
         </div>
-        <h2>✅ ¡Contraseña Restablecida!</h2>
+        <h2>
+          <font-awesome-icon icon="check-circle" class="success-icon" />
+          ¡Contraseña Restablecida!
+        </h2>
         <p>Tu contraseña ha sido restablecida exitosamente en <strong>ShopNodeCore</strong>. Ya puedes iniciar sesión con tu nueva contraseña.</p>
-        <router-link to="/" class="btn btn-primary">Ir al Inicio</router-link>
+        <router-link to="/" class="btn btn-primary">
+          <font-awesome-icon icon="home" class="btn-icon" />
+          Ir al Inicio
+        </router-link>
       </div>
       
       <div v-if="error" class="error">
-        <h2>❌ Error</h2>
+        <h2>
+          <font-awesome-icon icon="times-circle" class="error-icon" />
+          Error
+        </h2>
         <p>{{ error }}</p>
-        <button @click="tryAgain" class="btn btn-outline">Intentar Nuevamente</button>
-        <router-link to="/" class="btn btn-primary">Volver al Inicio</router-link>
+        <button @click="tryAgain" class="btn btn-outline">
+          <font-awesome-icon icon="redo" class="btn-icon" />
+          Intentar Nuevamente
+        </button>
+        <router-link to="/" class="btn btn-primary">
+          <font-awesome-icon icon="home" class="btn-icon" />
+          Volver al Inicio
+        </router-link>
       </div>
     </div>
   </div>
@@ -181,12 +218,62 @@ const tryAgain = () => {
   color: var(--color-tertiary);
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.brand-icon {
+  color: var(--icon-reset-brand);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.reset-card:hover .brand-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .reset-card h2 {
   margin-bottom: var(--spacing-lg);
   color: var(--color-tertiary);
   font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.error-icon {
+  color: var(--icon-reset-error);
+  font-size: 1.1em;
+  transition: all var(--transition-normal);
+}
+
+.warning-icon {
+  color: var(--icon-reset-warning);
+  font-size: 1em;
+  margin-right: 0.5rem;
+  transition: all var(--transition-normal);
+}
+
+.lock-icon {
+  color: var(--icon-reset-lock);
+  font-size: 1.1em;
+  transition: all var(--transition-normal);
+}
+
+.success-icon {
+  color: var(--icon-reset-success);
+  font-size: 1.1em;
+  transition: all var(--transition-normal);
+}
+
+.reset-card:hover .error-icon,
+.reset-card:hover .warning-icon,
+.reset-card:hover .lock-icon,
+.reset-card:hover .success-icon {
+  transform: scale(1.1);
 }
 
 .reset-card p {
@@ -251,6 +338,24 @@ const tryAgain = () => {
   transition: all var(--transition-normal);
   border: var(--border-width-thin) solid;
   cursor: pointer;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-outline:hover .btn-icon {
+  color: var(--icon-reset-home);
+}
+
+.btn-primary:hover .btn-icon {
+  color: var(--color-quaternary);
 }
 
 .btn-primary {
@@ -292,14 +397,12 @@ const tryAgain = () => {
   margin: var(--spacing-lg) 0;
 }
 
-.spinner {
-  border: 3px solid var(--color-gray-200);
-  border-radius: var(--border-radius-full);
-  border-top: 3px solid var(--color-primary);
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
+.loading-icon {
+  font-size: 2rem;
+  color: var(--icon-reset-loading);
   margin: 0 auto var(--spacing-lg);
+  display: block;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {

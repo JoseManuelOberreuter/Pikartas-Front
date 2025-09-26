@@ -1,47 +1,50 @@
 <template>
+
+<!-- TODO: eliminar decimales de los precios -->
+
   <div class="cart-sidebar-overlay" v-show="isCartOpen" @click="closeCart">
     <div class="cart-sidebar" @click.stop :class="{ 'is-open': isCartOpen }" >
       <div class="cart-header">
-        <h2>🛒 Carrito de Compras</h2>
+        <h2><font-awesome-icon icon="shopping-cart" class="cart-title-icon" /> Carrito de Compras</h2>
         <button class="close-btn" @click="closeCart" title="Cerrar carrito">
-          <span class="close-icon">×</span>
+          <font-awesome-icon icon="times" class="close-icon" />
         </button>
       </div>
       
       <div class="cart-content">
         <div v-if="loading && cartItems.length === 0" class="loading-state">
-          <div class="loading-spinner">🔄</div>
+          <font-awesome-icon icon="spinner" class="loading-spinner" spin />
           <p>Cargando carrito...</p>
         </div>
 
         <div v-else-if="error && cartItems.length === 0" class="error-state">
-          <div class="error-icon">⚠️</div>
+          <font-awesome-icon icon="exclamation-triangle" class="error-icon" />
           <p>{{ error }}</p>
           <button class="action-btn retry-btn" @click="retryLoadCart">
-            <span class="btn-icon">🔄</span>
+            <font-awesome-icon icon="spinner" class="btn-icon" />
             <span class="btn-text">Reintentar</span>
           </button>
         </div>
 
         <!-- Mensaje cuando no hay items en el carrito -->
         <div v-if="cartItems.length === 0 && !loading && !error" class="empty-cart">
-          <div class="empty-cart-icon">🛒</div>
+          <font-awesome-icon icon="shopping-cart" class="empty-cart-icon" />
           <p v-if="isAuthenticated">No tienes nada en el carrito. ¡Agrega algo!</p>
           <p v-else>Debes tener sesión iniciada para usar el carrito</p>
           <div class="empty-cart-actions">
             <router-link v-if="isAuthenticated" to="/shop" class="action-btn shop-btn" @click="closeCart">
-              <span class="btn-icon">🛍️</span>
+              <font-awesome-icon icon="store" class="btn-icon" />
               <span class="btn-text">Ir a la tienda</span>
             </router-link>
                       <button v-else class="action-btn login-btn" @click="openLoginModal">
-            <span class="btn-icon">🔐</span>
+            <font-awesome-icon icon="lock" class="btn-icon" />
             <span class="btn-text">Iniciar Sesión</span>
           </button>
           </div>
         </div>
 
         <div v-else-if="cartItems.length === 0" class="empty-cart">
-          <div class="empty-cart-icon">🛒</div>
+          <font-awesome-icon icon="shopping-cart" class="empty-cart-icon" />
           <p>Tu carrito está vacío</p>
           <router-link to="/shop" class="btn btn-primary" @click="closeCart">
             Ir a la tienda
@@ -60,11 +63,11 @@
               
               <div class="quantity-controls">
                 <button class="qty-btn decrease" @click="decreaseQuantity(item.id)" :disabled="item.quantity <= 1">
-                  <span class="qty-icon">−</span>
+                  <font-awesome-icon icon="minus" class="qty-icon" />
                 </button>
                 <span class="quantity">{{ item.quantity }}</span>
                 <button class="qty-btn increase" @click="increaseQuantity(item.id)">
-                  <span class="qty-icon">+</span>
+                  <font-awesome-icon icon="plus" class="qty-icon" />
                 </button>
               </div>
               
@@ -74,7 +77,7 @@
             </div>
             
             <button class="remove-btn" @click="removeFromCart(item.id)" title="Eliminar producto">
-              <span class="remove-icon">🗑️</span>
+              <font-awesome-icon icon="trash" class="remove-icon" />
             </button>
           </div>
         </div>
@@ -89,15 +92,15 @@
         <div class="cart-actions">
           <div class="action-buttons">
             <button class="action-btn clear-btn" @click="clearCart">
-              <span class="btn-icon">🗑️</span>
+              <font-awesome-icon icon="trash" class="btn-icon" />
               <span class="btn-text">Limpiar</span>
           </button>
             <router-link to="/cart" class="action-btn view-btn" @click="closeCart">
-              <span class="btn-icon">👁️</span>
+              <font-awesome-icon icon="eye" class="btn-icon" />
               <span class="btn-text">Ver Carrito</span>
           </router-link>
             <router-link to="/checkout" class="action-btn checkout-btn" @click="closeCart">
-              <span class="btn-icon">💳</span>
+              <font-awesome-icon icon="credit-card" class="btn-icon" />
               <span class="btn-text">Comprar</span>
           </router-link>
           </div>
@@ -209,6 +212,19 @@ const openLoginModal = () => {
   margin: 0;
   color: #333;
   font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cart-title-icon {
+  color: var(--icon-cart);
+  font-size: 1.1rem;
+  transition: color var(--transition-normal);
+}
+
+.cart-header:hover .cart-title-icon {
+  color: var(--icon-cart-hover);
 }
 
 .close-btn {
@@ -235,9 +251,13 @@ const openLoginModal = () => {
 }
 
 .close-icon {
-  font-size: 1.5rem;
-  font-weight: bold;
-  line-height: 1;
+  font-size: 1.2rem;
+  color: var(--icon-close);
+  transition: color var(--transition-normal);
+}
+
+.close-btn:hover .close-icon {
+  color: var(--icon-close-hover);
 }
 
 .cart-content {
@@ -261,6 +281,7 @@ const openLoginModal = () => {
 .loading-spinner {
   font-size: 2rem;
   margin-bottom: 1rem;
+  color: var(--icon-loading);
   animation: spin 2s linear infinite;
 }
 
@@ -278,7 +299,14 @@ const openLoginModal = () => {
 .empty-cart-icon {
   font-size: 3.5rem;
   margin-bottom: 0.5rem;
+  color: var(--icon-cart);
   opacity: 0.5;
+  transition: color var(--transition-normal);
+}
+
+.empty-cart:hover .empty-cart-icon {
+  color: var(--icon-cart-hover);
+  opacity: 0.7;
 }
 
 .empty-cart p {
@@ -297,6 +325,7 @@ const openLoginModal = () => {
 .error-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
+  color: var(--icon-warning);
   opacity: 0.7;
 }
 
@@ -412,9 +441,25 @@ const openLoginModal = () => {
 }
 
 .qty-icon {
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: 1;
+  font-size: 0.9rem;
+  color: var(--icon-plus);
+  transition: color var(--transition-normal);
+}
+
+.qty-btn.decrease .qty-icon {
+  color: var(--icon-minus);
+}
+
+.qty-btn.increase .qty-icon {
+  color: var(--icon-plus);
+}
+
+.qty-btn.decrease:hover:not(:disabled) .qty-icon {
+  color: var(--icon-minus-hover);
+}
+
+.qty-btn.increase:hover:not(:disabled) .qty-icon {
+  color: var(--icon-plus-hover);
 }
 
 .quantity {
@@ -458,13 +503,13 @@ const openLoginModal = () => {
 }
 
 .remove-icon {
-  font-size: 1rem;
-  color: #dc3545;
-  transition: color 0.3s;
+  font-size: 0.9rem;
+  color: var(--icon-trash);
+  transition: color var(--transition-normal);
 }
 
 .remove-btn:hover .remove-icon {
-  color: #c82333;
+  color: var(--icon-trash-hover);
 }
 
 .cart-footer {
@@ -539,8 +584,58 @@ const openLoginModal = () => {
 }
 
 .btn-icon {
-  font-size: 1rem;
+  font-size: 0.9rem;
   line-height: 1;
+  transition: color var(--transition-normal);
+}
+
+/* Colores específicos para cada tipo de botón */
+.clear-btn .btn-icon {
+  color: var(--icon-trash);
+}
+
+.clear-btn:hover .btn-icon {
+  color: var(--icon-trash-hover);
+}
+
+.view-btn .btn-icon {
+  color: var(--icon-view);
+}
+
+.view-btn:hover .btn-icon {
+  color: var(--icon-view-hover);
+}
+
+.checkout-btn .btn-icon {
+  color: var(--icon-checkout);
+}
+
+.checkout-btn:hover .btn-icon {
+  color: var(--icon-checkout-hover);
+}
+
+.shop-btn .btn-icon {
+  color: var(--icon-shop);
+}
+
+.shop-btn:hover .btn-icon {
+  color: var(--icon-shop-hover);
+}
+
+.login-btn .btn-icon {
+  color: var(--icon-login);
+}
+
+.login-btn:hover .btn-icon {
+  color: var(--icon-login-hover);
+}
+
+.retry-btn .btn-icon {
+  color: var(--icon-retry);
+}
+
+.retry-btn:hover .btn-icon {
+  color: var(--icon-retry-hover);
 }
 
 .btn-text {

@@ -2,27 +2,50 @@
   <div class="verification-container">
     <div class="verification-card">
       <div v-if="!verifying && !verified && !token" class="check-email">
-        <h2>📧 Revisa tu Correo</h2>
+        <h2>
+          <font-awesome-icon icon="envelope" class="section-icon" />
+          Revisa tu Correo
+        </h2>
         <p>Te hemos enviado un email de verificación. Haz clic en el enlace para activar tu cuenta.</p>
-        <router-link to="/" class="btn btn-primary">Volver al Inicio</router-link>
+        <router-link to="/" class="btn btn-primary">
+          <font-awesome-icon icon="home" class="btn-icon" />
+          Volver al Inicio
+        </router-link>
       </div>
       
       <div v-if="verifying" class="verifying">
-        <div class="spinner"></div>
-        <h2>⏳ Verificando...</h2>
+        <div class="spinner">
+          <font-awesome-icon icon="spinner" class="spinner-icon" :spin="true" />
+        </div>
+        <h2>
+          <font-awesome-icon icon="clock" class="section-icon" />
+          Verificando...
+        </h2>
         <p>Estamos verificando tu cuenta, por favor espera.</p>
       </div>
       
       <div v-if="verified" class="success">
-        <h2>✅ ¡Cuenta Verificada!</h2>
+        <h2>
+          <font-awesome-icon icon="check-circle" class="section-icon" />
+          ¡Cuenta Verificada!
+        </h2>
         <p>Tu cuenta ha sido verificada exitosamente. Ya puedes iniciar sesión.</p>
-        <router-link to="/" class="btn btn-primary">Ir al Inicio</router-link>
+        <router-link to="/" class="btn btn-primary">
+          <font-awesome-icon icon="home" class="btn-icon" />
+          Ir al Inicio
+        </router-link>
       </div>
       
       <div v-if="error" class="error">
-        <h2>❌ Error de Verificación</h2>
+        <h2>
+          <font-awesome-icon icon="times-circle" class="section-icon" />
+          Error de Verificación
+        </h2>
         <p>{{ error }}</p>
-        <router-link to="/" class="btn btn-outline">Volver al Inicio</router-link>
+        <router-link to="/" class="btn btn-outline">
+          <font-awesome-icon icon="home" class="btn-icon" />
+          Volver al Inicio
+        </router-link>
       </div>
     </div>
   </div>
@@ -83,6 +106,35 @@ onMounted(async () => {
   margin-bottom: var(--spacing-lg);
   color: var(--color-tertiary);
   font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.section-icon {
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.check-email .section-icon {
+  color: var(--icon-email-verification-check);
+}
+
+.verifying .section-icon {
+  color: var(--icon-email-verification-spinner);
+}
+
+.success .section-icon {
+  color: var(--icon-email-verification-success);
+}
+
+.error .section-icon {
+  color: var(--icon-email-verification-error);
+}
+
+.verification-card:hover .section-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .verification-card p {
@@ -105,6 +157,28 @@ onMounted(async () => {
   margin-top: var(--spacing-lg);
   transition: all var(--transition-normal);
   border: var(--border-width-thin) solid;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-email-verification-home-btn);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-email-verification-home-btn-outline);
+}
+
+.btn-outline:hover .btn-icon {
+  color: var(--icon-email-verification-home-btn-outline-hover);
 }
 
 .btn-primary {
@@ -141,6 +215,14 @@ onMounted(async () => {
   height: 30px;
   animation: spin 1s linear infinite;
   margin: 0 auto var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-icon {
+  font-size: 1rem;
+  color: var(--icon-email-verification-spinner);
 }
 
 @keyframes spin {

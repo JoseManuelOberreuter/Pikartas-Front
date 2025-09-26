@@ -4,7 +4,9 @@
     <div class="modal" @click.stop>
       <div class="modal-header">
         <h2>Iniciar Sesión</h2>
-        <button class="close-btn" @click="closeModals">&times;</button>
+        <button class="close-btn" @click="closeModals">
+          <font-awesome-icon icon="times" class="close-icon" />
+        </button>
       </div>
       <form @submit.prevent="handleLogin" class="auth-form">
         <div class="form-group">
@@ -44,7 +46,9 @@
     <div class="modal" @click.stop>
       <div class="modal-header">
         <h2>Registrarse</h2>
-        <button class="close-btn" @click="closeModals">&times;</button>
+        <button class="close-btn" @click="closeModals">
+          <font-awesome-icon icon="times" class="close-icon" />
+        </button>
       </div>
       <form @submit.prevent="handleRegister" class="auth-form">
         <div class="form-group">
@@ -108,7 +112,9 @@
     <div class="modal" @click.stop>
       <div class="modal-header">
         <h2>Recuperar Contraseña</h2>
-        <button class="close-btn" @click="closeModals">&times;</button>
+        <button class="close-btn" @click="closeModals">
+          <font-awesome-icon icon="times" class="close-icon" />
+        </button>
       </div>
       <form @submit.prevent="handleForgotPassword" class="auth-form">
         <div class="form-group">
@@ -303,7 +309,7 @@ const handleForgotPassword = async () => {
   border: none;
   font-size: var(--font-size-3xl);
   cursor: pointer;
-  color: var(--color-gray-500);
+  color: var(--icon-modal-close);
   line-height: 1;
   padding: 0;
   width: 32px;
@@ -317,7 +323,16 @@ const handleForgotPassword = async () => {
 
 .close-btn:hover {
   background: var(--color-gray-200);
-  color: var(--color-gray-700);
+  color: var(--icon-modal-close-hover);
+}
+
+.close-icon {
+  font-size: 1.1rem;
+  transition: color var(--transition-normal);
+}
+
+.close-btn:hover .close-icon {
+  color: var(--icon-modal-close-hover);
 }
 
 .auth-form {

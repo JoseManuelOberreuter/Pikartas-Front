@@ -3,7 +3,7 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-section">
-          <h3>🛒 ShopVue</h3>
+          <h3><font-awesome-icon icon="shopping-cart" class="footer-brand-icon" /> ShopVue</h3>
           <p>Tu tienda online de tecnología favorita</p>
         </div>
         <div class="footer-section">
@@ -16,8 +16,8 @@
         </div>
         <div class="footer-section">
           <h4>Contacto</h4>
-          <p>📧 info@shopvue.com</p>
-          <p>📞 +1 (555) 123-4567</p>
+          <p><font-awesome-icon icon="envelope" class="contact-icon" /> info@shopvue.com</p>
+          <p><font-awesome-icon icon="phone" class="contact-icon" /> +1 (555) 123-4567</p>
         </div>
       </div>
       <div class="footer-bottom">
@@ -56,6 +56,19 @@
 
 .footer-section h3 {
   font-size: var(--font-size-xl);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-brand-icon {
+  color: var(--icon-footer-brand);
+  font-size: 1.2rem;
+  transition: color var(--transition-normal);
+}
+
+.footer-section h3:hover .footer-brand-icon {
+  color: var(--icon-footer-brand-hover);
 }
 
 .footer-section h4 {
@@ -66,6 +79,20 @@
   margin: 0 0 var(--spacing-sm) 0;
   color: var(--color-gray-200);
   line-height: var(--line-height-relaxed);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-icon {
+  color: var(--icon-footer-contact);
+  font-size: 0.9rem;
+  transition: color var(--transition-normal);
+  min-width: 16px;
+}
+
+.footer-section p:hover .contact-icon {
+  color: var(--icon-footer-contact-hover);
 }
 
 .footer-section ul {

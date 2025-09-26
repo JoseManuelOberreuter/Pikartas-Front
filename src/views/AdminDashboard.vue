@@ -1,14 +1,22 @@
 <template>
+
+<!-- TODO: los colores de los botones y de los iconos -->
+
   <div class="admin-dashboard">
     <div class="container">
       <div class="dashboard-header">
-        <h1>🛠️ Panel de Administración</h1>
+        <h1>
+          <font-awesome-icon icon="tools" class="header-icon" />
+          Panel de Administración
+        </h1>
         <p>Gestiona tu tienda online</p>
       </div>
 
       <div class="dashboard-stats" v-if="stats">
         <div class="stat-card">
-          <div class="stat-icon">📦</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="box" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.totalProducts || 0 }}</h3>
             <p>Total Productos</p>
@@ -16,7 +24,9 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">🛒</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="shopping-cart" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.totalOrders || 0 }}</h3> 
             <p>Total Órdenes</p>
@@ -24,7 +34,9 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">💰</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="dollar-sign" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>${{ stats.totalRevenue || 0 }}</h3>
             <p>Ingresos Totales</p>
@@ -32,7 +44,9 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">👥</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="users" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.totalUsers || 0 }}</h3>
             <p>Total Usuarios</p>
@@ -40,7 +54,9 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">💳</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="credit-card" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.paidOrders || 0 }}</h3>
             <p>Órdenes Pagadas</p>
@@ -48,7 +64,9 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">⏳</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="clock" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.pendingPayments || 0 }}</h3>
             <p>Pagos Pendientes</p>
@@ -56,7 +74,9 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">🔄</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="undo" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.refundedOrders || 0 }}</h3>
             <p>Reembolsos</p>
@@ -64,7 +84,9 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">📊</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="chart-line" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.conversionRate || 0 }}%</h3>
             <p>Tasa de Conversión</p>
@@ -75,48 +97,78 @@
       <div class="dashboard-actions">
         <div class="action-grid">
           <div class="action-card" @click="navigateTo('/admin/products')">
-            <div class="action-icon">📦</div>
+            <div class="action-icon">
+              <font-awesome-icon icon="box" class="action-icon-svg" />
+            </div>
             <h3>Gestionar Productos</h3>
             <p>Crear, editar y eliminar productos</p>
-            <div class="action-button">Ir a Productos</div>
+            <div class="action-button">
+              <font-awesome-icon icon="arrow-right" class="action-btn-icon" />
+              Ir a Productos
+            </div>
           </div>
 
           <div class="action-card" @click="navigateTo('/admin/orders')">
-            <div class="action-icon">📋</div>
+            <div class="action-icon">
+              <font-awesome-icon icon="clipboard-list" class="action-icon-svg" />
+            </div>
             <h3>Gestionar Órdenes</h3>
             <p>Ver y actualizar estado de órdenes</p>
-            <div class="action-button">Ir a Órdenes</div>
+            <div class="action-button">
+              <font-awesome-icon icon="arrow-right" class="action-btn-icon" />
+              Ir a Órdenes
+            </div>
           </div>
 
           <div class="action-card" @click="navigateTo('/admin/analytics')">
-            <div class="action-icon">📊</div>
+            <div class="action-icon">
+              <font-awesome-icon icon="chart-bar" class="action-icon-svg" />
+            </div>
             <h3>Estadísticas</h3>
             <p>Ver reportes y analíticas</p>
-            <div class="action-button">Ver Estadísticas</div>
+            <div class="action-button">
+              <font-awesome-icon icon="arrow-right" class="action-btn-icon" />
+              Ver Estadísticas
+            </div>
           </div>
 
           <div class="action-card" @click="navigateTo('/admin/users')">
-            <div class="action-icon">👥</div>
+            <div class="action-icon">
+              <font-awesome-icon icon="users" class="action-icon-svg" />
+            </div>
             <h3>Gestionar Usuarios</h3>
             <p>Ver y administrar usuarios registrados</p>
-            <div class="action-button">Gestionar Usuarios</div>
+            <div class="action-button">
+              <font-awesome-icon icon="arrow-right" class="action-btn-icon" />
+              Gestionar Usuarios
+            </div>
           </div>
 
           <div class="action-card" @click="navigateTo('/admin/orders')">
-            <div class="action-icon">💳</div>
+            <div class="action-icon">
+              <font-awesome-icon icon="credit-card" class="action-icon-svg" />
+            </div>
             <h3>Gestionar Pagos</h3>
             <p>Reembolsos y estado de pagos</p>
-            <div class="action-button">Gestionar Pagos</div>
+            <div class="action-button">
+              <font-awesome-icon icon="arrow-right" class="action-btn-icon" />
+              Gestionar Pagos
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Payment Alerts -->
       <div class="payment-alerts" v-if="paymentAlerts.length > 0">
-        <h2>🚨 Alertas de Pago</h2>
+        <h2>
+          <font-awesome-icon icon="exclamation-triangle" class="alerts-icon" />
+          Alertas de Pago
+        </h2>
         <div class="alerts-list">
           <div class="alert-item" v-for="alert in paymentAlerts" :key="alert.id" :class="`alert-${alert.type}`">
-            <div class="alert-icon">{{ alert.icon }}</div>
+            <div class="alert-icon">
+              <font-awesome-icon :icon="getAlertIcon(alert.type)" class="alert-icon-svg" />
+            </div>
             <div class="alert-content">
               <h4>{{ alert.title }}</h4>
               <p>{{ alert.message }}</p>
@@ -134,7 +186,9 @@
         <h2>Actividad Reciente</h2>
         <div class="activity-list" v-if="recentOrders.length">
           <div class="activity-item" v-for="order in recentOrders" :key="order._id">
-            <div class="activity-icon">🛒</div>
+            <div class="activity-icon">
+              <font-awesome-icon icon="shopping-cart" class="activity-icon-svg" />
+            </div>
             <div class="activity-info">
               <h4>Nueva orden #{{ order._id?.slice(-8) }}</h4>
               <p>{{ formatDate(order.createdAt) }} - ${{ order.totalAmount }}</p>
@@ -276,6 +330,15 @@ const getPaymentStatusText = (status) => {
   return statusMap[status] || status
 }
 
+const getAlertIcon = (type) => {
+  const iconMap = {
+    warning: 'exclamation-triangle',
+    info: 'info-circle',
+    danger: 'times-circle'
+  }
+  return iconMap[type] || 'info-circle'
+}
+
 const generatePaymentAlerts = (orders) => {
   const alerts = []
   
@@ -368,6 +431,20 @@ onMounted(() => {
   margin: 0 0 1rem 0;
   color: #333;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: var(--icon-admin-tools);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.dashboard-header:hover .header-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .dashboard-header p {
@@ -395,7 +472,29 @@ onMounted(() => {
 
 .stat-icon {
   font-size: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.stat-icon-svg {
+  font-size: 1em;
+  transition: all var(--transition-normal);
+}
+
+.stat-card:hover .stat-icon-svg {
+  transform: scale(1.1);
+}
+
+/* Colores específicos para cada tipo de estadística */
+.stat-card:nth-child(1) .stat-icon-svg { color: var(--icon-admin-products); }
+.stat-card:nth-child(2) .stat-icon-svg { color: var(--icon-admin-orders); }
+.stat-card:nth-child(3) .stat-icon-svg { color: var(--icon-admin-revenue); }
+.stat-card:nth-child(4) .stat-icon-svg { color: var(--icon-admin-users); }
+.stat-card:nth-child(5) .stat-icon-svg { color: var(--icon-admin-payments); }
+.stat-card:nth-child(6) .stat-icon-svg { color: var(--icon-admin-pending); }
+.stat-card:nth-child(7) .stat-icon-svg { color: var(--icon-admin-refunds); }
+.stat-card:nth-child(8) .stat-icon-svg { color: var(--icon-admin-analytics); }
 
 .stat-info h3 {
   margin: 0 0 0.5rem 0;
@@ -438,7 +537,27 @@ onMounted(() => {
 .action-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.action-icon-svg {
+  font-size: 1em;
+  color: var(--icon-admin-products);
+  transition: all var(--transition-normal);
+}
+
+.action-card:hover .action-icon-svg {
+  transform: scale(1.1);
+}
+
+/* Colores específicos para cada acción */
+.action-card:nth-child(1) .action-icon-svg { color: var(--icon-admin-products); }
+.action-card:nth-child(2) .action-icon-svg { color: var(--icon-admin-orders); }
+.action-card:nth-child(3) .action-icon-svg { color: var(--icon-admin-analytics); }
+.action-card:nth-child(4) .action-icon-svg { color: var(--icon-admin-users); }
+.action-card:nth-child(5) .action-icon-svg { color: var(--icon-admin-payments); }
 
 .action-card h3 {
   margin: 0 0 0.5rem 0;
@@ -458,7 +577,21 @@ onMounted(() => {
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
   font-weight: 600;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--transition-normal);
+}
+
+.action-btn-icon {
+  font-size: 0.875rem;
+  color: var(--icon-admin-action);
+  transition: all var(--transition-normal);
+}
+
+.action-card:hover .action-btn-icon {
+  transform: translateX(3px);
 }
 
 .recent-activity {
@@ -472,6 +605,19 @@ onMounted(() => {
   margin: 0 0 1.5rem 0;
   color: #333;
   font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alerts-icon {
+  color: var(--icon-admin-alerts);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.payment-alerts:hover .alerts-icon {
+  transform: scale(1.1);
 }
 
 .activity-list {
@@ -491,6 +637,39 @@ onMounted(() => {
 
 .activity-icon {
   font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-icon-svg {
+  font-size: 1em;
+  color: var(--icon-admin-cart);
+  transition: all var(--transition-normal);
+}
+
+.activity-item:hover .activity-icon-svg {
+  transform: scale(1.1);
+}
+
+.alert-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-icon-svg {
+  font-size: 1em;
+  transition: all var(--transition-normal);
+}
+
+.alert-item.alert-warning .alert-icon-svg { color: var(--icon-admin-pending); }
+.alert-item.alert-info .alert-icon-svg { color: var(--icon-admin-clock); }
+.alert-item.alert-danger .alert-icon-svg { color: var(--icon-admin-chart); }
+
+.alert-item:hover .alert-icon-svg {
+  transform: scale(1.1);
 }
 
 .activity-info {

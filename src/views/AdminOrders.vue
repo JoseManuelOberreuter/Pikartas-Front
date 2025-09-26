@@ -2,10 +2,14 @@
   <div class="admin-orders">
     <div class="container">
       <div class="orders-header">
-        <h1>📋 Gestión de Órdenes</h1>
+        <h1>
+          <font-awesome-icon icon="clipboard-list" class="header-icon" />
+          Gestión de Órdenes
+        </h1>
         <div class="header-actions">
           <router-link to="/admin" class="btn btn-outline">
-            ← Volver al Dashboard
+            <font-awesome-icon icon="arrow-left" class="btn-icon" />
+            Volver al Dashboard
           </router-link>
         </div>
       </div>
@@ -13,42 +17,54 @@
       <!-- Stats Cards -->
       <div class="stats-grid" v-if="stats">
         <div class="stat-card">
-          <div class="stat-icon">📦</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="box" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.totalOrders || 0 }}</h3>
             <p>Total Órdenes</p>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">⏳</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="clock" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.pendingOrders || 0 }}</h3>
             <p>Pendientes</p>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="check-circle" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.completedOrders || 0 }}</h3>
             <p>Completadas</p>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">💰</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="dollar-sign" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>${{ stats.totalRevenue || 0 }}</h3>
             <p>Ingresos Totales</p>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">💳</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="credit-card" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.paidOrders || 0 }}</h3>
             <p>Pagadas</p>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🔄</div>
+          <div class="stat-icon">
+            <font-awesome-icon icon="undo" class="stat-icon-svg" />
+          </div>
           <div class="stat-info">
             <h3>{{ stats.refundedOrders || 0 }}</h3>
             <p>Reembolsadas</p>
@@ -92,7 +108,7 @@
 
       <!-- Loading -->
       <div v-if="loading" class="loading">
-        <div class="spinner"></div>
+        <font-awesome-icon icon="spinner" spin class="loading-icon" />
         <p>Cargando órdenes...</p>
       </div>
 
@@ -160,7 +176,8 @@
                 <td>
                   <div class="actions">
                     <button @click="viewOrderDetails(order)" class="btn btn-sm btn-outline">
-                      👁️ Ver
+                      <font-awesome-icon icon="eye" class="action-icon" />
+                      Ver
                     </button>
                     <button 
                       v-if="order.paymentStatus === 'paid' && order.status !== 'cancelled'"
@@ -168,14 +185,24 @@
                       class="btn btn-sm btn-warning"
                       :disabled="refundingOrder === order._id"
                     >
-                      {{ refundingOrder === order._id ? '⏳' : '🔄' }} Reembolsar
+                      <font-awesome-icon 
+                        :icon="refundingOrder === order._id ? 'spinner' : 'undo'" 
+                        :spin="refundingOrder === order._id" 
+                        class="action-icon" 
+                      />
+                      Reembolsar
                     </button>
                     <button 
                       @click="checkPaymentStatus(order)" 
                       class="btn btn-sm btn-info"
                       :disabled="checkingPayment === order._id"
                     >
-                      {{ checkingPayment === order._id ? '⏳' : '💳' }} Estado Pago
+                      <font-awesome-icon 
+                        :icon="checkingPayment === order._id ? 'spinner' : 'credit-card'" 
+                        :spin="checkingPayment === order._id" 
+                        class="action-icon" 
+                      />
+                      Estado Pago
                     </button>
                   </div>
                 </td>
@@ -186,7 +213,9 @@
         
         <div v-if="filteredOrders.length === 0" class="no-orders">
           <div class="empty-state">
-            <div class="empty-icon">📋</div>
+            <div class="empty-icon">
+              <font-awesome-icon icon="clipboard-list" class="empty-icon-svg" />
+            </div>
             <h3>No hay órdenes</h3>
             <p>No se encontraron órdenes con los filtros seleccionados</p>
           </div>
@@ -199,7 +228,9 @@
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <h2>Detalles de la Orden #{{ selectedOrder._id?.slice(-8) }}</h2>
-          <button @click="closeOrderDetails" class="close-btn">&times;</button>
+          <button @click="closeOrderDetails" class="close-btn">
+            <font-awesome-icon icon="times" class="close-icon" />
+          </button>
         </div>
         
         <div class="modal-body">
@@ -504,6 +535,19 @@ onMounted(() => {
   margin: 0;
   font-size: 2rem;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: var(--icon-admin-orders-header);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.orders-header:hover .header-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .stats-grid {
@@ -525,7 +569,27 @@ onMounted(() => {
 
 .stat-icon {
   font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.stat-icon-svg {
+  font-size: 1em;
+  transition: all var(--transition-normal);
+}
+
+.stat-card:hover .stat-icon-svg {
+  transform: scale(1.1);
+}
+
+/* Colores específicos para cada estadística */
+.stat-card:nth-child(1) .stat-icon-svg { color: var(--icon-admin-products); }
+.stat-card:nth-child(2) .stat-icon-svg { color: var(--icon-admin-pending); }
+.stat-card:nth-child(3) .stat-icon-svg { color: var(--icon-admin-success); }
+.stat-card:nth-child(4) .stat-icon-svg { color: var(--icon-admin-revenue); }
+.stat-card:nth-child(5) .stat-icon-svg { color: var(--icon-admin-payments); }
+.stat-card:nth-child(6) .stat-icon-svg { color: var(--icon-admin-refunds); }
 
 .stat-info h3 {
   margin: 0 0 0.25rem 0;
@@ -571,14 +635,12 @@ onMounted(() => {
   padding: 4rem;
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.loading-icon {
+  font-size: 2.5rem;
+  color: var(--icon-admin-orders-loading);
   margin: 0 auto 1rem;
+  display: block;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -745,6 +807,19 @@ th {
 .empty-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon-svg {
+  font-size: 1em;
+  color: var(--icon-admin-orders-empty);
+  transition: all var(--transition-normal);
+}
+
+.empty-state:hover .empty-icon-svg {
+  transform: scale(1.1) rotate(10deg);
 }
 
 .empty-state h3 {
@@ -800,7 +875,7 @@ th {
   background: none;
   border: none;
   font-size: 2rem;
-  color: #666;
+  color: var(--icon-admin-orders-close);
   cursor: pointer;
   padding: 0;
   width: 30px;
@@ -808,10 +883,21 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all var(--transition-normal);
 }
 
 .close-btn:hover {
-  color: #333;
+  color: var(--icon-admin-orders-close-hover);
+  transform: scale(1.1);
+}
+
+.close-icon {
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.close-btn:hover .close-icon {
+  color: var(--icon-admin-orders-close-hover);
 }
 
 .modal-body {

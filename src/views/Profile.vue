@@ -12,7 +12,7 @@
               @error="handleAvatarError"
             />
             <div class="avatar-overlay" @click="openAvatarModal">
-              <span class="avatar-edit-icon">📷</span>
+              <font-awesome-icon icon="camera" class="avatar-edit-icon" />
               <span class="avatar-edit-text">Cambiar</span>
             </div>
           </div>
@@ -29,9 +29,18 @@
           <h1 class="user-name">{{ authStore.user?.name || 'Usuario' }}</h1>
           <p class="user-email">{{ authStore.user?.email || 'No email' }}</p>
           <div class="user-badges">
-            <span class="badge badge-verified" v-if="authStore.user?.isVerified">✓ Verificado</span>
-            <span class="badge badge-admin" v-if="authStore.user?.role === 'admin'">👑 Admin</span>
-            <span class="badge badge-member" v-else>👤 Miembro</span>
+            <span class="badge badge-verified" v-if="authStore.user?.isVerified">
+              <font-awesome-icon icon="check-circle" class="badge-icon" />
+              Verificado
+            </span>
+            <span class="badge badge-admin" v-if="authStore.user?.role === 'admin'">
+              <font-awesome-icon icon="crown" class="badge-icon" />
+              Admin
+            </span>
+            <span class="badge badge-member" v-else>
+              <font-awesome-icon icon="user" class="badge-icon" />
+              Miembro
+            </span>
           </div>
         </div>
       </div>
@@ -49,7 +58,8 @@
                 @click="enableEditMode" 
                 class="btn btn-outline btn-sm"
               >
-                ✏️ Editar
+                <font-awesome-icon icon="edit" class="btn-icon" />
+                Editar
               </button>
             </div>
             
@@ -110,8 +120,12 @@
                   Cancelar
                 </button>
                 <button type="submit" :disabled="saving" class="btn btn-primary">
-                  <span v-if="saving">💾 Guardando...</span>
-                  <span v-else">💾 Guardar cambios</span>
+                  <font-awesome-icon 
+                    :icon="saving ? 'spinner' : 'save'" 
+                    :spin="saving" 
+                    class="btn-icon" 
+                  />
+                  {{ saving ? 'Guardando...' : 'Guardar cambios' }}
                 </button>
               </div>
             </form>
@@ -122,14 +136,17 @@
         <div class="tab-content"> 
           <div class="content-card">
             <div class="card-header">
-              <h2>🔒 Seguridad de la cuenta</h2>
+              <h2>
+                <font-awesome-icon icon="shield-alt" class="security-icon" />
+                Seguridad de la cuenta
+              </h2>
             </div>
             
             <div class="security-form">
               <div class="security-item">
                 <div class="security-info">
                   <h3>
-                    <span>🔐</span>
+                    <font-awesome-icon icon="lock" class="lock-icon" />
                     Cambiar contraseña
                   </h3>
                   <p>Te enviaremos un enlace seguro a tu email para cambiar tu contraseña</p>
@@ -143,8 +160,12 @@
                       :disabled="changingPassword"
                       class="btn btn-primary btn-sm"
                     >
-                      <span v-if="changingPassword">📧 Enviando...</span>
-                      <span v-else>🔐 Solicitar por email</span>
+                      <font-awesome-icon 
+                        :icon="changingPassword ? 'envelope' : 'lock'" 
+                        :spin="changingPassword" 
+                        class="btn-icon btn-icon-profile" 
+                      />
+                      {{ changingPassword ? 'Enviando...' : 'Solicitar por email' }}
                     </button>
                   </div>
 
@@ -389,6 +410,12 @@ onMounted(() => {
 .avatar-edit-icon {
   font-size: 1.5rem;
   margin-bottom: 0.25rem;
+  color: var(--icon-profile-camera);
+  transition: all var(--transition-normal);
+}
+
+.avatar-overlay:hover .avatar-edit-icon {
+  transform: scale(1.1);
 }
 
 .user-info {
@@ -418,6 +445,30 @@ onMounted(() => {
   border-radius: 20px;
   font-size: 0.875rem;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.badge-icon {
+  font-size: 0.75rem;
+  transition: all var(--transition-normal);
+}
+
+.badge-verified .badge-icon {
+  color: var(--icon-profile-verified);
+}
+
+.badge-admin .badge-icon {
+  color: var(--icon-profile-admin);
+}
+
+.badge-member .badge-icon {
+  color: var(--icon-profile-member);
+}
+
+.badge:hover .badge-icon {
+  transform: scale(1.1);
 }
 
 .badge-verified {
@@ -470,6 +521,19 @@ onMounted(() => {
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--color-gray-800);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.security-icon {
+  color: var(--icon-profile-lock);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.card-header:hover .security-icon {
+  transform: scale(1.1);
 }
 
 /* Forms */
@@ -531,6 +595,56 @@ onMounted(() => {
   border-top: 1px solid var(--color-gray-200);
 }
 
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-outline:hover .btn-icon {
+  color: var(--icon-profile-edit-hover);
+}
+
+.btn-primary:hover .btn-icon {
+  color: var(--icon-profile-save-hover);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-profile-save);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-profile-edit);
+}
+
+/* Iconos específicos para botones de perfil */
+.btn-icon-profile {
+  color: var(--icon-profile-btn-lock) !important;
+}
+
+.btn-primary:hover .btn-icon-profile {
+  color: var(--icon-profile-btn-lock) !important;
+}
+
 /* Security */
 .security-form {
   padding: 2rem;
@@ -568,6 +682,16 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.lock-icon {
+  color: var(--icon-profile-lock);
+  font-size: 1em;
+  transition: all var(--transition-normal);
+}
+
+.security-item:hover .lock-icon {
+  transform: scale(1.1);
 }
 
 .security-info p {

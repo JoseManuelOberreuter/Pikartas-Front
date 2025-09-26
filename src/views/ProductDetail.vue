@@ -1,8 +1,11 @@
 <template>
+
+<!-- TODO: cambiar logica para bajar a 0 productos en el carrito, el usuario no puede eliminar el producto del carrito en esta vista -->
+
   <div class="product-detail">
     <div class="container">
       <div v-if="loading" class="loading-state">
-        <div class="loading-spinner">🔄</div>
+        <font-awesome-icon icon="spinner" spin class="loading-spinner" />
         <h2>Cargando producto...</h2>
       </div>
 
@@ -10,7 +13,8 @@
         <h2>Producto no encontrado</h2>
         <p>El producto que buscas no existe o no está disponible.</p>
         <router-link to="/shop" class="btn btn-primary">
-          ← Volver a la tienda
+          <font-awesome-icon icon="arrow-left" class="btn-icon" />
+          Volver a la tienda
         </router-link>
       </div>
 
@@ -61,7 +65,7 @@
                   @click="decreaseQuantity" 
                   :disabled="quantity <= 1"
                 >
-                  -
+                  <font-awesome-icon icon="minus" class="qty-icon" />
                 </button>
                 <input 
                   type="number" 
@@ -75,7 +79,7 @@
                   @click="increaseQuantity" 
                   :disabled="quantity >= product.stock"
                 >
-                  +
+                  <font-awesome-icon icon="plus" class="qty-icon" />
                 </button>
               </div>
             </div>
@@ -85,11 +89,13 @@
               @click="addToCart"
               :disabled="product.stock === 0"
             >
-              {{ product.stock === 0 ? 'Sin Stock' : `🛒 Agregar al Carrito` }}
+              <font-awesome-icon icon="shopping-cart" class="btn-icon" />
+              {{ product.stock === 0 ? 'Sin Stock' : 'Agregar al Carrito' }}
             </button>
 
             <button class="btn btn-outline" @click="goBack">
-              ← Volver
+              <font-awesome-icon icon="arrow-left" class="btn-icon" />
+              Volver
             </button>
           </div>
         </div>
@@ -269,6 +275,7 @@ onMounted(async () => {
 .loading-spinner {
   font-size: 3rem;
   margin-bottom: 1rem;
+  color: var(--icon-product-loading);
   animation: spin 2s linear infinite;
 }
 
@@ -438,7 +445,10 @@ onMounted(async () => {
   cursor: pointer;
   font-weight: bold;
   font-size: 1.1rem;
-  transition: background 0.3s;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .qty-btn:hover:not(:disabled) {
@@ -448,6 +458,21 @@ onMounted(async () => {
 .qty-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.qty-icon {
+  font-size: 0.875rem;
+  color: var(--icon-product-plus);
+  transition: all var(--transition-normal);
+}
+
+.qty-btn:hover:not(:disabled) .qty-icon {
+  color: var(--icon-product-plus-hover);
+  transform: scale(1.1);
+}
+
+.qty-btn[disabled] .qty-icon {
+  color: var(--color-gray-400);
 }
 
 .qty-input {
@@ -473,7 +498,31 @@ onMounted(async () => {
   text-decoration: none;
   transition: all 0.3s;
   font-size: 1.1rem;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-product-cart);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-product-back);
+}
+
+.btn-outline:hover .btn-icon {
+  color: var(--icon-product-back-hover);
 }
 
 .btn:disabled {

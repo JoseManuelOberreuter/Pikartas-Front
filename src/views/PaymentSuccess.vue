@@ -3,7 +3,9 @@
     <div class="container">
       <div class="success-content">
         <div class="success-icon">
-          <div class="checkmark">✓</div>
+          <div class="checkmark">
+            <font-awesome-icon icon="check" class="check-icon" />
+          </div>
         </div>
         
         <h1>¡Pago Exitoso!</h1>
@@ -43,18 +45,32 @@
         <div class="next-steps">
           <h3>Próximos Pasos</h3>
           <ul>
-            <li>📧 Recibirás un email de confirmación en breve</li>
-            <li>📦 Tu pedido será procesado y enviado</li>
-            <li>📱 Te notificaremos cuando esté en camino</li>
-            <li>📋 Puedes rastrear tu pedido en tu perfil</li>
+            <li>
+              <font-awesome-icon icon="envelope" class="step-icon" />
+              Recibirás un email de confirmación en breve
+            </li>
+            <li>
+              <font-awesome-icon icon="box" class="step-icon" />
+              Tu pedido será procesado y enviado
+            </li>
+            <li>
+              <font-awesome-icon icon="bell" class="step-icon" />
+              Te notificaremos cuando esté en camino
+            </li>
+            <li>
+              <font-awesome-icon icon="clipboard-list" class="step-icon" />
+              Puedes rastrear tu pedido en tu perfil
+            </li>
           </ul>
         </div>
 
         <div class="success-actions">
           <router-link to="/" class="btn btn-primary">
+            <font-awesome-icon icon="home" class="btn-icon" />
             Continuar Comprando
           </router-link>
           <router-link to="/profile" class="btn btn-outline">
+            <font-awesome-icon icon="clipboard-list" class="btn-icon" />
             Ver Mis Pedidos
           </router-link>
         </div>
@@ -64,11 +80,11 @@
           <p>Si tienes alguna pregunta sobre tu pedido, no dudes en contactarnos:</p>
           <div class="contact-methods">
             <div class="contact-item">
-              <span class="contact-icon">📧</span>
+              <font-awesome-icon icon="envelope" class="contact-icon" />
               <span>soporte@shopvuecore.com</span>
             </div>
             <div class="contact-item">
-              <span class="contact-icon">📞</span>
+              <font-awesome-icon icon="phone" class="contact-icon" />
               <span>+56 2 2345 6789</span>
             </div>
           </div>
@@ -147,6 +163,11 @@ onMounted(() => {
   font-weight: bold;
   margin: 0 auto;
   animation: successPulse 0.6s ease-out;
+}
+
+.check-icon {
+  font-size: 1em;
+  color: var(--icon-payment-success-check);
 }
 
 @keyframes successPulse {
@@ -250,6 +271,34 @@ onMounted(() => {
   padding: 0.5rem 0;
   color: #666;
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.step-icon {
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.next-steps li:nth-child(1) .step-icon {
+  color: var(--icon-payment-success-email);
+}
+
+.next-steps li:nth-child(2) .step-icon {
+  color: var(--icon-payment-success-box);
+}
+
+.next-steps li:nth-child(3) .step-icon {
+  color: var(--icon-payment-success-phone);
+}
+
+.next-steps li:nth-child(4) .step-icon {
+  color: var(--icon-payment-success-list);
+}
+
+.next-steps li:hover .step-icon {
+  transform: scale(1.1);
 }
 
 .success-actions {
@@ -269,7 +318,30 @@ onMounted(() => {
   text-decoration: none;
   transition: all 0.3s;
   font-size: 1rem;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-payment-success-continue-btn);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-payment-success-orders-btn);
+}
+
+.btn-outline:hover .btn-icon {
+  color: var(--icon-payment-success-orders-btn-hover);
 }
 
 .btn-primary {
@@ -328,6 +400,19 @@ onMounted(() => {
 
 .contact-icon {
   font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.contact-item:nth-child(1) .contact-icon {
+  color: var(--icon-payment-success-support-email);
+}
+
+.contact-item:nth-child(2) .contact-icon {
+  color: var(--icon-payment-success-support-phone);
+}
+
+.contact-item:hover .contact-icon {
+  transform: scale(1.1);
 }
 
 /* Responsive Design */

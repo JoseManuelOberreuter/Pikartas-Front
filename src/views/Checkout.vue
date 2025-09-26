@@ -2,15 +2,21 @@
   <div class="checkout">
     <div class="container">
       <div class="checkout-header">
-        <h1>💳 Finalizar Compra</h1>
+        <h1>
+          <font-awesome-icon icon="credit-card" class="header-icon" />
+          Finalizar Compra
+        </h1>
         <p>Completa tu pedido de {{ cartItemCount }} artículos</p>
       </div>
 
       <div v-if="cartItems.length === 0" class="empty-cart">
-        <div class="empty-cart-icon">🛒</div>
+        <div class="empty-cart-icon">
+          <font-awesome-icon icon="shopping-cart" class="empty-cart-icon-svg" />
+        </div>
         <h2>Tu carrito está vacío</h2>
         <p>Agrega productos antes de realizar una compra</p>
         <router-link to="/shop" class="btn btn-primary">
+          <font-awesome-icon icon="store" class="btn-icon" />
           Ir a la Tienda
         </router-link>
       </div>
@@ -20,7 +26,10 @@
           <form @submit.prevent="submitOrder">
             <!-- Shipping Information -->
             <div class="form-section">
-              <h2>📦 Información de Envío</h2>
+              <h2>
+                <font-awesome-icon icon="box" class="section-icon" />
+                Información de Envío
+              </h2>
               
               <div class="form-row">
                 <div class="form-group">
@@ -98,30 +107,37 @@
 
             <!-- Payment Information -->
             <div class="form-section">
-              <h2>💳 Información de Pago</h2>
+              <h2>
+                <font-awesome-icon icon="credit-card" class="section-icon" />
+                Información de Pago
+              </h2>
               
               <div class="payment-method-selection">
                 <div class="payment-option selected">
-                  <div class="payment-icon">🏦</div>
+                  <div class="payment-icon">
+                    <font-awesome-icon icon="university" class="payment-icon-svg" />
+                  </div>
                   <div class="payment-info">
                     <h3>Transbank Webpay Plus</h3>
                     <p>Pago seguro con tarjeta de crédito o débito</p>
                   </div>
-                  <div class="payment-check">✓</div>
+                  <div class="payment-check">
+                    <font-awesome-icon icon="check" class="check-icon" />
+                  </div>
                 </div>
               </div>
 
               <div class="payment-info-card">
                 <div class="info-item">
-                  <span class="info-icon">🔒</span>
+                  <font-awesome-icon icon="shield-alt" class="info-icon" />
                   <span>Pago 100% seguro con Transbank</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-icon">💳</span>
+                  <font-awesome-icon icon="credit-card" class="info-icon" />
                   <span>Acepta todas las tarjetas principales</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-icon">⚡</span>
+                  <font-awesome-icon icon="bolt" class="info-icon" />
                   <span>Procesamiento instantáneo</span>
                 </div>
               </div>
@@ -129,7 +145,10 @@
 
             <!-- Order Notes -->
             <div class="form-section">
-              <h2>📝 Notas del Pedido</h2>
+              <h2>
+                <font-awesome-icon icon="clipboard-list" class="section-icon" />
+                Notas del Pedido
+              </h2>
               
               <div class="form-group">
                 <label for="orderNotes">Comentarios adicionales (opcional)</label>
@@ -144,9 +163,15 @@
 
             <div class="form-actions">
               <router-link to="/cart" class="btn btn-outline">
-                ← Volver al Carrito
+                <font-awesome-icon icon="arrow-left" class="btn-icon" />
+                Volver al Carrito
               </router-link>
               <button type="submit" class="btn btn-primary" :disabled="isProcessing">
+                <font-awesome-icon 
+                  :icon="isProcessing ? 'spinner' : 'credit-card'" 
+                  :spin="isProcessing"
+                  class="btn-icon" 
+                />
                 {{ isProcessing ? 'Procesando...' : `Pagar $${finalTotal.toFixed(2)}` }}
               </button>
             </div>
@@ -155,7 +180,10 @@
 
         <div class="order-summary">
           <div class="summary-card">
-            <h2>📋 Resumen del Pedido</h2>
+            <h2>
+              <font-awesome-icon icon="clipboard-list" class="summary-icon" />
+              Resumen del Pedido
+            </h2>
             
             <div class="order-items">
               <div v-for="item in cartItems" :key="item.id" class="order-item">
@@ -197,15 +225,15 @@
 
             <div class="security-info">
               <div class="security-item">
-                <span class="security-icon">🔒</span>
+                <font-awesome-icon icon="shield-alt" class="security-icon" />
                 <span>Pago 100% seguro</span>
               </div>
               <div class="security-item">
-                <span class="security-icon">🚚</span>
+                <font-awesome-icon icon="truck" class="security-icon" />
                 <span>Envío asegurado</span>
               </div>
               <div class="security-item">
-                <span class="security-icon">↩️</span>
+                <font-awesome-icon icon="undo" class="security-icon" />
                 <span>30 días de garantía</span>
               </div>
             </div>
@@ -311,6 +339,20 @@ const submitOrder = async () => {
   margin: 0 0 1rem 0;
   color: #333;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: var(--icon-checkout-header);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.checkout-header:hover .header-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .checkout-header p {
@@ -331,6 +373,20 @@ const submitOrder = async () => {
   font-size: 5rem;
   margin-bottom: 1.5rem;
   opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-cart-icon-svg {
+  font-size: 1em;
+  color: var(--icon-checkout-empty);
+  transition: all var(--transition-normal);
+}
+
+.empty-cart:hover .empty-cart-icon-svg {
+  transform: scale(1.1) rotate(-10deg);
+  opacity: 0.8;
 }
 
 .empty-cart h2 {
@@ -372,6 +428,23 @@ const submitOrder = async () => {
   color: #333;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #f8f9fa;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-icon {
+  color: var(--icon-checkout-shipping);
+  font-size: 1.1em;
+  transition: all var(--transition-normal);
+}
+
+.form-section:nth-child(2) .section-icon {
+  color: var(--icon-checkout-payment);
+}
+
+.form-section:nth-child(3) .section-icon {
+  color: var(--icon-checkout-notes);
 }
 
 .form-row {
@@ -437,6 +510,19 @@ const submitOrder = async () => {
 .payment-icon {
   font-size: 2rem;
   margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-icon-svg {
+  font-size: 1em;
+  color: var(--icon-checkout-bank);
+  transition: all var(--transition-normal);
+}
+
+.payment-option:hover .payment-icon-svg {
+  transform: scale(1.1);
 }
 
 .payment-info {
@@ -469,6 +555,11 @@ const submitOrder = async () => {
   font-weight: bold;
 }
 
+.check-icon {
+  font-size: 0.875rem;
+  color: var(--icon-checkout-pay-btn);
+}
+
 .payment-info-card {
   background: #f8f9fa;
   border-radius: 8px;
@@ -491,6 +582,23 @@ const submitOrder = async () => {
 
 .info-icon {
   font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.info-item:nth-child(1) .info-icon {
+  color: var(--icon-checkout-secure);
+}
+
+.info-item:nth-child(2) .info-icon {
+  color: var(--icon-checkout-card);
+}
+
+.info-item:nth-child(3) .info-icon {
+  color: var(--icon-checkout-lightning);
+}
+
+.info-item:hover .info-icon {
+  transform: scale(1.1);
 }
 
 .form-actions {
@@ -516,6 +624,19 @@ const submitOrder = async () => {
   margin: 0 0 1.5rem 0;
   font-size: 1.25rem;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.summary-icon {
+  color: var(--icon-checkout-summary);
+  font-size: 1.1em;
+  transition: all var(--transition-normal);
+}
+
+.summary-card:hover .summary-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .order-items {
@@ -622,6 +743,23 @@ const submitOrder = async () => {
 
 .security-icon {
   font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.security-item:nth-child(1) .security-icon {
+  color: var(--icon-checkout-security);
+}
+
+.security-item:nth-child(2) .security-icon {
+  color: var(--icon-checkout-truck);
+}
+
+.security-item:nth-child(3) .security-icon {
+  color: var(--icon-checkout-return);
+}
+
+.security-item:hover .security-icon {
+  transform: scale(1.1);
 }
 
 .btn {
@@ -634,7 +772,30 @@ const submitOrder = async () => {
   text-decoration: none;
   transition: all 0.3s;
   font-size: 1rem;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-checkout-back);
+}
+
+.btn-outline:hover .btn-icon {
+  color: var(--icon-checkout-back-hover);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-checkout-pay-btn);
 }
 
 .btn:disabled {

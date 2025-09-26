@@ -2,9 +2,12 @@
   <div class="admin-products">
     <div class="container">
       <div class="products-header">
-        <h1>📦 Gestión de Productos</h1>
+        <h1>
+          <font-awesome-icon icon="box" class="header-icon" />
+          Gestión de Productos
+        </h1>
         <button @click="openCreateModal" class="btn btn-primary">
-          <span class="btn-icon">➕</span>
+          <font-awesome-icon icon="plus" class="btn-icon" />
           Crear Producto
         </button>
       </div>
@@ -33,7 +36,7 @@
 
       <!-- Loading -->
       <div v-if="loading" class="loading">
-        <div class="spinner"></div>
+        <font-awesome-icon icon="spinner" spin class="loading-icon" />
         <p>Cargando productos...</p>
       </div>
 
@@ -93,10 +96,10 @@
                 <td>
                   <div class="actions">
                     <button @click="editProduct(product)" class="btn btn-sm btn-outline">
-                      ✏️
+                      <font-awesome-icon icon="edit" class="action-icon" />
                     </button>
                     <button @click="deleteProduct(product._id)" class="btn btn-sm btn-danger">
-                      🗑️
+                      <font-awesome-icon icon="trash" class="action-icon" />
                     </button>
                   </div>
                 </td>
@@ -107,10 +110,13 @@
         
         <div v-if="filteredProducts.length === 0" class="no-products">
           <div class="empty-state">
-            <div class="empty-icon">📦</div>
+            <div class="empty-icon">
+              <font-awesome-icon icon="box" class="empty-icon-svg" />
+            </div>
             <h3>No hay productos</h3>
             <p>Comienza agregando tu primer producto</p>
             <button @click="openCreateModal" class="btn btn-primary">
+              <font-awesome-icon icon="plus" class="btn-icon" />
               Crear Primer Producto
             </button>
           </div>
@@ -122,7 +128,9 @@
         <div class="modal-content" @click.stop>
           <div class="modal-header">
             <h2>{{ isEditing ? 'Editar Producto' : 'Crear Producto' }}</h2>
-            <button @click="closeModal" class="close-btn">&times;</button>
+            <button @click="closeModal" class="close-btn">
+              <font-awesome-icon icon="times" class="close-icon" />
+            </button>
           </div>
           
           <form @submit.prevent="submitProduct" class="product-form">
@@ -183,7 +191,10 @@
                   <option v-for="category in availableCategories" :key="category" :value="category">
                     {{ category }}
                   </option>
-                  <option value="__new__">➕ Crear nueva categoría</option>
+                  <option value="__new__">
+                    <font-awesome-icon icon="plus" class="option-icon" />
+                    Crear nueva categoría
+                  </option>
                 </select>
                 
                 <div v-if="productForm.category === '__new__'" class="new-category-input">
@@ -217,7 +228,7 @@
                   id="product-image"
                 />
                 <label for="product-image" class="file-input-label">
-                  <span class="upload-icon">📷</span>
+                  <font-awesome-icon icon="camera" class="upload-icon" />
                   <span class="upload-text">
                     {{ selectedImage ? selectedImage.name : 'Seleccionar imagen' }}
                   </span>
@@ -230,7 +241,7 @@
                     @click="removeImage" 
                     class="remove-image-btn"
                   >
-                    ✕
+                    <font-awesome-icon icon="times" class="remove-icon" />
                   </button>
                 </div>
                 
@@ -586,6 +597,19 @@ onMounted(async () => {
   margin: 0;
   font-size: 2rem;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: var(--icon-admin-products-header);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.products-header:hover .header-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .filters {
@@ -619,14 +643,12 @@ onMounted(async () => {
   padding: 4rem;
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.loading-icon {
+  font-size: 2.5rem;
+  color: var(--icon-admin-products-loading);
   margin: 0 auto 1rem;
+  display: block;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -774,8 +796,38 @@ th {
   font-size: 0.875rem;
 }
 
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
 .btn-icon {
-  margin-right: 0.5rem;
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-admin-products-add);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-admin-products-edit);
+}
+
+.btn-danger .btn-icon {
+  color: var(--icon-admin-products-delete);
 }
 
 .no-products {
@@ -789,6 +841,19 @@ th {
 .empty-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon-svg {
+  font-size: 1em;
+  color: var(--icon-admin-products-empty);
+  transition: all var(--transition-normal);
+}
+
+.empty-state:hover .empty-icon-svg {
+  transform: scale(1.1) rotate(10deg);
 }
 
 .empty-state h3 {
@@ -842,7 +907,26 @@ th {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #666;
+  color: var(--icon-admin-products-close);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  transition: all var(--transition-normal);
+}
+
+.close-btn:hover {
+  color: var(--icon-admin-products-close-hover);
+  transform: scale(1.1);
+}
+
+.close-icon {
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.close-btn:hover .close-icon {
+  color: var(--icon-admin-products-close-hover);
 }
 
 .product-form {
@@ -978,6 +1062,30 @@ th {
 
 .upload-icon {
   font-size: 1.5rem;
+  color: var(--icon-admin-products-camera);
+  transition: all var(--transition-normal);
+}
+
+.file-input-label:hover .upload-icon {
+  transform: scale(1.1);
+}
+
+.action-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .action-icon {
+  transform: scale(1.1);
+}
+
+.remove-icon {
+  font-size: 0.75rem;
+  transition: all var(--transition-normal);
+}
+
+.remove-image-btn:hover .remove-icon {
+  transform: scale(1.1);
 }
 
 .upload-text {

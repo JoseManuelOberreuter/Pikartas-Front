@@ -3,7 +3,9 @@
     <div class="container">
       <div class="error-content">
         <div class="error-icon">
-          <div class="error-symbol">❌</div>
+          <div class="error-symbol">
+            <font-awesome-icon icon="times-circle" class="error-symbol-svg" />
+          </div>
         </div>
         
         <h1>Error en el Pago</h1>
@@ -38,22 +40,40 @@
         <div class="error-reasons">
           <h3>Posibles Causas</h3>
           <ul>
-            <li>💳 Datos de tarjeta incorrectos</li>
-            <li>💰 Fondos insuficientes</li>
-            <li>🔒 Tarjeta bloqueada o vencida</li>
-            <li>🌐 Problemas de conexión</li>
-            <li>⏰ Tiempo de sesión agotado</li>
+            <li>
+              <font-awesome-icon icon="credit-card" class="reason-icon" />
+              Datos de tarjeta incorrectos
+            </li>
+            <li>
+              <font-awesome-icon icon="dollar-sign" class="reason-icon" />
+              Fondos insuficientes
+            </li>
+            <li>
+              <font-awesome-icon icon="lock" class="reason-icon" />
+              Tarjeta bloqueada o vencida
+            </li>
+            <li>
+              <font-awesome-icon icon="globe" class="reason-icon" />
+              Problemas de conexión
+            </li>
+            <li>
+              <font-awesome-icon icon="clock" class="reason-icon" />
+              Tiempo de sesión agotado
+            </li>
           </ul>
         </div>
 
         <div class="error-actions">
           <button @click="retryPayment" class="btn btn-primary">
+            <font-awesome-icon icon="redo" class="btn-icon" />
             Intentar Pago Nuevamente
           </button>
           <router-link to="/checkout" class="btn btn-outline">
+            <font-awesome-icon icon="arrow-left" class="btn-icon" />
             Volver al Checkout
           </router-link>
           <router-link to="/cart" class="btn btn-secondary">
+            <font-awesome-icon icon="shopping-cart" class="btn-icon" />
             Revisar Carrito
           </router-link>
         </div>
@@ -63,15 +83,15 @@
           <p>Si el problema persiste, contáctanos para obtener asistencia:</p>
           <div class="contact-methods">
             <div class="contact-item">
-              <span class="contact-icon">📧</span>
+              <font-awesome-icon icon="envelope" class="contact-icon" />
               <span>soporte@shopvuecore.com</span>
             </div>
             <div class="contact-item">
-              <span class="contact-icon">📞</span>
+              <font-awesome-icon icon="phone" class="contact-icon" />
               <span>+56 2 2345 6789</span>
             </div>
             <div class="contact-item">
-              <span class="contact-icon">💬</span>
+              <font-awesome-icon icon="comments" class="contact-icon" />
               <span>Chat en vivo</span>
             </div>
           </div>
@@ -81,19 +101,19 @@
           <h4>Consejos Útiles</h4>
           <div class="tips-grid">
             <div class="tip-item">
-              <span class="tip-icon">🔍</span>
+              <font-awesome-icon icon="search" class="tip-icon" />
               <span>Verifica los datos de tu tarjeta</span>
             </div>
             <div class="tip-item">
-              <span class="tip-icon">💳</span>
+              <font-awesome-icon icon="credit-card" class="tip-icon" />
               <span>Intenta con otra tarjeta</span>
             </div>
             <div class="tip-item">
-              <span class="tip-icon">🔄</span>
+              <font-awesome-icon icon="sync-alt" class="tip-icon" />
               <span>Actualiza la página e intenta de nuevo</span>
             </div>
             <div class="tip-item">
-              <span class="tip-icon">📱</span>
+              <font-awesome-icon icon="mobile-alt" class="tip-icon" />
               <span>Contacta a tu banco si es necesario</span>
             </div>
           </div>
@@ -203,6 +223,11 @@ const retryPayment = () => {
   animation: errorShake 0.5s ease-in-out;
 }
 
+.error-symbol-svg {
+  font-size: 1em;
+  color: var(--icon-payment-error-symbol);
+}
+
 @keyframes errorShake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
@@ -296,6 +321,38 @@ const retryPayment = () => {
   padding: 0.5rem 0;
   color: #666;
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.reason-icon {
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.error-reasons li:nth-child(1) .reason-icon {
+  color: var(--icon-payment-error-card);
+}
+
+.error-reasons li:nth-child(2) .reason-icon {
+  color: var(--icon-payment-error-money);
+}
+
+.error-reasons li:nth-child(3) .reason-icon {
+  color: var(--icon-payment-error-lock);
+}
+
+.error-reasons li:nth-child(4) .reason-icon {
+  color: var(--icon-payment-error-globe);
+}
+
+.error-reasons li:nth-child(5) .reason-icon {
+  color: var(--icon-payment-error-time);
+}
+
+.error-reasons li:hover .reason-icon {
+  transform: scale(1.1);
 }
 
 .error-actions {
@@ -316,7 +373,30 @@ const retryPayment = () => {
   text-decoration: none;
   transition: all 0.3s;
   font-size: 1rem;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-payment-error-retry-btn);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-payment-error-checkout-btn);
+}
+
+.btn-secondary .btn-icon {
+  color: var(--icon-payment-error-cart-btn);
 }
 
 .btn-primary {
@@ -387,6 +467,23 @@ const retryPayment = () => {
 
 .contact-icon {
   font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.contact-item:nth-child(1) .contact-icon {
+  color: var(--icon-payment-error-support-email);
+}
+
+.contact-item:nth-child(2) .contact-icon {
+  color: var(--icon-payment-error-support-phone);
+}
+
+.contact-item:nth-child(3) .contact-icon {
+  color: var(--icon-payment-error-chat);
+}
+
+.contact-item:hover .contact-icon {
+  transform: scale(1.1);
 }
 
 .help-tips {
@@ -421,6 +518,27 @@ const retryPayment = () => {
 .tip-icon {
   font-size: 1rem;
   flex-shrink: 0;
+  transition: all var(--transition-normal);
+}
+
+.tip-item:nth-child(1) .tip-icon {
+  color: var(--icon-payment-error-search);
+}
+
+.tip-item:nth-child(2) .tip-icon {
+  color: var(--icon-payment-error-card-alt);
+}
+
+.tip-item:nth-child(3) .tip-icon {
+  color: var(--icon-payment-error-refresh);
+}
+
+.tip-item:nth-child(4) .tip-icon {
+  color: var(--icon-payment-error-mobile);
+}
+
+.tip-item:hover .tip-icon {
+  transform: scale(1.1);
 }
 
 /* Responsive Design */

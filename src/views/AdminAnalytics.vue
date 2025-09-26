@@ -2,10 +2,14 @@
   <div class="admin-analytics">
     <div class="container">
       <div class="analytics-header">
-        <h1>📊 Estadísticas y Análisis</h1>
+        <h1>
+          <font-awesome-icon icon="chart-bar" class="header-icon" />
+          Estadísticas y Análisis
+        </h1>
         <div class="header-actions">
           <router-link to="/admin" class="btn btn-outline">
-            ← Volver al Dashboard
+            <font-awesome-icon icon="arrow-left" class="btn-icon" />
+            Volver al Dashboard
           </router-link>
         </div>
       </div>
@@ -13,33 +17,35 @@
       <!-- Coming Soon Message -->
       <div class="coming-soon">
         <div class="coming-soon-content">
-          <div class="coming-soon-icon">📊</div>
+          <div class="coming-soon-icon">
+            <font-awesome-icon icon="chart-line" class="coming-soon-icon-svg" />
+          </div>
           <h2>Panel de Análisis</h2>
           <p>Esta sección estará disponible próximamente con:</p>
           
           <div class="features-list">
             <div class="feature-item">
-              <span class="feature-icon">📈</span>
+              <font-awesome-icon icon="chart-line" class="feature-icon" />
               <span>Gráficos de ventas por período</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">💰</span>
+              <font-awesome-icon icon="dollar-sign" class="feature-icon" />
               <span>Análisis de ingresos y ganancias</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">👥</span>
+              <font-awesome-icon icon="users" class="feature-icon" />
               <span>Comportamiento de usuarios</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">📦</span>
+              <font-awesome-icon icon="box" class="feature-icon" />
               <span>Productos más vendidos</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">🌍</span>
+              <font-awesome-icon icon="globe" class="feature-icon" />
               <span>Análisis geográfico de ventas</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">📅</span>
+              <font-awesome-icon icon="calendar-alt" class="feature-icon" />
               <span>Reportes personalizados</span>
             </div>
           </div>
@@ -68,9 +74,11 @@
 
           <div class="actions">
             <router-link to="/admin/products" class="btn btn-primary">
+              <font-awesome-icon icon="box" class="btn-icon" />
               Gestionar Productos
             </router-link>
             <router-link to="/admin/orders" class="btn btn-outline">
+              <font-awesome-icon icon="clipboard-list" class="btn-icon" />
               Ver Órdenes
             </router-link>
           </div>
@@ -143,6 +151,19 @@ onMounted(() => {
   margin: 0;
   font-size: 2rem;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: var(--icon-admin-analytics-header);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.analytics-header:hover .header-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .coming-soon {
@@ -165,6 +186,19 @@ onMounted(() => {
 .coming-soon-icon {
   font-size: 4rem;
   margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coming-soon-icon-svg {
+  font-size: 1em;
+  color: var(--icon-admin-analytics-chart);
+  transition: all var(--transition-normal);
+}
+
+.coming-soon-content:hover .coming-soon-icon-svg {
+  transform: scale(1.1) rotate(10deg);
 }
 
 .coming-soon-content h2 {
@@ -199,7 +233,20 @@ onMounted(() => {
 
 .feature-icon {
   font-size: 1.25rem;
+  transition: all var(--transition-normal);
 }
+
+.feature-item:hover .feature-icon {
+  transform: scale(1.1);
+}
+
+/* Colores específicos para cada característica */
+.feature-item:nth-child(1) .feature-icon { color: var(--icon-admin-analytics-sales); }
+.feature-item:nth-child(2) .feature-icon { color: var(--icon-admin-analytics-revenue); }
+.feature-item:nth-child(3) .feature-icon { color: var(--icon-admin-analytics-users); }
+.feature-item:nth-child(4) .feature-icon { color: var(--icon-admin-analytics-products); }
+.feature-item:nth-child(5) .feature-icon { color: var(--icon-admin-analytics-globe); }
+.feature-item:nth-child(6) .feature-icon { color: var(--icon-admin-analytics-calendar); }
 
 .temp-stats {
   margin: 2rem 0;
@@ -255,6 +302,24 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-admin-analytics-products-btn);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-admin-analytics-orders-btn);
 }
 
 .btn-primary {

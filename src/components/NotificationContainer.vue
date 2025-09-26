@@ -9,10 +9,10 @@
           @click="removeNotification(notification.id)"
         >
           <div class="notification__icon">
-            <span v-if="notification.type === 'success'">✅</span>
-            <span v-else-if="notification.type === 'error'">❌</span>
-            <span v-else-if="notification.type === 'warning'">⚠️</span>
-            <span v-else-if="notification.type === 'info'">ℹ️</span>
+            <font-awesome-icon v-if="notification.type === 'success'" icon="check-circle" class="notification-icon notification-icon--success" />
+            <font-awesome-icon v-else-if="notification.type === 'error'" icon="times-circle" class="notification-icon notification-icon--error" />
+            <font-awesome-icon v-else-if="notification.type === 'warning'" icon="exclamation-triangle" class="notification-icon notification-icon--warning" />
+            <font-awesome-icon v-else-if="notification.type === 'info'" icon="info-circle" class="notification-icon notification-icon--info" />
           </div>
           
           <div class="notification__content">
@@ -24,7 +24,7 @@
             @click.stop="removeNotification(notification.id)"
             aria-label="Cerrar notificación"
           >
-            ×
+            <font-awesome-icon icon="times" class="close-icon" />
           </button>
         </div>
       </TransitionGroup>
@@ -96,6 +96,34 @@ const { removeNotification } = notificationStore
 .notification__icon {
   font-size: var(--font-size-lg);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-icon {
+  font-size: 1.2rem;
+  transition: all var(--transition-normal);
+}
+
+.notification-icon--success {
+  color: var(--icon-notification-success);
+}
+
+.notification-icon--error {
+  color: var(--icon-notification-error);
+}
+
+.notification-icon--warning {
+  color: var(--icon-notification-warning);
+}
+
+.notification-icon--info {
+  color: var(--icon-notification-info);
+}
+
+.notification:hover .notification-icon {
+  transform: scale(1.1);
 }
 
 .notification__content {
@@ -114,7 +142,7 @@ const { removeNotification } = notificationStore
   background: none;
   border: none;
   font-size: var(--font-size-xl);
-  color: var(--color-gray-400);
+  color: var(--icon-notification-close);
   cursor: pointer;
   padding: 0;
   width: 24px;
@@ -129,7 +157,16 @@ const { removeNotification } = notificationStore
 
 .notification__close:hover {
   background: var(--color-gray-100);
-  color: var(--color-gray-600);
+  color: var(--icon-notification-close-hover);
+}
+
+.close-icon {
+  font-size: 0.9rem;
+  transition: color var(--transition-normal);
+}
+
+.notification__close:hover .close-icon {
+  color: var(--icon-notification-close-hover);
 }
 
 /* Animaciones */

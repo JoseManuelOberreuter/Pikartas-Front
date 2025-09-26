@@ -6,7 +6,7 @@
         <div class="nav-brand">
           <router-link to="/" class="brand-link">
             <div class="logo">
-              <span class="logo-icon">🛒</span>
+              <font-awesome-icon icon="shopping-cart" class="logo-icon" />
               <span class="logo-text">ShopNodeCore</span>
             </div>
           </router-link>
@@ -24,7 +24,7 @@
         <div class="nav-actions">
           <div class="cart-section">
             <button class="cart-button" @click="toggleCart">
-              <span class="cart-icon">🛒</span>
+              <font-awesome-icon icon="shopping-cart" class="cart-icon" />
               <span class="cart-count" v-if="cartItemCount > 0">{{ cartItemCount }}</span>
             </button>
           </div>
@@ -34,19 +34,19 @@
             <!-- Usuario autenticado - Mostrar perfil -->
             <div v-if="authStore.isAuthenticated && !authStore.loading" class="user-profile" @click="toggleUserMenu">
               <div class="user-avatar">
-                <span class="avatar-icon">👤</span>
+                <font-awesome-icon icon="user" class="avatar-icon" />
               </div>
               <div class="user-info">
                 <span class="user-name">{{ getUserDisplayName }}</span>
                 <span class="user-status">En línea</span>
               </div>
-              <span class="dropdown-arrow" :class="{ 'dropdown-arrow-open': userMenuOpen }">▼</span>
+              <font-awesome-icon icon="chevron-down" class="dropdown-arrow" :class="{ 'dropdown-arrow-open': userMenuOpen }" />
               
               <!-- Menú desplegable del usuario -->
               <div class="user-menu" :class="{ 'user-menu-open': userMenuOpen }">
                 <div class="user-menu-header">
                   <div class="user-avatar-large">
-                    <span class="avatar-icon-large">👤</span>
+                    <font-awesome-icon icon="user" class="avatar-icon-large" />
                   </div>
                   <div class="user-details">
                     <h3 class="user-menu-name">{{ getUserDisplayName }}</h3>
@@ -57,32 +57,32 @@
                 <ul class="user-menu-items">
                   <li>
                     <button class="user-menu-item" @click="goToProfile">
-                      <span class="menu-icon">👤</span>
+                      <font-awesome-icon icon="user" class="menu-icon" />
                       <span>Mi Perfil</span>
                     </button>
                   </li>
                   <li>
                     <button class="user-menu-item" @click="goToOrders">
-                      <span class="menu-icon">📦</span>
+                      <font-awesome-icon icon="box" class="menu-icon" />
                       <span>Mis Pedidos</span>
                     </button>
                   </li>
                   <li v-if="isAdmin">
                     <button class="user-menu-item admin-menu-item" @click="goToAdmin">
-                      <span class="menu-icon">🛠️</span>
+                      <font-awesome-icon icon="tools" class="menu-icon" />
                       <span>Panel Admin</span>
                     </button>
                   </li>
                   <li>
                     <button class="user-menu-item" @click="goToSettings">
-                      <span class="menu-icon">⚙️</span>
+                      <font-awesome-icon icon="cog" class="menu-icon" />
                       <span>Configuración</span>
                     </button>
                   </li>
                 </ul>
                 <div class="user-menu-separator"></div>
                 <button class="user-menu-item logout-btn" @click="handleLogout">
-                  <span class="menu-icon">🚪</span>
+                  <font-awesome-icon icon="sign-out-alt" class="menu-icon" />
                   <span>Cerrar Sesión</span>
                 </button>
               </div>
@@ -90,7 +90,7 @@
             
             <!-- Loading state -->
             <div v-else-if="authStore.loading" class="auth-loading">
-              <span class="loading-spinner">🔄</span>
+              <font-awesome-icon icon="spinner" class="loading-spinner" spin />
               <span class="loading-text">Cargando...</span>
             </div>
             
@@ -109,9 +109,7 @@
         <!-- Mobile Menu Toggle -->
         <div class="mobile-menu-toggle">
           <button class="hamburger" @click="toggleMobileMenu">
-            <span></span>
-            <span></span>
-            <span></span>
+            <font-awesome-icon icon="bars" class="hamburger-icon" />
           </button>
         </div>
       </div>
@@ -129,7 +127,7 @@
           <div v-if="authStore.isAuthenticated && !authStore.loading" class="mobile-user-profile">
             <div class="mobile-user-info">
               <div class="user-avatar">
-                <span class="avatar-icon">👤</span>
+                <font-awesome-icon icon="user" class="avatar-icon" />
               </div>
               <div class="mobile-user-details">
                 <h3 class="mobile-user-name">{{ getUserDisplayName }}</h3>
@@ -141,7 +139,8 @@
                 Mi Perfil
               </button>
               <button v-if="isAdmin" class="btn btn-admin btn-full" @click="goToAdmin(); closeMobileMenu()">
-                🛠️ Panel Admin
+                <font-awesome-icon icon="tools" class="btn-icon" />
+                Panel Admin
               </button>
               <button class="btn btn-tertiary btn-full" @click="handleLogout(); closeMobileMenu()">
                 Cerrar Sesión
@@ -332,7 +331,13 @@ onUnmounted(() => {
 
 .logo-icon {
   font-size: var(--font-size-2xl);
+  color: var(--icon-cart);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: color var(--transition-normal);
+}
+
+.logo:hover .logo-icon {
+  color: var(--icon-cart-hover);
 }
 
 .logo-text {
@@ -416,15 +421,19 @@ onUnmounted(() => {
   padding: var(--spacing-md);
   border-radius: var(--border-radius-lg);
   transition: all var(--transition-normal);
-  color: var(--color-gray-600);
+  color: var(--icon-cart);
   border: var(--border-width-thin) solid transparent;
 }
 
 .cart-button:hover {
   background: rgba(221, 235, 157, 0.12);
-  color: var(--color-tertiary);
+  color: var(--icon-cart-hover);
   transform: scale(1.05);
   border-color: var(--color-primary);
+}
+
+.cart-button:hover .cart-icon {
+  color: var(--icon-cart-hover);
 }
 
 .cart-count {
@@ -492,7 +501,12 @@ onUnmounted(() => {
 
 .avatar-icon {
   font-size: var(--font-size-lg);
-  color: var(--color-quaternary);
+  color: var(--icon-user);
+  transition: color var(--transition-normal);
+}
+
+.user-profile:hover .avatar-icon {
+  color: var(--icon-user-hover);
 }
 
 .user-info {
@@ -516,9 +530,13 @@ onUnmounted(() => {
 
 .dropdown-arrow {
   font-size: var(--font-size-xs);
-  color: var(--color-gray-500);
-  transition: transform var(--transition-normal);
+  color: var(--icon-dropdown);
+  transition: all var(--transition-normal);
   margin-left: var(--spacing-xs);
+}
+
+.user-profile:hover .dropdown-arrow {
+  color: var(--icon-dropdown-hover);
 }
 
 .dropdown-arrow-open {
@@ -570,7 +588,7 @@ onUnmounted(() => {
 
 .avatar-icon-large {
   font-size: var(--font-size-xl);
-  color: var(--color-quaternary);
+  color: var(--icon-user);
 }
 
 .user-details {
@@ -637,6 +655,28 @@ onUnmounted(() => {
   font-size: var(--font-size-base);
   width: 20px;
   text-align: center;
+  color: var(--icon-settings);
+  transition: color var(--transition-normal);
+}
+
+.user-menu-item:hover .menu-icon {
+  color: var(--icon-settings-hover);
+}
+
+.user-menu-item.admin-menu-item .menu-icon {
+  color: var(--icon-admin);
+}
+
+.user-menu-item.admin-menu-item:hover .menu-icon {
+  color: var(--icon-admin-hover);
+}
+
+.user-menu-item.logout-btn .menu-icon {
+  color: var(--icon-logout);
+}
+
+.user-menu-item.logout-btn:hover .menu-icon {
+  color: var(--icon-logout-hover);
 }
 
 /* === AUTH LOADING === */
@@ -652,6 +692,7 @@ onUnmounted(() => {
 .loading-spinner {
   animation: spin 1s linear infinite;
   font-size: var(--font-size-base);
+  color: var(--icon-loading);
 }
 
 @keyframes spin {
@@ -758,6 +799,17 @@ onUnmounted(() => {
   justify-content: center;
 }
 
+.btn-icon {
+  margin-right: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--icon-admin);
+  transition: color var(--transition-normal);
+}
+
+.btn-admin:hover .btn-icon {
+  color: var(--icon-admin-hover);
+}
+
 /* === MOBILE MENU === */
 .mobile-menu-toggle {
   display: none;
@@ -771,21 +823,23 @@ onUnmounted(() => {
   padding: var(--spacing-sm);
   border-radius: var(--border-radius-md);
   transition: all var(--transition-normal);
-  flex-direction: column;
-  gap: 4px;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hamburger:hover {
   background: var(--color-gray-100);
 }
 
-.hamburger span {
-  width: 24px;
-  height: 3px;
-  background: var(--color-gray-700);
-  border-radius: var(--border-radius-full);
+.hamburger-icon {
+  font-size: var(--font-size-lg);
+  color: var(--icon-menu);
   transition: all var(--transition-normal);
+}
+
+.hamburger:hover .hamburger-icon {
+  color: var(--icon-menu-hover);
 }
 
 .mobile-menu {

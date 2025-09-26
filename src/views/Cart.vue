@@ -2,15 +2,21 @@
   <div class="cart">
     <div class="container">
       <div class="cart-header">
-        <h1>🛒 Mi Carrito</h1>
+        <h1>
+          <font-awesome-icon icon="shopping-cart" class="header-icon" />
+          Mi Carrito
+        </h1>
         <p v-if="cartItems.length > 0">{{ cartItemCount }} artículos en tu carrito</p>
       </div>
 
       <div v-if="cartItems.length === 0" class="empty-cart">
-        <div class="empty-cart-icon">🛒</div>
+        <div class="empty-cart-icon">
+          <font-awesome-icon icon="shopping-cart" class="empty-cart-icon-svg" />
+        </div>
         <h2>Tu carrito está vacío</h2>
         <p>¡Empieza a agregar productos increíbles!</p>
         <router-link to="/shop" class="btn btn-primary">
+          <font-awesome-icon icon="store" class="btn-icon" />
           Ir a la Tienda
         </router-link>
       </div>
@@ -46,7 +52,7 @@
                     @click="decreaseQuantity(item.id)" 
                     :disabled="item.quantity <= 1"
                   >
-                    -
+                    <font-awesome-icon icon="minus" class="qty-icon" />
                   </button>
                   <input 
                     type="number" 
@@ -55,7 +61,9 @@
                     min="1"
                     class="qty-input"
                   >
-                  <button class="qty-btn" @click="increaseQuantity(item.id)">+</button>
+                  <button class="qty-btn" @click="increaseQuantity(item.id)">
+                    <font-awesome-icon icon="plus" class="qty-icon" />
+                  </button>
                 </div>
               </div>
               
@@ -65,7 +73,8 @@
               </div>
               
               <button class="remove-btn" @click="removeFromCart(item.id)">
-                🗑️ Eliminar
+                <font-awesome-icon icon="trash" class="remove-icon" />
+                Eliminar
               </button>
             </div>
           </div>
@@ -99,17 +108,23 @@
             </div>
             
             <div v-if="cartTotal < 500" class="shipping-notice">
-              <p>💡 Agrega ${{ (500 - cartTotal).toFixed(2) }} más para obtener envío gratis</p>
+              <p>
+                <font-awesome-icon icon="lightbulb" class="notice-icon" />
+                Agrega ${{ (500 - cartTotal).toFixed(2) }} más para obtener envío gratis
+              </p>
             </div>
             
             <div class="cart-actions">
               <button class="btn btn-outline" @click="clearCart">
+                <font-awesome-icon icon="trash" class="btn-icon" />
                 Limpiar Carrito
               </button>
               <router-link to="/shop" class="btn btn-secondary">
+                <font-awesome-icon icon="store" class="btn-icon" />
                 Seguir Comprando
               </router-link>
               <router-link to="/checkout" class="btn btn-primary">
+                <font-awesome-icon icon="credit-card" class="btn-icon" />
                 Proceder al Pago
               </router-link>
             </div>
@@ -200,6 +215,20 @@ const clearCart = async () => {
   margin: 0 0 1rem 0;
   color: #333;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: var(--icon-cart-header);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.cart-header:hover .header-icon {
+  transform: scale(1.1) rotate(10deg);
 }
 
 .cart-header p {
@@ -220,6 +249,20 @@ const clearCart = async () => {
   font-size: 5rem;
   margin-bottom: 1.5rem;
   opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-cart-icon-svg {
+  font-size: 1em;
+  color: var(--icon-cart-empty);
+  transition: all var(--transition-normal);
+}
+
+.empty-cart:hover .empty-cart-icon-svg {
+  transform: scale(1.1) rotate(-10deg);
+  opacity: 0.8;
 }
 
 .empty-cart h2 {
@@ -309,6 +352,7 @@ const clearCart = async () => {
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -358,7 +402,25 @@ const clearCart = async () => {
   background: #f8f9fa;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.3s;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-icon {
+  font-size: 0.875rem;
+  color: var(--icon-cart-quantity-minus);
+  transition: all var(--transition-normal);
+}
+
+.qty-btn:hover:not(:disabled) .qty-icon {
+  color: var(--icon-cart-quantity-plus);
+  transform: scale(1.1);
+}
+
+.qty-btn:disabled .qty-icon {
+  color: var(--icon-cart-quantity-disabled);
 }
 
 .qty-btn:hover:not(:disabled) {
@@ -408,6 +470,20 @@ const clearCart = async () => {
   cursor: pointer;
   font-size: 0.875rem;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.remove-icon {
+  font-size: 0.875rem;
+  color: var(--icon-cart-remove);
+  transition: all var(--transition-normal);
+}
+
+.remove-btn:hover .remove-icon {
+  color: var(--icon-cart-remove-hover);
+  transform: scale(1.1);
 }
 
 .remove-btn:hover {
@@ -477,6 +553,19 @@ const clearCart = async () => {
   color: #0056b3;
   font-size: 0.875rem;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notice-icon {
+  color: var(--icon-cart-shipping-notice);
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.shipping-notice:hover .notice-icon {
+  transform: scale(1.1) rotate(15deg);
 }
 
 .cart-actions {
@@ -494,7 +583,35 @@ const clearCart = async () => {
   text-align: center;
   text-decoration: none;
   transition: all 0.3s;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-primary .btn-icon {
+  color: var(--icon-cart-shop-btn);
+}
+
+.btn-secondary .btn-icon {
+  color: var(--icon-cart-continue-btn);
+}
+
+.btn-outline .btn-icon {
+  color: var(--icon-cart-clear-btn);
+}
+
+.btn-outline:hover .btn-icon {
+  color: var(--icon-cart-remove-hover);
 }
 
 .btn-outline {

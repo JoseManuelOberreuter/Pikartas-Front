@@ -2,22 +2,28 @@
   <div class="user-orders">
     <div class="container">
       <div class="orders-header">
-        <h1>📦 Mis Pedidos</h1>
+        <h1>
+          <font-awesome-icon icon="box" class="header-icon" />
+          Mis Pedidos
+        </h1>
       </div>
 
       <!-- Loading State -->
       <div v-if="loading" class="loading-state">
-        <div class="spinner"></div>
+        <font-awesome-icon icon="spinner" spin class="loading-icon" />
         <p>Cargando tus pedidos...</p>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="orders.length === 0" class="empty-state">
-        <div class="empty-icon">📦</div>
+        <div class="empty-icon">
+          <font-awesome-icon icon="box" class="empty-icon-svg" />
+        </div>
         <h2>No tienes pedidos aún</h2>
         <p>Cuando realices tu primera compra, aparecerá aquí</p>
         <div class="empty-actions">
           <router-link to="/shop" class="btn btn-primary">
+            <font-awesome-icon icon="store" class="btn-icon" />
             Ir a la Tienda
           </router-link>
         </div>
@@ -126,7 +132,7 @@
             <!-- Payment Info -->
             <div v-if="order.paymentInfo" class="payment-info">
               <div class="payment-status">
-                <span class="payment-icon">💳</span>
+                <font-awesome-icon icon="credit-card" class="payment-icon" />
                 <span>Pago: {{ getPaymentStatusLabel(order.paymentInfo.status) }}</span>
               </div>
               <div v-if="order.paymentInfo.authorizationCode" class="auth-code">
@@ -143,7 +149,8 @@
             :disabled="currentPage === 1"
             class="btn btn-outline"
           >
-            ← Anterior
+            <font-awesome-icon icon="chevron-left" class="btn-icon" />
+            Anterior
           </button>
           <span class="page-info">
             Página {{ currentPage }} de {{ totalPages }}
@@ -153,7 +160,8 @@
             :disabled="currentPage === totalPages"
             class="btn btn-outline"
           >
-            Siguiente →
+            Siguiente
+            <font-awesome-icon icon="chevron-right" class="btn-icon" />
           </button>
         </div>
       </div>
@@ -164,7 +172,9 @@
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <h2>Detalles del Pedido #{{ getOrderNumber(selectedOrder._id) }}</h2>
-          <button @click="closeOrderDetails" class="close-btn">×</button>
+          <button @click="closeOrderDetails" class="close-btn">
+            <font-awesome-icon icon="times" class="close-icon" />
+          </button>
         </div>
         <div class="modal-body">
           <div class="order-details-modal">
@@ -457,6 +467,20 @@ onMounted(() => {
   margin: 0 0 0.5rem 0;
   color: var(--color-gray-800);
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: var(--icon-orders-header);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.orders-header:hover .header-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .orders-header p {
@@ -470,14 +494,12 @@ onMounted(() => {
   padding: 4rem 2rem;
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.loading-icon {
+  font-size: 2.5rem;
+  color: var(--icon-orders-loading);
   margin: 0 auto 1rem;
+  display: block;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -497,6 +519,20 @@ onMounted(() => {
   font-size: 5rem;
   margin-bottom: 1.5rem;
   opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon-svg {
+  color: var(--icon-orders-empty);
+  font-size: 1em;
+  transition: all var(--transition-normal);
+}
+
+.empty-state:hover .empty-icon-svg {
+  transform: scale(1.1) rotate(10deg);
+  opacity: 0.7;
 }
 
 .empty-state h2 {
@@ -734,6 +770,12 @@ onMounted(() => {
 
 .payment-icon {
   font-size: 1rem;
+  color: var(--icon-orders-payment);
+  transition: all var(--transition-normal);
+}
+
+.payment-status:hover .payment-icon {
+  transform: scale(1.1);
 }
 
 .auth-code {
@@ -765,7 +807,27 @@ onMounted(() => {
   text-decoration: none;
   transition: all 0.3s ease;
   font-size: 1rem;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.btn:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+.btn-outline:hover .btn-icon {
+  color: var(--icon-orders-prev-hover);
+}
+
+.btn-outline:hover .btn-icon:last-child {
+  color: var(--icon-orders-next-hover);
 }
 
 .btn:disabled {
@@ -864,12 +926,26 @@ onMounted(() => {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--color-gray-600);
-  transition: color 0.3s ease;
+  color: var(--icon-orders-close);
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
 }
 
 .close-btn:hover {
-  color: var(--color-gray-800);
+  color: var(--icon-orders-close-hover);
+  transform: scale(1.1);
+}
+
+.close-icon {
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.close-btn:hover .close-icon {
+  color: var(--icon-orders-close-hover);
 }
 
 .modal-body {

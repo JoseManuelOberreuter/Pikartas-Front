@@ -4,10 +4,12 @@
       <img :src="product.image" :alt="product.name" />
       <div class="product-actions">
         <button class="quick-view-btn" @click="viewProduct">
-          👁️ Ver
+          <font-awesome-icon icon="eye" class="btn-icon" />
+          Ver
         </button>
         <button class="add-to-cart-btn" @click="addToCart" :disabled="product.stock === 0">
-          {{ product.stock === 0 ? 'Sin Stock' : '🛒 Agregar' }}
+          <font-awesome-icon icon="shopping-cart" class="btn-icon" :class="{ 'btn-icon-disabled': product.stock === 0 }" />
+          {{ product.stock === 0 ? 'Sin Stock' : 'Agregar' }}
         </button>
       </div>
     </div>
@@ -20,9 +22,11 @@
       </div>
       <div class="product-stock" v-if="product.stock <= 10">
         <span class="stock-warning" v-if="product.stock > 0">
+          <font-awesome-icon icon="exclamation-triangle" class="warning-icon" />
           Solo quedan {{ product.stock }} unidades
         </span>
         <span class="out-of-stock" v-else>
+          <font-awesome-icon icon="times-circle" class="error-icon" />
           Sin stock
         </span>
       </div>
@@ -117,6 +121,9 @@ const viewProduct = () => {
   font-weight: 500;
   transition: all 0.3s;
   font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .quick-view-btn {
@@ -126,6 +133,15 @@ const viewProduct = () => {
 
 .quick-view-btn:hover {
   background: white;
+}
+
+.quick-view-btn .btn-icon {
+  color: var(--icon-view);
+  transition: color var(--transition-normal);
+}
+
+.quick-view-btn:hover .btn-icon {
+  color: var(--icon-view-hover);
 }
 
 .add-to-cart-btn {
@@ -140,6 +156,19 @@ const viewProduct = () => {
 .add-to-cart-btn:disabled {
   background: #6c757d;
   cursor: not-allowed;
+}
+
+.add-to-cart-btn .btn-icon {
+  color: var(--icon-add-cart);
+  transition: color var(--transition-normal);
+}
+
+.add-to-cart-btn:hover:not(:disabled) .btn-icon {
+  color: var(--icon-add-cart-hover);
+}
+
+.add-to-cart-btn .btn-icon-disabled {
+  color: var(--icon-add-cart-disabled);
 }
 
 .product-info {
@@ -178,11 +207,27 @@ const viewProduct = () => {
 .stock-warning {
   color: #ffc107;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stock-warning .warning-icon {
+  color: #ffc107;
+  font-size: 0.875rem;
 }
 
 .out-of-stock {
   color: #dc3545;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.out-of-stock .error-icon {
+  color: #dc3545;
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {
