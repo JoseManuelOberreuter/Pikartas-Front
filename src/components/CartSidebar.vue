@@ -187,7 +187,7 @@ const openLoginModal = () => {
   right: 0;
   width: 400px;
   height: 100%;
-  background: white;
+  background: var(--color-black);
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
@@ -204,13 +204,13 @@ const openLoginModal = () => {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #eee;
-  background: #f8f9fa;
+  border-bottom: 1px solid var(--color-primary);
+  background: var(--color-black);
 }
 
 .cart-header h2 {
   margin: 0;
-  color: #333;
+  color: var(--color-white);
   font-size: 1.25rem;
   display: flex;
   align-items: center;
@@ -218,20 +218,20 @@ const openLoginModal = () => {
 }
 
 .cart-title-icon {
-  color: var(--icon-cart);
+  color: var(--color-primary);
   font-size: 1.1rem;
   transition: color var(--transition-normal);
 }
 
 .cart-header:hover .cart-title-icon {
-  color: var(--icon-cart-hover);
+  color: var(--color-quaternary);
 }
 
 .close-btn {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   cursor: pointer;
-  color: #666;
+  color: var(--color-white);
   line-height: 1;
   padding: 0;
   width: 36px;
@@ -245,19 +245,19 @@ const openLoginModal = () => {
 }
 
 .close-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.2);
   transform: scale(1.1);
-  color: #333;
+  color: var(--color-primary);
 }
 
 .close-icon {
   font-size: 1.2rem;
-  color: var(--icon-close);
+  color: var(--color-white);
   transition: color var(--transition-normal);
 }
 
 .close-btn:hover .close-icon {
-  color: var(--icon-close-hover);
+  color: var(--color-primary);
 }
 
 .cart-content {
@@ -292,26 +292,26 @@ const openLoginModal = () => {
 
 .loading-state p {
   margin: 0;
-  color: #666;
+  color: var(--color-white);
   font-size: 0.95rem;
 }
 
 .empty-cart-icon {
   font-size: 3.5rem;
   margin-bottom: 0.5rem;
-  color: var(--icon-cart);
+  color: var(--color-primary);
   opacity: 0.5;
   transition: color var(--transition-normal);
 }
 
 .empty-cart:hover .empty-cart-icon {
-  color: var(--icon-cart-hover);
+  color: var(--color-quaternary);
   opacity: 0.7;
 }
 
 .empty-cart p {
   margin: 0;
-  color: #666;
+  color: var(--color-white);
   font-size: 1rem;
   line-height: 1.4;
 }
@@ -331,7 +331,7 @@ const openLoginModal = () => {
 
 .error-state p {
   margin: 0 0 1.5rem 0;
-  color: #dc3545;
+  color: var(--color-quaternary);
   font-size: 1.1rem;
 }
 
@@ -345,7 +345,7 @@ const openLoginModal = () => {
   display: flex;
   gap: 1rem;
   padding: 1rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-primary);
   position: relative;
 }
 

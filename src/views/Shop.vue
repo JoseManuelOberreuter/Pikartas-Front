@@ -2,8 +2,8 @@
   <div class="shop">
     <div class="container">
       <div class="shop-header">
-        <h1><font-awesome-icon icon="store" class="shop-header-icon" /> Nuestra Tienda</h1>
-        <p>Explora nuestra colección de productos tecnológicos</p>
+        <h1><font-awesome-icon icon="dice-d20" class="shop-header-icon" /> Nuestra Tienda</h1>
+        <p>Explora nuestra colección de cartas Pokémon</p>
       </div>
 
       <div class="shop-controls">
@@ -108,9 +108,10 @@ const searchQuery = ref('')
 // Categorías (se pueden cargar desde el backend también)
 const categories = ref([
   'Todos',
-  'Electrónicos', 
-  'Accesorios',
-  'Fotografía'
+  'Cartas Raras', 
+  'Cartas Comunes',
+  'Booster Packs',
+  'Coleccionables'
 ])
 
 // Cargar productos desde el backend
@@ -233,6 +234,7 @@ onMounted(async () => {
   padding-top: 120px;
   padding-bottom: 80px;
   min-height: 100vh;
+  background: var(--color-black);
 }
 
 .shop-header {
@@ -243,7 +245,7 @@ onMounted(async () => {
 .shop-header h1 {
   font-size: 2.5rem;
   margin: 0 0 1rem 0;
-  color: #333;
+  color: var(--color-primary);
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -252,7 +254,7 @@ onMounted(async () => {
 }
 
 .shop-header-icon {
-  color: var(--icon-shop-header);
+  color: var(--color-primary);
   font-size: 0.9em;
   transition: all var(--transition-normal);
 }
@@ -263,7 +265,7 @@ onMounted(async () => {
 
 .shop-header p {
   font-size: 1.1rem;
-  color: #666;
+  color: var(--color-white);
   margin: 0;
 }
 
@@ -290,15 +292,16 @@ onMounted(async () => {
 
 .filter-group label {
   font-weight: 600;
-  color: #333;
+  color: var(--color-white);
   font-size: 0.875rem;
 }
 
 .filter-group select {
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-primary);
   border-radius: 4px;
-  background: white;
+  background: var(--color-white);
+  color: var(--color-black);
   font-size: 0.875rem;
   min-width: 120px;
 }
@@ -316,16 +319,17 @@ onMounted(async () => {
 .search-input {
   width: 100%;
   padding: 0.75rem 2.5rem 0.75rem 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-primary);
   border-radius: 25px;
   font-size: 1rem;
-  background: white;
+  background: var(--color-white);
+  color: var(--color-black);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: var(--color-quaternary);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
 }
 
 .search-icon {
@@ -333,27 +337,28 @@ onMounted(async () => {
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--icon-shop-search);
+  color: var(--color-primary);
   font-size: 1rem;
   transition: all var(--transition-normal);
 }
 
 .search-input:focus + .search-icon {
-  color: var(--icon-shop-search-focus);
+  color: var(--color-quaternary);
   transform: translateY(-50%) scale(1.1);
 }
 
 .results-info {
   margin-bottom: 2rem;
   padding: 1rem;
-  background: #f8f9fa;
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid var(--color-primary);
   border-radius: 6px;
   text-align: center;
 }
 
 .results-info p {
   margin: 0;
-  color: #666;
+  color: var(--color-white);
   font-weight: 500;
 }
 
@@ -366,7 +371,7 @@ onMounted(async () => {
 .loading-spinner {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: var(--icon-shop-loading);
+  color: var(--color-primary);
   animation: spin 2s linear infinite;
 }
 
@@ -377,14 +382,14 @@ onMounted(async () => {
 
 .loading-state p {
   margin: 0;
-  color: #666;
+  color: var(--color-white);
   font-size: 1.1rem;
 }
 
 .empty-icon {
   font-size: 4rem;
   margin-bottom: 1.5rem;
-  color: var(--icon-shop-empty);
+  color: var(--color-primary);
   opacity: 0.5;
   transition: all var(--transition-normal);
 }
@@ -396,13 +401,13 @@ onMounted(async () => {
 
 .empty-state h3 {
   margin: 0 0 1rem 0;
-  color: #333;
+  color: var(--color-white);
   font-size: 1.5rem;
 }
 
 .empty-state p {
   margin: 0;
-  color: #666;
+  color: var(--color-white);
   font-size: 1rem;
 }
 
@@ -415,7 +420,8 @@ onMounted(async () => {
 .no-results {
   text-align: center;
   padding: 4rem 2rem;
-  background: #f8f9fa;
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid var(--color-primary);
   border-radius: 12px;
   margin-top: 2rem;
 }
@@ -423,7 +429,7 @@ onMounted(async () => {
 .no-results-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
-  color: var(--icon-shop-no-results);
+  color: var(--color-quaternary);
   transition: all var(--transition-normal);
 }
 
@@ -433,13 +439,13 @@ onMounted(async () => {
 
 .no-results h3 {
   margin: 0 0 1rem 0;
-  color: #333;
+  color: var(--color-white);
   font-size: 1.5rem;
 }
 
 .no-results p {
   margin: 0 0 2rem 0;
-  color: #666;
+  color: var(--color-white);
   font-size: 1.1rem;
 }
 
@@ -456,12 +462,13 @@ onMounted(async () => {
 }
 
 .btn-primary {
-  background: #007bff;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-black);
 }
 
 .btn-primary:hover {
-  background: #0056b3;
+  background: var(--color-quaternary);
+  color: var(--color-white);
   transform: translateY(-2px);
 }
 

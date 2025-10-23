@@ -6,8 +6,8 @@
         <div class="nav-brand">
           <router-link to="/" class="brand-link">
             <div class="logo">
-              <font-awesome-icon icon="shopping-cart" class="logo-icon" />
-              <span class="logo-text">ShopNodeCore</span>
+              <font-awesome-icon icon="dice-d20" class="logo-icon" />
+              <span class="logo-text">Pikartas</span>
             </div>
           </router-link>
         </div>
@@ -17,6 +17,7 @@
           <ul class="nav-menu">
             <li><router-link to="/" class="nav-link">Inicio</router-link></li>
             <li><router-link to="/shop" class="nav-link">Tienda</router-link></li>
+            <li><router-link to="/offers" class="nav-link">Ofertas</router-link></li>
           </ul>
         </div>
         
@@ -119,6 +120,7 @@
         <ul class="mobile-nav-menu">
           <li><router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">Inicio</router-link></li>
           <li><router-link to="/shop" class="mobile-nav-link" @click="closeMobileMenu">Tienda</router-link></li>
+          <li><router-link to="/offers" class="mobile-nav-link" @click="closeMobileMenu">Ofertas</router-link></li>
         </ul>
         
         <!-- Mobile Auth Section -->
@@ -285,14 +287,14 @@ onUnmounted(() => {
 
 <style scoped>
 .header {
-  background: var(--color-white);
+  background: var(--color-black);
   box-shadow: var(--shadow-md);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: var(--z-fixed);
-  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+  border-bottom: var(--border-width-thin) solid var(--color-primary);
 }
 
 .nav {
@@ -331,17 +333,17 @@ onUnmounted(() => {
 
 .logo-icon {
   font-size: var(--font-size-2xl);
-  color: var(--icon-cart);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  color: var(--color-primary);
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
   transition: color var(--transition-normal);
 }
 
 .logo:hover .logo-icon {
-  color: var(--icon-cart-hover);
+  color: var(--color-quaternary);
 }
 
 .logo-text {
-  background: linear-gradient(45deg, var(--color-secondary), var(--color-tertiary));
+  background: linear-gradient(45deg, var(--color-primary), var(--color-quaternary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -366,7 +368,7 @@ onUnmounted(() => {
 
 .nav-link {
   text-decoration: none;
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-lg);
   transition: all var(--transition-normal);
@@ -383,7 +385,7 @@ onUnmounted(() => {
   left: 50%;
   width: 0;
   height: 3px;
-  background: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
+  background: var(--color-quaternary);
   transition: all var(--transition-normal);
   transform: translateX(-50%);
   border-radius: var(--border-radius-full);
@@ -391,8 +393,8 @@ onUnmounted(() => {
 
 .nav-link:hover,
 .nav-link.router-link-active {
-  color: var(--color-tertiary);
-  background: rgba(221, 235, 157, 0.08);
+  color: var(--color-primary);
+  background: rgba(255, 215, 0, 0.1);
 }
 
 .nav-link:hover::before,
@@ -421,26 +423,26 @@ onUnmounted(() => {
   padding: var(--spacing-md);
   border-radius: var(--border-radius-lg);
   transition: all var(--transition-normal);
-  color: var(--icon-cart);
+  color: var(--color-primary);
   border: var(--border-width-thin) solid transparent;
 }
 
 .cart-button:hover {
-  background: rgba(221, 235, 157, 0.12);
-  color: var(--icon-cart-hover);
+  background: rgba(255, 215, 0, 0.15);
+  color: var(--color-quaternary);
   transform: scale(1.05);
   border-color: var(--color-primary);
 }
 
 .cart-button:hover .cart-icon {
-  color: var(--icon-cart-hover);
+  color: var(--color-quaternary);
 }
 
 .cart-count {
   position: absolute;
   top: var(--spacing-xs);
   right: var(--spacing-xs);
-  background: var(--color-error);
+  background: var(--color-quaternary);
   color: var(--color-white);
   border-radius: var(--border-radius-full);
   width: 22px;
@@ -462,7 +464,7 @@ onUnmounted(() => {
 }
 
 .auth-section {
-  border-left: var(--border-width-thin) solid var(--color-gray-200);
+  border-left: var(--border-width-thin) solid var(--color-primary);
   padding-left: var(--spacing-xl);
   position: relative;
 }
@@ -477,12 +479,12 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all var(--transition-normal);
   border: var(--border-width-thin) solid transparent;
-  background: linear-gradient(135deg, rgba(221, 235, 157, 0.1), rgba(160, 200, 120, 0.05));
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 0, 0, 0.05));
   position: relative;
 }
 
 .user-profile:hover {
-  background: linear-gradient(135deg, rgba(221, 235, 157, 0.15), rgba(160, 200, 120, 0.1));
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 0, 0, 0.1));
   border-color: var(--color-primary);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
@@ -492,7 +494,7 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
   border-radius: var(--border-radius-full);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: linear-gradient(135deg, var(--color-primary), var(--color-quaternary));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,12 +503,12 @@ onUnmounted(() => {
 
 .avatar-icon {
   font-size: var(--font-size-lg);
-  color: var(--icon-user);
+  color: var(--color-white);
   transition: color var(--transition-normal);
 }
 
 .user-profile:hover .avatar-icon {
-  color: var(--icon-user-hover);
+  color: var(--color-white);
 }
 
 .user-info {
@@ -518,7 +520,7 @@ onUnmounted(() => {
 .user-name {
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-sm);
-  color: var(--color-quaternary);
+  color: var(--color-primary);
   line-height: 1.2;
 }
 
@@ -530,13 +532,13 @@ onUnmounted(() => {
 
 .dropdown-arrow {
   font-size: var(--font-size-xs);
-  color: var(--icon-dropdown);
+  color: var(--color-primary);
   transition: all var(--transition-normal);
   margin-left: var(--spacing-xs);
 }
 
 .user-profile:hover .dropdown-arrow {
-  color: var(--icon-dropdown-hover);
+  color: var(--color-quaternary);
 }
 
 .dropdown-arrow-open {
@@ -569,7 +571,7 @@ onUnmounted(() => {
 
 .user-menu-header {
   padding: var(--spacing-xl);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: linear-gradient(135deg, var(--color-primary), var(--color-quaternary));
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
@@ -598,13 +600,13 @@ onUnmounted(() => {
 .user-menu-name {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-quaternary);
+  color: var(--color-white);
   margin: 0 0 4px 0;
 }
 
 .user-menu-email {
   font-size: var(--font-size-xs);
-  color: var(--color-quaternary);
+  color: var(--color-white);
   opacity: 0.8;
   margin: 0;
 }
@@ -638,7 +640,7 @@ onUnmounted(() => {
 
 .user-menu-item:hover {
   background: var(--color-gray-100);
-  color: var(--color-tertiary);
+  color: var(--color-primary);
 }
 
 .logout-btn {
@@ -733,39 +735,40 @@ onUnmounted(() => {
 
 .btn-outline {
   background: transparent;
-  color: var(--color-tertiary);
-  border-color: var(--color-tertiary);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .btn-outline:hover {
-  background: var(--color-tertiary);
-  color: var(--color-white);
+  background: var(--color-primary);
+  color: var(--color-black);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
 .btn-primary {
   background: var(--color-primary);
-  color: var(--color-quaternary);
+  color: var(--color-black);
   border-color: var(--color-primary);
 }
 
 .btn-primary:hover {
-  background: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
+  background: var(--color-quaternary);
+  color: var(--color-white);
+  border-color: var(--color-quaternary);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
 .btn-tertiary {
-  background: var(--color-tertiary);
+  background: var(--color-quaternary);
   color: var(--color-white);
-  border-color: var(--color-tertiary);
+  border-color: var(--color-quaternary);
 }
 
 .btn-tertiary:hover {
-  background: var(--color-tertiary-dark);
-  border-color: var(--color-tertiary-dark);
+  background: var(--color-quaternary-dark);
+  border-color: var(--color-quaternary-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -844,8 +847,8 @@ onUnmounted(() => {
 
 .mobile-menu {
   display: none;
-  background: var(--color-white);
-  border-top: var(--border-width-thin) solid var(--color-gray-200);
+  background: var(--color-black);
+  border-top: var(--border-width-thin) solid var(--color-primary);
   padding: var(--spacing-xl);
   position: absolute;
   top: 100%;
@@ -877,7 +880,7 @@ onUnmounted(() => {
 .mobile-nav-link {
   display: block;
   text-decoration: none;
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-lg);
   padding: var(--spacing-md);
@@ -887,13 +890,13 @@ onUnmounted(() => {
 
 .mobile-nav-link:hover,
 .mobile-nav-link.router-link-active {
-  color: var(--color-tertiary);
-  background: rgba(221, 235, 157, 0.1);
+  color: var(--color-primary);
+  background: rgba(255, 215, 0, 0.1);
 }
 
 /* === MOBILE USER PROFILE === */
 .mobile-auth-section {
-  border-top: var(--border-width-thin) solid var(--color-gray-200);
+  border-top: var(--border-width-thin) solid var(--color-primary);
   padding-top: var(--spacing-xl);
 }
 
@@ -907,7 +910,7 @@ onUnmounted(() => {
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-lg);
-  background: linear-gradient(135deg, rgba(221, 235, 157, 0.1), rgba(160, 200, 120, 0.05));
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 0, 0, 0.05));
   border-radius: var(--border-radius-lg);
 }
 
@@ -919,13 +922,13 @@ onUnmounted(() => {
 .mobile-user-name {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-quaternary);
+  color: var(--color-primary);
   margin: 0 0 4px 0;
 }
 
 .mobile-user-email {
   font-size: var(--font-size-sm);
-  color: var(--color-gray-600);
+  color: var(--color-white);
   margin: 0;
 }
 

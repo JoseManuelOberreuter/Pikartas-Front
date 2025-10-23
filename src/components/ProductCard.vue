@@ -63,12 +63,13 @@ const viewProduct = () => {
 
 <style scoped>
 .product-card {
-  background: white;
+  background: var(--color-white);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  border: 1px solid var(--color-primary);
 }
 
 .product-card:hover {
@@ -145,16 +146,17 @@ const viewProduct = () => {
 }
 
 .add-to-cart-btn {
-  background: #007bff;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-black);
 }
 
 .add-to-cart-btn:hover:not(:disabled) {
-  background: #0056b3;
+  background: var(--color-quaternary);
+  color: var(--color-white);
 }
 
 .add-to-cart-btn:disabled {
-  background: #6c757d;
+  background: var(--color-gray-500);
   cursor: not-allowed;
 }
 
@@ -179,16 +181,17 @@ const viewProduct = () => {
   font-size: 1.1rem;
   font-weight: 600;
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: var(--color-black);
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .product-category {
   font-size: 0.875rem;
-  color: #007bff;
+  color: var(--color-primary);
   margin: 0 0 0.75rem 0;
   font-weight: 500;
 }
@@ -196,7 +199,7 @@ const viewProduct = () => {
 .product-price {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #28a745;
+  color: var(--color-quaternary);
   margin-bottom: 0.5rem;
 }
 
@@ -205,7 +208,7 @@ const viewProduct = () => {
 }
 
 .stock-warning {
-  color: #ffc107;
+  color: var(--color-primary);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -213,12 +216,12 @@ const viewProduct = () => {
 }
 
 .stock-warning .warning-icon {
-  color: #ffc107;
+  color: var(--color-primary);
   font-size: 0.875rem;
 }
 
 .out-of-stock {
-  color: #dc3545;
+  color: var(--color-quaternary);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -226,7 +229,7 @@ const viewProduct = () => {
 }
 
 .out-of-stock .error-icon {
-  color: #dc3545;
+  color: var(--color-quaternary);
   font-size: 0.875rem;
 }
 

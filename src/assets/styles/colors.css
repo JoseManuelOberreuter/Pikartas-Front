@@ -1,19 +1,19 @@
 :root {
     /* === PALETA DE COLORES === */
-    --color-primary: #DDEB9D;      /* Verde claro - Principal */
-    --color-secondary: #A0C878;    /* Verde medio - Secundario */
-    --color-tertiary: #27667B;     /* Azul verdoso - Terciario */
-    --color-quaternary: #143D60;   /* Azul oscuro - Cuarto */
+    --color-primary: #FDB31C;      /* Yellow - Principal */
+    --color-secondary: #010101;    /* Black - Secundario */
+    --color-tertiary: #FFFFFF;     /* White - Terciario */
+    --color-quaternary: #FF0000;   /* Red - Cuarto */
     
     /* === VARIACIONES DE COLORES === */
-    --color-primary-dark: #c5d084;
-    --color-primary-light: #e8f0b5;
-    --color-secondary-dark: #8db865;
-    --color-secondary-light: #b3d38b;
-    --color-tertiary-dark: #1e4f5f;
-    --color-tertiary-light: #3a7a94;
-    --color-quaternary-dark: #0f2a44;
-    --color-quaternary-light: #1a4d7a;
+    --color-primary-dark: #E89B0A;  /* Dark Orange Yellow */
+    --color-primary-light: #FFD54F; /* Light Orange Yellow */
+    --color-secondary-dark: #010101; /* Black */
+    --color-secondary-light: #1a1a1a; /* Dark Gray */
+    --color-tertiary-dark: #F5F5F5;  /* Light Gray */
+    --color-tertiary-light: #FFFFFF; /* White */
+    --color-quaternary-dark: #CC0000; /* Dark Red */
+    --color-quaternary-light: #FF3333; /* Light Red */
     
     /* === COLORES DE ESTADO === */
     --color-success: #28a745;
@@ -22,19 +22,19 @@
     --color-info: var(--color-tertiary);
     
     /* === COLORES DE ADMIN DASHBOARD === */
-    --color-admin-tools: #6366f1;          /* Indigo - Herramientas */
-    --color-admin-products: #10b981;       /* Emerald - Productos */
-    --color-admin-orders: #f59e0b;         /* Amber - Órdenes */
-    --color-admin-revenue: #059669;        /* Green - Ingresos */
-    --color-admin-users: #8b5cf6;          /* Violet - Usuarios */
-    --color-admin-payments: #06b6d4;       /* Cyan - Pagos */
-    --color-admin-pending: #f97316;        /* Orange - Pendientes */
-    --color-admin-refunds: #ef4444;        /* Red - Reembolsos */
-    --color-admin-analytics: #3b82f6;      /* Blue - Analytics */
-    --color-admin-alerts: #dc2626;         /* Red - Alertas */
-    --color-admin-clock: #f59e0b;          /* Amber - Reloj */
-    --color-admin-chart: #7c3aed;          /* Purple - Gráficos */
-    --color-admin-cart: #059669;           /* Green - Carrito */
+    --color-admin-tools: #FDB31C;          /* Yellow - Herramientas */
+    --color-admin-products: #FF0000;       /* Red - Productos */
+    --color-admin-orders: #FFFFFF;         /* White - Órdenes */
+    --color-admin-revenue: #FDB31C;        /* Yellow - Ingresos */
+    --color-admin-users: #FF0000;          /* Red - Usuarios */
+    --color-admin-payments: #FDB31C;       /* Yellow - Pagos */
+    --color-admin-pending: #FF0000;        /* Red - Pendientes */
+    --color-admin-refunds: #FF0000;        /* Red - Reembolsos */
+    --color-admin-analytics: #FDB31C;      /* Yellow - Analytics */
+    --color-admin-alerts: #FF0000;         /* Red - Alertas */
+    --color-admin-clock: #FDB31C;          /* Yellow - Reloj */
+    --color-admin-chart: #FF0000;          /* Red - Gráficos */
+    --color-admin-cart: #FDB31C;           /* Yellow - Carrito */
   
     /* === COLORES NEUTROS === */
     --color-white: #ffffff;

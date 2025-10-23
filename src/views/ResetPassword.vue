@@ -8,7 +8,7 @@
         <div style="text-align: center; margin-bottom: 20px;">
           <h1 style="color: #333; margin-bottom: 10px;">
             <font-awesome-icon icon="shopping-cart" class="brand-icon" />
-            ShopNodeCore
+            Pikartas
           </h1>
         </div>
         <h2>
@@ -37,7 +37,7 @@
         <div style="text-align: center; margin-bottom: 20px;">
           <h1 style="color: #333; margin-bottom: 10px;">
             <font-awesome-icon icon="shopping-cart" class="brand-icon" />
-            ShopNodeCore
+            Pikartas
           </h1>
           <h2 style="color: #ff6b35;">
             <font-awesome-icon icon="lock" class="lock-icon" />
@@ -84,14 +84,14 @@
         <div style="text-align: center; margin-bottom: 20px;">
           <h1 style="color: #333; margin-bottom: 10px;">
             <font-awesome-icon icon="shopping-cart" class="brand-icon" />
-            ShopNodeCore
+            Pikartas
           </h1>
         </div>
         <h2>
           <font-awesome-icon icon="check-circle" class="success-icon" />
           ¡Contraseña Restablecida!
         </h2>
-        <p>Tu contraseña ha sido restablecida exitosamente en <strong>ShopNodeCore</strong>. Ya puedes iniciar sesión con tu nueva contraseña.</p>
+        <p>Tu contraseña ha sido restablecida exitosamente en <strong>Pikartas</strong>. Ya puedes iniciar sesión con tu nueva contraseña.</p>
         <router-link to="/" class="btn btn-primary">
           <font-awesome-icon icon="home" class="btn-icon" />
           Ir al Inicio

@@ -3,25 +3,26 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-section">
-          <h3><font-awesome-icon icon="shopping-cart" class="footer-brand-icon" /> ShopVue</h3>
-          <p>Tu tienda online de tecnología favorita</p>
+          <h3><font-awesome-icon icon="dice-d20" class="footer-brand-icon" /> Pikartas</h3>
+          <p>Tu tienda online de cartas Pokémon favorita</p>
         </div>
         <div class="footer-section">
           <h4>Enlaces Rápidos</h4>
           <ul>
             <li><router-link to="/">Inicio</router-link></li>
             <li><router-link to="/shop">Tienda</router-link></li>
+            <li><router-link to="/offers">Ofertas</router-link></li>
             <li><router-link to="/cart">Carrito</router-link></li>
           </ul>
         </div>
         <div class="footer-section">
           <h4>Contacto</h4>
-          <p><font-awesome-icon icon="envelope" class="contact-icon" /> info@shopvue.com</p>
+          <p><font-awesome-icon icon="envelope" class="contact-icon" /> info@pikartas.com</p>
           <p><font-awesome-icon icon="phone" class="contact-icon" /> +1 (555) 123-4567</p>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2024 ShopVue. Todos los derechos reservados.</p>
+        <p>&copy; 2024 Pikartas. Todos los derechos reservados.</p>
       </div>
     </div>
   </footer>
@@ -34,7 +35,7 @@
 <style scoped>
 /* Footer */
 .footer {
-  background: linear-gradient(135deg, var(--color-quaternary) 0%, var(--color-tertiary) 100%);
+  background: linear-gradient(135deg, var(--color-black) 0%, var(--color-quaternary) 100%);
   color: var(--color-white);
   padding: var(--spacing-5xl) 0 var(--spacing-lg);
   margin-top: auto;
@@ -62,13 +63,13 @@
 }
 
 .footer-brand-icon {
-  color: var(--icon-footer-brand);
+  color: var(--color-primary);
   font-size: 1.2rem;
   transition: color var(--transition-normal);
 }
 
 .footer-section h3:hover .footer-brand-icon {
-  color: var(--icon-footer-brand-hover);
+  color: var(--color-quaternary);
 }
 
 .footer-section h4 {
@@ -77,7 +78,7 @@
 
 .footer-section p {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--color-gray-200);
+  color: var(--color-white);
   line-height: var(--line-height-relaxed);
   display: flex;
   align-items: center;
@@ -85,14 +86,14 @@
 }
 
 .contact-icon {
-  color: var(--icon-footer-contact);
+  color: var(--color-primary);
   font-size: 0.9rem;
   transition: color var(--transition-normal);
   min-width: 16px;
 }
 
 .footer-section p:hover .contact-icon {
-  color: var(--icon-footer-contact-hover);
+  color: var(--color-quaternary);
 }
 
 .footer-section ul {
@@ -105,7 +106,7 @@
 }
 
 .footer-section ul li a {
-  color: var(--color-gray-200);
+  color: var(--color-white);
   text-decoration: none;
   transition: all var(--transition-normal);
   padding: var(--spacing-xs) 0;
@@ -125,7 +126,7 @@
 
 .footer-bottom p {
   margin: 0;
-  color: var(--color-gray-300);
+  color: var(--color-white);
   font-size: var(--font-size-sm);
 }
 

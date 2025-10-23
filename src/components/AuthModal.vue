@@ -292,14 +292,14 @@ const handleForgotPassword = async () => {
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-2xl);
-  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
-  background: var(--color-gray-100);
+  border-bottom: var(--border-width-thin) solid var(--color-primary);
+  background: var(--color-black);
   border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
 }
 
 .modal-header h2 {
   margin: 0;
-  color: var(--color-tertiary);
+  color: var(--color-primary);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
 }
@@ -309,7 +309,7 @@ const handleForgotPassword = async () => {
   border: none;
   font-size: var(--font-size-3xl);
   cursor: pointer;
-  color: var(--icon-modal-close);
+  color: var(--color-white);
   line-height: 1;
   padding: 0;
   width: 32px;
@@ -322,21 +322,23 @@ const handleForgotPassword = async () => {
 }
 
 .close-btn:hover {
-  background: var(--color-gray-200);
-  color: var(--icon-modal-close-hover);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-primary);
 }
 
 .close-icon {
   font-size: 1.1rem;
+  color: var(--color-white);
   transition: color var(--transition-normal);
 }
 
 .close-btn:hover .close-icon {
-  color: var(--icon-modal-close-hover);
+  color: var(--color-primary);
 }
 
 .auth-form {
   padding: var(--spacing-3xl);
+  background: var(--color-black);
 }
 
 .form-group {
@@ -349,26 +351,26 @@ const handleForgotPassword = async () => {
   font-family: var(--font-family-primary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-700);
+  color: var(--color-white);
 }
 
 .form-group input {
   width: 100%;
   padding: var(--spacing-md);
-  border: var(--border-width-thin) solid var(--color-gray-300);
+  border: var(--border-width-thin) solid var(--color-primary);
   border-radius: var(--border-radius-md);
   font-family: var(--font-family-primary);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
-  color: var(--color-gray-700);
+  color: var(--color-black);
   background-color: var(--color-white);
   transition: all var(--transition-normal);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(221, 235, 157, 0.15);
+  border-color: var(--color-quaternary);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
 }
 
 .form-group input::placeholder {
@@ -378,38 +380,38 @@ const handleForgotPassword = async () => {
 .auth-switch {
   text-align: center;
   margin: 0;
-  color: var(--color-gray-500);
+  color: var(--color-white);
   font-size: var(--font-size-sm);
 }
 
 .auth-switch a {
-  color: var(--color-tertiary);
+  color: var(--color-primary);
   text-decoration: none;
   font-weight: var(--font-weight-semibold);
   transition: color var(--transition-normal);
 }
 
 .auth-switch a:hover {
-  color: var(--color-tertiary-dark);
+  color: var(--color-quaternary);
   text-decoration: underline;
 }
 
 .forgot-password {
   text-align: center;
   margin: 0 0 var(--spacing-lg) 0;
-  color: var(--color-gray-500);
+  color: var(--color-white);
   font-size: var(--font-size-sm);
 }
 
 .forgot-password a {
-  color: var(--color-secondary);
+  color: var(--color-primary);
   text-decoration: none;
   font-weight: var(--font-weight-semibold);
   transition: color var(--transition-normal);
 }
 
 .forgot-password a:hover {
-  color: var(--color-secondary-dark);
+  color: var(--color-quaternary);
   text-decoration: underline;
 }
 

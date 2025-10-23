@@ -181,7 +181,7 @@
 }
 
 .modal {
-  background-color: var(--color-white);
+  background-color: var(--color-black);
   border-radius: var(--border-radius-xl);
   max-width: 500px;
   width: 90%;
@@ -191,6 +191,7 @@
   transform: translateY(20px);
   animation: slideUp var(--transition-normal) forwards;
   z-index: var(--z-modal);
+  border: 1px solid var(--color-primary);
 }
 
 @keyframes fadeIn {

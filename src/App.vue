@@ -108,8 +108,8 @@ html {
 body {
   font-family: var(--font-family-primary);
   line-height: var(--line-height-normal);
-  color: var(--color-gray-700);
-  background-color: var(--color-white);
+  color: var(--color-white);
+  background-color: var(--color-black);
 }
 
 #app {
