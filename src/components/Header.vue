@@ -2,16 +2,6 @@
   <header class="header">
     <nav class="nav">
       <div class="container">
-        <!-- Logo Section -->
-        <div class="nav-brand">
-          <router-link to="/" class="brand-link">
-            <div class="logo">
-              <font-awesome-icon icon="dice-d20" class="logo-icon" />
-              <span class="logo-text">Pikartas</span>
-            </div>
-          </router-link>
-        </div>
-        
         <!-- Navigation Menu -->
         <div class="nav-center">
           <ul class="nav-menu">
@@ -303,58 +293,16 @@ onUnmounted(() => {
 
 .nav .container {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   padding: var(--spacing-lg) var(--spacing-2xl);
   min-height: var(--header-height);
   gap: var(--spacing-2xl);
 }
 
-/* === LOGO SECTION === */
-.nav-brand {
-  justify-self: start;
-}
-
-.brand-link {
-  text-decoration: none;
-  color: inherit;
-  transition: transform var(--transition-normal);
-}
-
-.brand-link:hover {
-  transform: scale(1.02);
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.logo-icon {
-  font-size: var(--font-size-2xl);
-  color: var(--color-primary);
-  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
-  transition: color var(--transition-normal);
-}
-
-.logo:hover .logo-icon {
-  color: var(--color-quaternary);
-}
-
-.logo-text {
-  background: linear-gradient(45deg, var(--color-primary), var(--color-quaternary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: -0.02em;
-}
-
 /* === NAVIGATION CENTER === */
 .nav-center {
-  justify-self: center;
+  justify-self: start;
 }
 
 .nav-menu {
@@ -947,7 +895,7 @@ onUnmounted(() => {
 /* === RESPONSIVE DESIGN === */
 @media (max-width: 1024px) {
   .nav .container {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr auto;
     gap: var(--spacing-xl);
   }
   
@@ -996,14 +944,6 @@ onUnmounted(() => {
     gap: var(--spacing-lg);
   }
   
-  .logo-text {
-    font-size: var(--font-size-xl);
-  }
-  
-  .logo-icon {
-    font-size: var(--font-size-xl);
-  }
-  
   .nav-actions {
     gap: var(--spacing-lg);
   }
@@ -1017,14 +957,6 @@ onUnmounted(() => {
 @media (max-width: 480px) {
   .nav .container {
     padding: var(--spacing-sm) var(--spacing-md);
-  }
-  
-  .logo-text {
-    font-size: var(--font-size-lg);
-  }
-  
-  .logo-icon {
-    font-size: var(--font-size-lg);
   }
   
   .auth-buttons {
