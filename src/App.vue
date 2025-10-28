@@ -1,35 +1,42 @@
 <template>
   <div id="app">
-    <!-- Header Component -->
-    <Header 
-      @open-login="openLoginModal"
-      @open-register="openRegisterModal"
-    />
+    <!-- Video Background Global -->
+    <video autoplay muted loop class="app-video">
+      <source src="@/assets/video/fondo.mp4" type="video/mp4">
+    </video>
+    
+    <div class="app-content">
+      <!-- Header Component -->
+      <Header 
+        @open-login="openLoginModal"
+        @open-register="openRegisterModal"
+      />
 
-    <!-- Auth Modal Component -->
-    <AuthModal
-      :show-login-modal="showLoginModal"
-      :show-register-modal="showRegisterModal"
-      :show-forgot-password-modal="showForgotPasswordModal"
-      @close-modals="closeModals"
-      @switch-to-register="switchToRegister"
-      @switch-to-login="switchToLogin"
-      @switch-to-forgot-password="switchToForgotPassword"
-    />
+      <!-- Auth Modal Component -->
+      <AuthModal
+        :show-login-modal="showLoginModal"
+        :show-register-modal="showRegisterModal"
+        :show-forgot-password-modal="showForgotPasswordModal"
+        @close-modals="closeModals"
+        @switch-to-register="switchToRegister"
+        @switch-to-login="switchToLogin"
+        @switch-to-forgot-password="switchToForgotPassword"
+      />
 
-    <!-- Main Content - Router View -->
-    <main>
-      <router-view />
-    </main>
+      <!-- Main Content - Router View -->
+      <main>
+        <router-view />
+      </main>
 
-    <!-- Cart Sidebar Component -->
-    <CartSidebar @open-login-modal="openLoginModal" />
+      <!-- Cart Sidebar Component -->
+      <CartSidebar @open-login-modal="openLoginModal" />
 
-    <!-- Footer Component -->
-    <Footer />
+      <!-- Footer Component -->
+      <Footer />
 
-    <!-- Notification Container -->
-    <NotificationContainer />
+      <!-- Notification Container -->
+      <NotificationContainer />
+    </div>
   </div>
 </template>
 
@@ -113,9 +120,27 @@ body {
 }
 
 #app {
+  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+/* Video Background Global */
+.app-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.app-content {
+  position: relative;
+  z-index: 1;
 }
 
 main {

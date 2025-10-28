@@ -31,7 +31,7 @@
 /* Features Section */
 .features {
   padding: var(--spacing-6xl) 0;
-  background: var(--color-black);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .section-title {

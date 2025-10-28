@@ -41,7 +41,7 @@ const handleSubscribe = () => {
 <style scoped>
 /* Newsletter Section */
 .newsletter {
-  background: linear-gradient(135deg, var(--color-quaternary) 0%, var(--color-primary) 100%);
+  background: rgba(0, 0, 0, 0.5);
   padding: var(--spacing-6xl) 0;
   color: var(--color-white);
   position: relative;

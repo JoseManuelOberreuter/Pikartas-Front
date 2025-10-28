@@ -35,7 +35,7 @@
 <style scoped>
 /* Footer */
 .footer {
-  background: linear-gradient(135deg, var(--color-black) 0%, var(--color-quaternary) 100%);
+  background: var(--color-black);
   color: var(--color-white);
   padding: var(--spacing-5xl) 0 var(--spacing-lg);
   margin-top: auto;

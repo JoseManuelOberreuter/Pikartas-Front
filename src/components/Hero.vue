@@ -1,18 +1,10 @@
 <template>
   <section class="hero">
     <div class="hero-carousel">
-      <div class="carousel-container">
-        <div class="carousel-slide active" data-slide="0">
-          <div class="slide-bg slide-1">
-            <div class="slide-overlay"></div>
-          </div>
+      <div class="carousel-container" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
+        <div class="carousel-slide" data-slide="0">
           <div class="slide-content">
-            <div class="slide-badge">
-              <font-awesome-icon icon="star" class="badge-icon" />
-              <span>Nuevos Lanzamientos</span>
-            </div>
             <h1 class="slide-title">
-              <font-awesome-icon icon="dice-d20" class="title-icon" />
               ¡Atrapa Todas Las Cartas!
             </h1>
             <p class="slide-description">
@@ -24,7 +16,7 @@
                 <font-awesome-icon icon="shopping-bag" />
                 Explorar Cartas
               </router-link>
-              <router-link to="/shop" class="btn btn-outline">
+              <router-link to="/offers" class="btn btn-outline">
                 <font-awesome-icon icon="fire" />
                 Ver Ofertas
               </router-link>
@@ -33,16 +25,8 @@
         </div>
         
         <div class="carousel-slide" data-slide="1">
-          <div class="slide-bg slide-2">
-            <div class="slide-overlay"></div>
-          </div>
           <div class="slide-content">
-            <div class="slide-badge">
-              <font-awesome-icon icon="fire" class="badge-icon" />
-              <span>Ofertas Especiales</span>
-            </div>
             <h1 class="slide-title">
-              <font-awesome-icon icon="gift" class="title-icon" />
               ¡Descuentos Increíbles!
             </h1>
             <p class="slide-description">
@@ -50,7 +34,7 @@
               Cartas holográficas y rarezas únicas a precios especiales.
             </p>
             <div class="slide-actions">
-              <router-link to="/shop" class="btn btn-primary">
+              <router-link to="/offers" class="btn btn-primary">
                 <font-awesome-icon icon="percent" />
                 Ver Descuentos
               </router-link>
@@ -63,16 +47,8 @@
         </div>
         
         <div class="carousel-slide" data-slide="2">
-          <div class="slide-bg slide-3">
-            <div class="slide-overlay"></div>
-          </div>
           <div class="slide-content">
-            <div class="slide-badge">
-              <font-awesome-icon icon="crown" class="badge-icon" />
-              <span>Colección Premium</span>
-            </div>
             <h1 class="slide-title">
-              <font-awesome-icon icon="gem" class="title-icon" />
               Cartas Legendarias
             </h1>
             <p class="slide-description">
@@ -85,7 +61,7 @@
                 Ver Colección
               </router-link>
               <router-link to="/shop" class="btn btn-outline">
-                <font-awesome-icon icon="heart" />
+                <font-awesome-icon icon="star" />
                 Favoritos
               </router-link>
             </div>
@@ -139,10 +115,7 @@ const goToSlide = (index) => {
 }
 
 const updateCarousel = () => {
-  const slides = document.querySelectorAll('.carousel-slide')
-  slides.forEach((slide, index) => {
-    slide.classList.toggle('active', index === currentSlide.value)
-  })
+  // La animación ahora se maneja con CSS transform
 }
 
 const startCarousel = () => {
@@ -168,7 +141,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Hero Section - Carrusel */
+/* Hero Section - Carrusel con deslizamiento */
 .hero {
   position: relative;
   height: 80vh;
@@ -180,60 +153,23 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   height: 100%;
+  z-index: 1;
 }
 
 .carousel-container {
   position: relative;
   width: 100%;
   height: 100%;
+  display: flex;
+  transition: transform 0.8s cubic-bezier(0.5, 0, 0.1, 1);
+  will-change: transform;
 }
 
 .carousel-slide {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   height: 100%;
-  opacity: 0;
-  transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
-  transform: translateX(100%);
-}
-
-.carousel-slide.active {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.slide-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.slide-1 {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-quaternary) 100%);
-}
-
-.slide-2 {
-  background: linear-gradient(135deg, var(--color-quaternary) 0%, var(--color-primary) 100%);
-}
-
-.slide-3 {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-black) 100%);
-}
-
-.slide-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
 }
 
 .slide-content {
@@ -249,49 +185,42 @@ onUnmounted(() => {
   color: var(--color-white);
 }
 
-.slide-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  margin-bottom: 1.5rem;
-  animation: slideInDown 0.8s ease-out;
-}
-
-.badge-icon {
-  color: var(--color-white);
-  animation: pulse 2s infinite;
-}
-
 .slide-title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: var(--font-weight-extrabold);
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: normal;
   margin: 0 0 1.5rem 0;
-  line-height: 1.1;
+  line-height: 1.6;
   animation: slideInUp 0.8s ease-out 0.2s both;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-}
-
-.title-icon {
-  color: var(--color-white);
-  font-size: 0.9em;
-  margin-right: 0.5rem;
-  animation: bounce 2s infinite;
+  text-shadow: 
+    3px 3px 0px rgba(0, 0, 0, 0.9),
+    6px 6px 0px rgba(0, 0, 0, 0.7),
+    -2px -2px 0px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 255, 255, 0.4),
+    0 0 60px rgba(255, 255, 255, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }
 
 .slide-description {
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-normal);
+  font-weight: var(--font-weight-semibold);
   margin: 0 0 2rem 0;
-  opacity: 0.95;
+  opacity: 1;
   line-height: var(--line-height-relaxed);
   animation: slideInUp 0.8s ease-out 0.4s both;
   max-width: 600px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.9),
+    4px 4px 8px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(0, 0, 0, 0.5),
+    -2px -2px 0px rgba(0, 0, 0, 0.6);
 }
 
 .slide-actions {
@@ -434,18 +363,6 @@ onUnmounted(() => {
   }
 }
 
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
-  }
-}
-
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
@@ -466,7 +383,9 @@ onUnmounted(() => {
   }
   
   .slide-title {
-    font-size: clamp(2rem, 8vw, 3rem);
+    font-size: clamp(1.2rem, 6vw, 2rem);
+    line-height: 1.4;
+    letter-spacing: 0.3px;
   }
   
   .slide-description {
@@ -508,16 +427,12 @@ onUnmounted(() => {
   }
   
   .slide-title {
-    font-size: clamp(1.8rem, 10vw, 2.5rem);
+    font-size: clamp(1rem, 8vw, 1.5rem);
+    line-height: 1.6;
   }
   
   .slide-description {
     font-size: var(--font-size-base);
-  }
-  
-  .slide-badge {
-    font-size: var(--font-size-sm);
-    padding: 0.4rem 0.8rem;
   }
   
   .carousel-controls {

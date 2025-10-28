@@ -68,5 +68,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Home component - Todos los estilos se manejan en los componentes hijos */
+.home {
+  position: relative;
+}
 </style> 

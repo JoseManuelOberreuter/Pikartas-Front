@@ -47,7 +47,7 @@ const handleViewProduct = (productId) => {
 /* Featured Products Section */
 .featured-products {
   padding: var(--spacing-6xl) 0;
-  background: var(--color-black);
+  background: transparent;
 }
 
 .section-header {
@@ -62,8 +62,9 @@ const handleViewProduct = (productId) => {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   margin: 0;
-  color: var(--color-primary);
+  color: var(--color-black);
   position: relative;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .section-title::after {
@@ -74,40 +75,41 @@ const handleViewProduct = (productId) => {
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: var(--color-quaternary);
+  background: var(--color-black);
   border-radius: var(--border-radius-full);
 }
 
 .view-all-link {
-  color: var(--color-primary);
+  color: var(--color-black);
   text-decoration: none;
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
   transition: all var(--transition-normal);
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--border-radius-md);
-  border: var(--border-width-thin) solid transparent;
+  border: var(--border-width-thin) solid var(--color-black);
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .view-all-link:hover {
-  color: var(--color-black);
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  color: var(--color-white);
+  background: var(--color-black);
+  border-color: var(--color-black);
   transform: translateX(var(--spacing-xs));
 }
 
 .arrow-icon {
-  color: var(--color-primary);
+  color: var(--color-black);
   font-size: 0.8em;
   transition: all var(--transition-normal);
   transform: rotate(-90deg);
 }
 
 .view-all-link:hover .arrow-icon {
-  color: var(--color-black);
+  color: var(--color-white);
   transform: rotate(-90deg) translateX(2px);
 }
 
