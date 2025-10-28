@@ -318,12 +318,18 @@ onUnmounted(() => {
   text-decoration: none;
   color: var(--color-white);
   font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-lg);
+  font-size: 0.8rem;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
   transition: all var(--transition-normal);
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--border-radius-lg);
   position: relative;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.05em;
 }
 
 .nav-link::before {
@@ -665,7 +671,13 @@ onUnmounted(() => {
   border-radius: var(--border-radius-lg);
   cursor: pointer;
   font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
+  font-size: 0.5rem;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
   transition: all var(--transition-normal);
   text-decoration: none;
   display: inline-flex;
@@ -673,12 +685,12 @@ onUnmounted(() => {
   justify-content: center;
   border: var(--border-width-thin) solid transparent;
   white-space: nowrap;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.05em;
 }
 
 .btn-sm {
   padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: var(--font-size-sm);
+  font-size: 0.6rem;
 }
 
 .btn-outline {
@@ -689,9 +701,13 @@ onUnmounted(() => {
 
 .btn-outline:hover {
   background: var(--color-primary);
-  color: var(--color-black);
+  color: var(--color-black) !important;
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+}
+
+.btn-outline:hover span {
+  color: var(--color-black) !important;
 }
 
 .btn-primary {
@@ -702,10 +718,14 @@ onUnmounted(() => {
 
 .btn-primary:hover {
   background: var(--color-quaternary);
-  color: var(--color-white);
+  color: var(--color-white) !important;
   border-color: var(--color-quaternary);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover span {
+  color: var(--color-white) !important;
 }
 
 .btn-tertiary {
@@ -717,8 +737,13 @@ onUnmounted(() => {
 .btn-tertiary:hover {
   background: var(--color-quaternary-dark);
   border-color: var(--color-quaternary-dark);
+  color: var(--color-white) !important;
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+}
+
+.btn-tertiary:hover span {
+  color: var(--color-white) !important;
 }
 
 .btn-admin {
@@ -731,8 +756,13 @@ onUnmounted(() => {
 .btn-admin:hover {
   background: linear-gradient(135deg, #e55a2e, #e68619);
   border-color: #e55a2e;
+  color: var(--color-white) !important;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.btn-admin:hover span {
+  color: var(--color-white) !important;
 }
 
 .admin-menu-item {
@@ -830,10 +860,17 @@ onUnmounted(() => {
   text-decoration: none;
   color: var(--color-white);
   font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-lg);
+  font-size: 0.8rem;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
   padding: var(--spacing-md);
   border-radius: var(--border-radius-md);
   transition: all var(--transition-normal);
+  letter-spacing: 0.05em;
 }
 
 .mobile-nav-link:hover,
