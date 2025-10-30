@@ -234,7 +234,7 @@ onMounted(async () => {
   padding-top: 120px;
   padding-bottom: 80px;
   min-height: 100vh;
-  background: var(--color-black);
+  background: transparent;
 }
 
 .shop-header {
