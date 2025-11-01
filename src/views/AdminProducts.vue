@@ -32,6 +32,16 @@
             </option>
           </select>
         </div>
+        <div class="filter-group">
+          <label class="filter-checkbox-label">
+            <input 
+              v-model="showInactive" 
+              type="checkbox" 
+              class="filter-checkbox"
+            />
+            <span>Mostrar productos inactivos</span>
+          </label>
+        </div>
       </div>
 
       <!-- Loading -->
@@ -88,9 +98,12 @@
                 <td>
                   <span 
                     class="status-badge" 
-                    :class="{ 'status-active': product.stock > 0, 'status-inactive': product.stock === 0 }"
+                    :class="{ 
+                      'status-active': product.is_active !== false && product.stock > 0, 
+                      'status-inactive': product.is_active === false || product.stock === 0 
+                    }"
                   >
-                    {{ product.stock > 0 ? 'Disponible' : 'Agotado' }}
+                    {{ product.is_active === false ? 'Inactivo' : (product.stock > 0 ? 'Disponible' : 'Agotado') }}
                   </span>
                 </td>
                 <td>
@@ -98,7 +111,15 @@
                     <button @click="editProduct(product)" class="btn btn-sm btn-outline">
                       <font-awesome-icon icon="edit" class="action-icon" />
                     </button>
-                    <button @click="deleteProduct(product._id)" class="btn btn-sm btn-danger">
+                    <button 
+                      v-if="product.is_active === false" 
+                      @click="reactivateProduct(product.id)" 
+                      class="btn btn-sm btn-success"
+                      title="Reactivar producto"
+                    >
+                      <font-awesome-icon icon="undo" class="action-icon" />
+                    </button>
+                    <button @click="deleteProduct(product.id)" class="btn btn-sm btn-danger">
                       <font-awesome-icon icon="trash" class="action-icon" />
                     </button>
                   </div>
@@ -283,6 +304,7 @@ const isEditing = ref(false)
 const submitting = ref(false)
 const searchTerm = ref('')
 const selectedCategory = ref('')
+const showInactive = ref(false)
 const availableCategories = ref([])
 const newCategoryName = ref('')
 const selectedImage = ref(null)
@@ -301,14 +323,24 @@ const productForm = ref({
 // Computed
 const categories = computed(() => {
   // Solo categorías de productos activos
-  const activeProducts = products.value.filter(p => p.isActive !== false)
+  const activeProducts = products.value.filter(p => p.is_active !== false && p.is_active !== null)
   const cats = [...new Set(activeProducts.map(p => p.category))]
   return cats.sort()
 })
 
 const filteredProducts = computed(() => {
-  // 🎯 FILTRAR SOLO PRODUCTOS ACTIVOS
-  let filtered = products.value.filter(p => p.isActive !== false)
+  // Filtrar productos según si se muestran inactivos o no
+  // Supabase devuelve is_active (snake_case)
+  let filtered = products.value.filter(p => {
+    if (showInactive.value) {
+      // Si showInactive está activo, mostrar todos los productos
+      return true;
+    } else {
+      // Si showInactive está desactivado, mostrar solo activos
+      const isActive = p.is_active !== false && p.is_active !== null;
+      return isActive;
+    }
+  })
 
   if (searchTerm.value) {
     const term = searchTerm.value.toLowerCase()
@@ -553,17 +585,53 @@ const updateStock = async (productId, newStock) => {
 }
 
 const deleteProduct = async (productId) => {
-  if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return
+  // Validar y convertir a número
+  const id = parseInt(productId);
+  if (!id || isNaN(id)) {
+    console.error('Invalid product ID:', productId);
+    error('Error: ID de producto inválido');
+    return;
+  }
+  
+  console.log('Deleting product with ID:', id, 'Type:', typeof id);
+  
+  if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
   
   try {
-    await adminService.deleteProduct(productId)
-    success('Producto eliminado')
-    await loadProducts()
+    await adminService.deleteProduct(id);
+    success('Producto eliminado');
+    await loadProducts();
   } catch (err) {
-    console.error('Error deleting product:', err)
-    error('Error al eliminar producto')
+    console.error('Error deleting product:', err);
+    error(err.message || 'Error al eliminar producto');
   }
-}
+};
+
+const reactivateProduct = async (productId) => {
+  // Validar y convertir a número
+  const id = parseInt(productId);
+  if (!id || isNaN(id)) {
+    console.error('Invalid product ID:', productId);
+    error('Error: ID de producto inválido');
+    return;
+  }
+  
+  if (!confirm('¿Estás seguro de que quieres reactivar este producto?')) return;
+  
+  try {
+    // Crear FormData para actualizar solo el campo is_active
+    // Supabase espera el valor como boolean true, no como string
+    const formData = new FormData();
+    formData.append('is_active', 'true'); // El backend lo convertirá a boolean
+    
+    await adminService.updateProduct(id, formData);
+    success('Producto reactivado exitosamente');
+    await loadProducts();
+  } catch (err) {
+    console.error('Error reactivating product:', err);
+    error(err.message || 'Error al reactivar producto');
+  }
+};
 
 // Lifecycle
 onMounted(async () => {
@@ -636,6 +704,21 @@ onMounted(async () => {
   border: 1px solid #ddd;
   border-radius: 4px;
   min-width: 200px;
+}
+
+.filter-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #007bff;
 }
 
 .loading {
@@ -789,6 +872,15 @@ th {
 
 .btn-danger:hover {
   background: #c82333;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #218838;
 }
 
 .btn-sm {
