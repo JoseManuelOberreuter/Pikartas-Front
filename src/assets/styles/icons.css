@@ -132,67 +132,67 @@
     --icon-product-minus-hover: var(--color-primary);
     
     /* === ICONOS DE ADMIN DASHBOARD === */
-    --icon-admin-tools: var(--color-tertiary);
-    --icon-admin-products: var(--color-primary);
-    --icon-admin-orders: var(--color-primary);
-    --icon-admin-revenue: var(--color-success);
-    --icon-admin-users: var(--color-tertiary);
-    --icon-admin-payments: var(--color-primary);
-    --icon-admin-pending: var(--color-warning);
-    --icon-admin-refunds: var(--color-gray-600);
-    --icon-admin-analytics: var(--color-info);
-    --icon-admin-alerts: var(--color-error);
-    --icon-admin-clock: var(--color-warning);
-    --icon-admin-chart: var(--color-error);
-    --icon-admin-cart: var(--color-primary);
+    --icon-admin-tools: var(--color-admin-tools);
+    --icon-admin-products: var(--color-admin-products);
+    --icon-admin-orders: var(--color-admin-orders);
+    --icon-admin-revenue: var(--color-admin-revenue);
+    --icon-admin-users: var(--color-admin-users);
+    --icon-admin-payments: var(--color-admin-payments);
+    --icon-admin-pending: var(--color-admin-pending);
+    --icon-admin-refunds: var(--color-admin-refunds);
+    --icon-admin-analytics: var(--color-admin-analytics);
+    --icon-admin-alerts: var(--color-admin-alerts);
+    --icon-admin-clock: var(--color-admin-clock);
+    --icon-admin-chart: var(--color-admin-chart);
+    --icon-admin-cart: var(--color-admin-cart);
     --icon-admin-action: var(--color-white);
     
     /* === ICONOS DE ADMIN PRODUCTS === */
-    --icon-admin-products-header: var(--color-primary);
+    --icon-admin-products-header: var(--color-admin-products);
     --icon-admin-products-add: var(--color-white);
     --icon-admin-products-search: var(--color-gray-500);
-    --icon-admin-products-loading: var(--color-primary);
-    --icon-admin-products-edit: var(--color-primary);
-    --icon-admin-products-delete: var(--color-error);
+    --icon-admin-products-loading: var(--color-admin-products);
+    --icon-admin-products-edit: var(--color-admin-products);
+    --icon-admin-products-delete: var(--color-admin-refunds);
     --icon-admin-products-empty: var(--color-gray-400);
     --icon-admin-products-camera: var(--color-gray-600);
     --icon-admin-products-close: var(--color-gray-500);
     --icon-admin-products-close-hover: var(--color-gray-700);
-    --icon-admin-products-plus: var(--color-primary);
+    --icon-admin-products-plus: var(--color-admin-products);
     
     /* === ICONOS DE ADMIN ORDERS === */
-    --icon-admin-orders-header: var(--color-primary);
+    --icon-admin-orders-header: var(--color-admin-orders);
     --icon-admin-orders-back: var(--color-gray-600);
-    --icon-admin-orders-back-hover: var(--color-primary);
-    --icon-admin-orders-loading: var(--color-primary);
-    --icon-admin-orders-view: var(--color-primary);
-    --icon-admin-orders-refund: var(--color-warning);
-    --icon-admin-orders-payment: var(--color-info);
+    --icon-admin-orders-back-hover: var(--color-admin-orders);
+    --icon-admin-orders-loading: var(--color-admin-orders);
+    --icon-admin-orders-view: var(--color-admin-orders);
+    --icon-admin-orders-refund: var(--color-admin-refunds);
+    --icon-admin-orders-payment: var(--color-admin-payments);
     --icon-admin-orders-empty: var(--color-gray-400);
     --icon-admin-orders-close: var(--color-gray-500);
     --icon-admin-orders-close-hover: var(--color-gray-700);
     
     /* === ICONOS DE ADMIN USERS === */
-    --icon-admin-users-header: var(--color-tertiary);
+    --icon-admin-users-header: var(--color-admin-users);
     --icon-admin-users-export: var(--color-white);
     --icon-admin-users-back: var(--color-gray-600);
-    --icon-admin-users-back-hover: var(--color-primary);
-    --icon-admin-users-loading: var(--color-primary);
+    --icon-admin-users-back-hover: var(--color-admin-users);
+    --icon-admin-users-loading: var(--color-admin-users);
     --icon-admin-users-empty: var(--color-gray-400);
     
     /* === ICONOS DE ADMIN ANALYTICS === */
-    --icon-admin-analytics-header: var(--color-info);
+    --icon-admin-analytics-header: var(--color-admin-analytics);
     --icon-admin-analytics-back: var(--color-gray-600);
-    --icon-admin-analytics-back-hover: var(--color-primary);
-    --icon-admin-analytics-chart: var(--color-info);
-    --icon-admin-analytics-sales: var(--color-success);
-    --icon-admin-analytics-revenue: var(--color-success);
-    --icon-admin-analytics-users: var(--color-tertiary);
-    --icon-admin-analytics-products: var(--color-primary);
-    --icon-admin-analytics-globe: var(--color-info);
-    --icon-admin-analytics-calendar: var(--color-warning);
+    --icon-admin-analytics-back-hover: var(--color-admin-analytics);
+    --icon-admin-analytics-chart: var(--color-admin-chart);
+    --icon-admin-analytics-sales: var(--color-admin-revenue);
+    --icon-admin-analytics-revenue: var(--color-admin-revenue);
+    --icon-admin-analytics-users: var(--color-admin-users);
+    --icon-admin-analytics-products: var(--color-admin-products);
+    --icon-admin-analytics-globe: var(--color-admin-analytics);
+    --icon-admin-analytics-calendar: var(--color-admin-pending);
     --icon-admin-analytics-products-btn: var(--color-white);
-    --icon-admin-analytics-orders-btn: var(--color-primary);
+    --icon-admin-analytics-orders-btn: var(--color-admin-orders);
     
     /* === ICONOS DE CART === */
     --icon-cart-header: var(--color-primary);
