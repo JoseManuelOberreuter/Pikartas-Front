@@ -40,7 +40,7 @@ export const useAuthStore = defineStore('auth', () => {
               const cartStore = useCartStore();
               await cartStore.initializeCart();
             } catch (cartError) {
-              console.error('Error initializing cart:', cartError);
+              // Error initializing cart - silently fail
             }
           } else if (userProfile) {
             user.value = {
@@ -62,7 +62,7 @@ export const useAuthStore = defineStore('auth', () => {
               const cartStore = useCartStore();
               await cartStore.initializeCart();
             } catch (cartError) {
-              console.error('Error initializing cart:', cartError);
+              // Error initializing cart - silently fail
             }
           } else {
             // Si no hay datos del usuario, limpiar autenticación
@@ -76,8 +76,8 @@ export const useAuthStore = defineStore('auth', () => {
           user.value = null;
           isAuthenticated.value = false;
         }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
+        } catch (error) {
+        // Error initializing auth - silently fail and clear auth
         // Si falla la verificación, limpiar autenticación
         localStorage.removeItem('token');
         user.value = null;
@@ -114,8 +114,6 @@ export const useAuthStore = defineStore('auth', () => {
       error.value = null;
       const response = await authService.login(credentials);
       
-      console.log('Login response:', response);
-      
       // Si el login fue exitoso y tenemos token
       if (response && response.token) {
         isAuthenticated.value = true;
@@ -124,7 +122,6 @@ export const useAuthStore = defineStore('auth', () => {
           // Hacer segunda llamada para obtener datos del usuario
           // Usamos el email como identificador
           const userProfile = await authService.getUserProfile(credentials.email);
-          console.log('User profile response:', userProfile);
           
           if (userProfile && userProfile.user) {
             // Asegurar que el objeto usuario tenga todas las propiedades necesarias
@@ -165,10 +162,8 @@ export const useAuthStore = defineStore('auth', () => {
               role: 'user'
             };
           }
-          
-          console.log('User set in store:', user.value);
         } catch (profileError) {
-          console.error('Error fetching user profile:', profileError);
+          // Error fetching user profile - silently fail and use basic data
           // Aunque falle obtener el perfil, mantenemos autenticado con datos básicos
           user.value = {
             _id: null,
@@ -188,7 +183,7 @@ export const useAuthStore = defineStore('auth', () => {
           const cartStore = useCartStore();
           await cartStore.initializeCart();
         } catch (cartError) {
-          console.error('Error initializing cart:', cartError);
+          // Error initializing cart - silently fail
         }
       } else {
         throw new Error('Login response does not contain token');
@@ -196,7 +191,6 @@ export const useAuthStore = defineStore('auth', () => {
       
       return response;
     } catch (err) {
-      console.error('Login error in store:', err);
       error.value = err;
       isAuthenticated.value = false;
       user.value = null;
@@ -221,7 +215,7 @@ export const useAuthStore = defineStore('auth', () => {
         const cartStore = useCartStore();
         await cartStore.initializeCart();
       } catch (cartError) {
-        console.error('Error initializing cart:', cartError);
+        // Error initializing cart - silently fail
       }
       
       return response;

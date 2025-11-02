@@ -236,16 +236,10 @@ const loadDashboardData = async () => {
       adminService.getOrderStats().catch(() => ({ data: {} })),
       adminService.getAllProducts().catch(() => ({ data: [] })),
       adminService.getAllOrders().catch(() => ({ data: [] })),
-      adminService.getAllUsers().catch((error) => {
-        console.error('Error loading users:', error)
+      adminService.getAllUsers().catch(() => {
         return { data: [], total: 0 }
       })
     ])
-
-    // 🔍 DEBUG: Ver qué está devolviendo el endpoint de usuarios
-    console.log('usersData:', usersData)
-    console.log('usersData.total:', usersData.total)
-    console.log('usersData.data:', usersData.data)
 
     // 🎯 CONTAR SOLO PRODUCTOS ACTIVOS
     const activeProducts = Array.isArray(allProducts.data) 
@@ -270,12 +264,6 @@ const loadDashboardData = async () => {
       conversionRate
     }
 
-    // 🔍 DEBUG: Verificar las estadísticas calculadas
-    console.log('Stats calculadas:', stats.value)
-    console.log('Total usuarios en stats:', stats.value.totalUsers)
-    console.log('usersData.total:', usersData.total)
-    console.log('usersData:', usersData)
-
     // Obtener órdenes recientes (últimas 5)
     if (Array.isArray(orders.data)) {
       recentOrders.value = orders.data
@@ -287,7 +275,6 @@ const loadDashboardData = async () => {
     generatePaymentAlerts(allOrders)
 
   } catch (err) {
-    console.error('Error loading dashboard data:', err)
     error('Error al cargar datos del dashboard')
   } finally {
     loading.value = false

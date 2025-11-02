@@ -45,7 +45,11 @@ export const useRoutesStore = defineStore('routes', () => {
     resetPassword: '/users/reset-password',
     profile: '/users/profile',
     updateProfile: '/users/profile', // Ruta PUT para actualizar perfil
-    uploadAvatar: '/users/upload-avatar'
+    uploadAvatar: '/users/upload-avatar',
+    getAllAdmin: '/users/all', // Ruta GET para obtener todos los usuarios (Admin)
+    getById: '/users', // Base para obtener usuario por ID
+    updateById: '/users', // Base para actualizar usuario por ID
+    deleteById: '/users' // Base para eliminar usuario por ID
   });
 
   // Rutas de productos
@@ -155,6 +159,19 @@ export const useRoutesStore = defineStore('routes', () => {
     return `${baseURL.value}${cartRoutes.value.remove}/${productId}`;
   };
 
+  // Métodos para URLs de administración de usuarios
+  const getUserByIdUrl = (id) => {
+    return `${baseURL.value}${userRoutes.value.getById}/${id}`;
+  };
+
+  const getUpdateUserUrl = (id) => {
+    return `${baseURL.value}${userRoutes.value.updateById}/${id}`;
+  };
+
+  const getDeleteUserUrl = (id) => {
+    return `${baseURL.value}${userRoutes.value.deleteById}/${id}`;
+  };
+
   // Método para cambiar la base URL (útil para diferentes ambientes)
   const setBaseURL = (newBaseURL) => {
     baseURL.value = newBaseURL;
@@ -196,6 +213,9 @@ export const useRoutesStore = defineStore('routes', () => {
     getOrderByIdUrl,
     getCancelOrderUrl,
     getUpdateOrderStatusUrl,
-    getRemoveFromCartUrl
+    getRemoveFromCartUrl,
+    getUserByIdUrl,
+    getUpdateUserUrl,
+    getDeleteUserUrl
   };
 }); 
