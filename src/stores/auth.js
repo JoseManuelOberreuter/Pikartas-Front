@@ -206,16 +206,19 @@ export const useAuthStore = defineStore('auth', () => {
       error.value = null;
       const response = await authService.verifyEmail(token);
       
-      user.value = response.user;
-      isAuthenticated.value = true;
-      
-      // Inicializar carrito después de verificación exitosa
-      try {
-        const { useCartStore } = await import('./cart');
-        const cartStore = useCartStore();
-        await cartStore.initializeCart();
-      } catch (cartError) {
-        // Error initializing cart - silently fail
+      // Solo actualizar user si la respuesta incluye user data
+      if (response.user && response.type === 'VERIFIED') {
+        user.value = response.user;
+        isAuthenticated.value = true;
+        
+        // Inicializar carrito después de verificación exitosa
+        try {
+          const { useCartStore } = await import('./cart');
+          const cartStore = useCartStore();
+          await cartStore.initializeCart();
+        } catch (cartError) {
+          // Error initializing cart - silently fail
+        }
       }
       
       return response;

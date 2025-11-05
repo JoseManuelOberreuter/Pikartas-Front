@@ -64,13 +64,22 @@ export const authService = {
   async verifyEmail(token) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.post(routesStore.fullUserRoutes.verify, { token });
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
+      // Usar GET con el token en la URL (como el backend espera)
+      const response = await axios.get(`${routesStore.fullUserRoutes.verify}/${token}`);
       return response.data;
     } catch (error) {
       logger.error('Verification error:', error);
+      throw error.response?.data || { error: error.message };
+    }
+  },
+
+  async resendVerification(email) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post('/api/users/resend-verification', { email });
+      return response.data;
+    } catch (error) {
+      logger.error('Resend verification error:', error);
       throw error.response?.data || { error: error.message };
     }
   },
