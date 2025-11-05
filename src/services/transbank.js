@@ -42,7 +42,6 @@ class TransbankService {
 
       return data
     } catch (error) {
-      console.error('Error initiating payment:', error)
       throw error
     }
   }
@@ -66,7 +65,6 @@ class TransbankService {
 
       return data
     } catch (error) {
-      console.error('Error confirming payment:', error)
       throw error
     }
   }
@@ -87,7 +85,6 @@ class TransbankService {
 
       return data
     } catch (error) {
-      console.error('Error getting payment status:', error)
       throw error
     }
   }
@@ -111,7 +108,6 @@ class TransbankService {
 
       return data
     } catch (error) {
-      console.error('Error refunding payment:', error)
       throw error
     }
   }
@@ -127,7 +123,6 @@ class TransbankService {
       const data = sessionStorage.getItem('paymentData')
       return data ? JSON.parse(data) : null
     } catch (error) {
-      console.error('Error parsing stored payment data:', error)
       return null
     }
   }
@@ -137,7 +132,7 @@ class TransbankService {
     try {
       sessionStorage.setItem('paymentData', JSON.stringify(data))
     } catch (error) {
-      console.error('Error storing payment data:', error)
+      // Silently fail if storage is not available
     }
   }
 

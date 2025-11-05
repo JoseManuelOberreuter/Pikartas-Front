@@ -116,7 +116,7 @@ const loadAnalytics = async () => {
       totalUsers: ordersStats.data?.totalUsers || 0
     }
   } catch (err) {
-    console.error('Error loading analytics:', err)
+    // Error loading analytics - stats will remain empty
   }
 }
 

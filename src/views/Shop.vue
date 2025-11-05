@@ -117,13 +117,10 @@ const categories = ref([
 const loadProducts = async () => {
   loading.value = true
   try {
-    console.log('🔍 Shop: Cargando productos desde el backend...');
     const response = await productService.getAllProducts()
-    console.log('📦 Shop: Respuesta del servidor:', response);
     
     // Mapear la respuesta del backend al formato esperado
     if (response.success && response.data) {
-      console.log(`✅ Shop: ${response.data.length} productos recibidos del servidor`);
       products.value = response.data.map(product => ({
         id: product._id || product.id, // Manejar tanto _id como id
         name: product.name,
@@ -133,18 +130,13 @@ const loadProducts = async () => {
         category: product.category,
         stock: product.stock
       }))
-      console.log('🎯 Shop: Productos mapeados:', products.value);
     } else {
-      console.warn('⚠️ Shop: Respuesta inválida del servidor:', response);
       products.value = []
     }
   } catch (error) {
-    console.error('❌ Shop: Error cargando productos:', error)
-    // Fallback a productos mock si falla
     products.value = []
   } finally {
     loading.value = false
-    console.log(`📊 Shop: Carga finalizada. Total productos: ${products.value.length}`);
   }
 }
 
@@ -189,7 +181,6 @@ const filteredProducts = computed(() => {
 
 // Methods
 const viewProduct = (productId) => {
-  console.log('🔍 Shop: Navegando a producto con ID:', productId);
   router.push(`/product/${productId}`)
 }
 

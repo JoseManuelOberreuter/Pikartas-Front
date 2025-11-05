@@ -189,7 +189,6 @@ const getUserDisplayName = computed(() => {
     }
     return 'Usuario'
   } catch (error) {
-    console.error('Error getting user display name:', error)
     return 'Usuario'
   }
 })
@@ -199,7 +198,6 @@ const isAdmin = computed(() => {
   try {
     return authStore?.user?.role === 'admin'
   } catch (error) {
-    console.error('Error checking admin status:', error)
     return false
   }
 })

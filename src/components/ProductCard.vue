@@ -55,8 +55,6 @@ const addToCart = async () => {
 }
 
 const viewProduct = () => {
-  console.log('🔍 ProductCard: Producto completo:', props.product);
-  console.log('🎯 ProductCard: ID del producto:', props.product.id);
   emit('view-product', props.product.id)
 }
 </script>

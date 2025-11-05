@@ -34,7 +34,6 @@ export const authService = {
   async register(userData) {
     try {
       const routesStore = useRoutesStore();
-      logger.debug('Sending registration data');
       const response = await axios.post(routesStore.fullUserRoutes.register, userData);
       
       // Tu backend NO devuelve token inmediatamente, requiere verificación
@@ -140,7 +139,6 @@ export const productService = {
     try {
       const routesStore = useRoutesStore();
       const url = routesStore.getProductByIdUrl(id);
-      logger.debug('Consultando producto', { productId: id });
       
       const response = await axios.get(url);
       
@@ -154,7 +152,6 @@ export const productService = {
   async createProduct(productData) {
     try {
       const routesStore = useRoutesStore();
-      logger.debug('Creating product');
       
       // Configurar headers para FormData si es necesario
       const config = {}
@@ -175,7 +172,6 @@ export const productService = {
   async updateProduct(id, productData) {
     try {
       const routesStore = useRoutesStore();
-      logger.debug('Updating product', { productId: id });
       
       // Configurar headers para FormData si es necesario
       const config = {}
@@ -368,7 +364,6 @@ export const adminService = {
   async createProduct(productData) {
     try {
       const routesStore = useRoutesStore();
-      logger.debug('Admin creating product');
       
       // Configurar headers para FormData si es necesario
       const config = {}
@@ -389,7 +384,6 @@ export const adminService = {
   async updateProduct(id, productData) {
     try {
       const routesStore = useRoutesStore();
-      logger.debug('Admin updating product', { productId: id });
       
       // Configurar headers para FormData si es necesario
       const config = {}
@@ -424,8 +418,6 @@ export const adminService = {
       const url = routesStore.getUpdateStockUrl(id);
       const data = { stock };
       
-      logger.debug('Update stock request', { productId: id, stock });
-      
       const response = await axios.patch(url, data);
       return response.data;
     } catch (error) {
@@ -437,7 +429,6 @@ export const adminService = {
   async getAllProducts() {
     try {
       const routesStore = useRoutesStore();
-      logger.debug('Admin getting all products');
       const response = await axios.get(routesStore.fullProductRoutes.getAllAdmin);
       return response.data;
     } catch (error) {
@@ -539,7 +530,6 @@ export const adminService = {
   async updateUser(id, userData) {
     try {
       const routesStore = useRoutesStore();
-      logger.debug('Admin updating user', { userId: id });
       const response = await axios.put(routesStore.getUpdateUserUrl(id), userData);
       return response.data;
     } catch (error) {
@@ -551,7 +541,6 @@ export const adminService = {
   async deleteUser(id) {
     try {
       const routesStore = useRoutesStore();
-      logger.debug('Admin deleting user', { userId: id });
       const response = await axios.delete(routesStore.getDeleteUserUrl(id));
       return response.data;
     } catch (error) {
@@ -563,7 +552,6 @@ export const adminService = {
   async reactivateUser(id) {
     try {
       const routesStore = useRoutesStore();
-      logger.debug('Admin reactivating user', { userId: id });
       // Llamar al endpoint dedicado de restauración
       const restoreUrl = `${routesStore.getUpdateUserUrl(id)}/restore`;
       const response = await axios.put(restoreUrl);

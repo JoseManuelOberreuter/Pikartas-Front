@@ -411,7 +411,6 @@ const loadOrders = async () => {
     orders.value = ordersResponse.data || []
     stats.value = statsResponse.data || {}
   } catch (err) {
-    console.error('Error loading orders:', err)
     error('Error al cargar órdenes')
   } finally {
     loading.value = false
@@ -424,7 +423,6 @@ const updateOrderStatus = async (orderId, newStatus) => {
     success('Estado de orden actualizado')
     await loadOrders()
   } catch (err) {
-    console.error('Error updating order status:', err)
     error('Error al actualizar estado de orden')
   }
 }
@@ -472,7 +470,6 @@ const refundOrder = async (order) => {
       selectedOrder.value.paymentStatus = 'refunded'
     }
   } catch (err) {
-    console.error('Error processing refund:', err)
     error('Error al procesar el reembolso: ' + (err.message || 'Error desconocido'))
   } finally {
     refundingOrder.value = null
@@ -486,7 +483,6 @@ const checkPaymentStatus = async (order) => {
     success('Estado de pago actualizado')
     await loadOrders()
   } catch (err) {
-    console.error('Error checking payment status:', err)
     error('Error al verificar el estado del pago: ' + (err.message || 'Error desconocido'))
   } finally {
     checkingPayment.value = null

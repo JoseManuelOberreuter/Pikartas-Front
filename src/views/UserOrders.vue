@@ -312,7 +312,6 @@ const loadOrders = async () => {
       orders.value = []
     }
   } catch (err) {
-    console.error('Error loading orders:', err)
     error('Error al cargar tus pedidos. Por favor, intenta de nuevo.')
     orders.value = []
   } finally {
@@ -376,7 +375,6 @@ const cancelOrder = async (orderId) => {
     success('Pedido cancelado exitosamente')
     await loadOrders()
   } catch (err) {
-    console.error('Error cancelling order:', err)
     error('Error al cancelar el pedido. Por favor, intenta de nuevo.')
   } finally {
     cancellingOrder.value = null
@@ -400,7 +398,6 @@ const formatDate = (dateString) => {
       minute: '2-digit'
     })
   } catch (err) {
-    console.error('Error formatting date:', err)
     return 'Fecha inválida'
   }
 }

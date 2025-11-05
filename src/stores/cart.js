@@ -31,7 +31,6 @@ export const useCartStore = defineStore('cart', () => {
             productDetails[productId] = product;
           }
         } catch (error) {
-          console.warn(`No se pudo obtener detalles del producto ${productId}:`, error);
           // Usar datos por defecto si falla
           productDetails[productId] = {
             id: productId,
@@ -47,7 +46,6 @@ export const useCartStore = defineStore('cart', () => {
       await Promise.all(promises);
       return productDetails;
     } catch (error) {
-      console.error('Error obteniendo detalles de productos:', error);
       return {};
     }
   }
@@ -218,8 +216,6 @@ export const useCartStore = defineStore('cart', () => {
         }
       }
     } catch (err) {
-      console.error('Error loading cart:', err);
-      
       // Manejar errores específicos de autenticación
       if (err.status === 401 || err.statusCode === 401) {
         error.value = 'Debes iniciar sesión para ver tu carrito';
@@ -258,8 +254,6 @@ export const useCartStore = defineStore('cart', () => {
       success(`${product.name} agregado al carrito`);
       
     } catch (err) {
-      console.error('Error adding to cart:', err);
-      
       // Manejar errores específicos de autenticación
       if (err.status === 401 || err.statusCode === 401) {
         error.value = 'Debes iniciar sesión para agregar productos al carrito';
@@ -291,8 +285,6 @@ export const useCartStore = defineStore('cart', () => {
       success('Producto eliminado del carrito');
       
     } catch (err) {
-      console.error('Error removing from cart:', err);
-      
       // Manejar errores específicos de autenticación
       if (err.status === 401 || err.statusCode === 401) {
         error.value = 'Debes iniciar sesión para modificar el carrito';
@@ -333,8 +325,6 @@ export const useCartStore = defineStore('cart', () => {
       await loadCart(); // Recargar carrito después de actualizar
       
     } catch (err) {
-      console.error('Error updating cart item:', err);
-      
       // Manejar errores específicos de autenticación
       if (err.status === 401 || err.statusCode === 401) {
         error.value = 'Debes iniciar sesión para modificar el carrito';
@@ -365,8 +355,6 @@ export const useCartStore = defineStore('cart', () => {
       success('Carrito vaciado');
       
     } catch (err) {
-      console.error('Error clearing cart:', err);
-      
       // Manejar errores específicos de autenticación
       if (err.status === 401 || err.statusCode === 401) {
         error.value = 'Debes iniciar sesión para vaciar el carrito';

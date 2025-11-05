@@ -77,8 +77,6 @@ const isProcessing = ref(false)
 const transbankToken = ref(route.query.token_ws)
 
 onMounted(async () => {
-  console.log('PaymentReturn mounted with token:', transbankToken.value)
-  
   if (!transbankToken.value) {
     error.value = 'Token de pago no encontrado'
     return
@@ -92,10 +90,7 @@ const confirmPayment = async () => {
     isProcessing.value = true
     currentStep.value = 2
     
-    console.log('Confirming payment with token:', transbankToken.value)
-    
     const data = await transbankService.confirmPayment(transbankToken.value)
-    console.log('Payment confirmation response:', data)
     
     currentStep.value = 3
     
@@ -117,7 +112,6 @@ const confirmPayment = async () => {
     })
     
   } catch (err) {
-    console.error('Error confirming payment:', err)
     error.value = err.message || 'Error al confirmar el pago'
     showError(error.value)
     

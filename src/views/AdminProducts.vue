@@ -363,7 +363,6 @@ const loadCategories = async () => {
   try {
     // Intentar cargar categorías desde el endpoint específico
     const response = await productService.getCategories()
-    console.log('Categories loaded from endpoint:', response);
     if (response.success && response.data) {
       availableCategories.value = response.data
     } else {
@@ -371,7 +370,6 @@ const loadCategories = async () => {
       await loadCategoriesFromProducts()
     }
   } catch (err) {
-    console.error('Error loading categories from endpoint:', err)
     // Fallback: extraer categorías de productos existentes
     await loadCategoriesFromProducts()
   }
@@ -384,13 +382,11 @@ const loadCategoriesFromProducts = async () => {
       // Extraer categorías únicas de los productos
       const categories = [...new Set(response.data.map(p => p.category).filter(Boolean))]
       availableCategories.value = categories.sort()
-      console.log('Categories extracted from products:', availableCategories.value);
     } else {
       // Fallback a categorías básicas
       availableCategories.value = ['Electrónicos', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes', 'Belleza', 'Automóviles', 'Otros', 'Plantas']
     }
   } catch (err) {
-    console.error('Error loading categories from products:', err)
     // Fallback a categorías básicas
     availableCategories.value = ['Electrónicos', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes', 'Belleza', 'Automóviles', 'Otros', 'Plantas']
   }
@@ -413,22 +409,8 @@ const loadProducts = async () => {
   loading.value = true
   try {
     const response = await adminService.getAllProducts()
-    console.log('Admin products loaded:', response);
     products.value = response.data || []
-    
-    // Verificar la estructura de los productos
-    if (products.value.length > 0) {
-      console.log('First product structure:', products.value[0])
-      console.log('First product ID:', products.value[0]._id)
-      console.log('First product ID (id):', products.value[0].id)
-      console.log('All product IDs:', products.value.map(p => ({ 
-        _id: p._id, 
-        id: p.id, 
-        name: p.name 
-      })))
-    }
   } catch (err) {
-    console.error('Error loading products:', err)
     error('Error al cargar productos')
   } finally {
     loading.value = false
@@ -469,14 +451,9 @@ const openCreateModal = () => {
 }
 
 const editProduct = (product) => {
-  console.log('Editing product:', product)
-  console.log('Product ID:', product._id)
-  console.log('Product ID (id):', product.id)
-  
   // Verificar que el producto tenga un ID válido (probar diferentes nombres)
   const productId = product._id || product.id
   if (!productId) {
-    console.error('Product has no valid ID:', product)
     error('Error: Producto sin ID válido')
     return
   }
@@ -493,9 +470,6 @@ const editProduct = (product) => {
     category: product.category,
     image: product.image
   }
-  
-  console.log('Product form after copy:', productForm.value)
-  console.log('Product form ID:', productForm.value._id)
   
   selectedImage.value = null
   imagePreviewUrl.value = ''
@@ -531,9 +505,6 @@ const submitProduct = async () => {
     }
     
     if (isEditing.value) {
-      console.log('Submitting product update with ID:', productForm.value._id)
-      console.log('Product form data:', productForm.value)
-      
       if (!productForm.value._id) {
         throw new Error('ID de producto no encontrado')
       }
@@ -548,7 +519,6 @@ const submitProduct = async () => {
     await loadProducts()
     closeModal()
   } catch (err) {
-    console.error('Error saving product:', err)
     error(err.message || 'Error al guardar producto')
   } finally {
     submitting.value = false
@@ -557,29 +527,22 @@ const submitProduct = async () => {
 
 const updateStock = async (productId, newStock) => {
   try {
-    console.log('Updating stock for product:', productId, 'New stock:', newStock)
-    
     // Verificar que el ID sea válido
     if (!productId) {
-      console.error('Invalid product ID:', productId)
       error('Error: ID de producto inválido')
       return
     }
     
     const stockValue = parseInt(newStock)
     if (stockValue < 0) {
-      console.log('Invalid stock value:', stockValue)
       return
     }
     
-    console.log('Calling updateProductStock with:', { productId, stockValue })
-    const result = await adminService.updateProductStock(productId, stockValue)
-    console.log('Update stock result:', result)
+    await adminService.updateProductStock(productId, stockValue)
     
     success('Stock actualizado')
     await loadProducts()
   } catch (err) {
-    console.error('Error updating stock:', err)
     error('Error al actualizar stock')
   }
 }
@@ -588,12 +551,9 @@ const deleteProduct = async (productId) => {
   // Validar y convertir a número
   const id = parseInt(productId);
   if (!id || isNaN(id)) {
-    console.error('Invalid product ID:', productId);
     error('Error: ID de producto inválido');
     return;
   }
-  
-  console.log('Deleting product with ID:', id, 'Type:', typeof id);
   
   if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
   
@@ -602,7 +562,6 @@ const deleteProduct = async (productId) => {
     success('Producto eliminado');
     await loadProducts();
   } catch (err) {
-    console.error('Error deleting product:', err);
     error(err.message || 'Error al eliminar producto');
   }
 };
@@ -611,7 +570,6 @@ const reactivateProduct = async (productId) => {
   // Validar y convertir a número
   const id = parseInt(productId);
   if (!id || isNaN(id)) {
-    console.error('Invalid product ID:', productId);
     error('Error: ID de producto inválido');
     return;
   }
@@ -628,7 +586,6 @@ const reactivateProduct = async (productId) => {
     success('Producto reactivado exitosamente');
     await loadProducts();
   } catch (err) {
-    console.error('Error reactivating product:', err);
     error(err.message || 'Error al reactivar producto');
   }
 };

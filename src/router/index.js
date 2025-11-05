@@ -155,13 +155,12 @@ router.beforeEach(async (to, from, next) => {
         if (!authStore.user || authStore.user.role !== 'admin') {
           // Redirigir al home si no es admin
           next('/')
-          return
-        }
-      } catch (error) {
-        console.error('Error checking admin permissions:', error)
-        next('/')
         return
       }
+    } catch (error) {
+      next('/')
+      return
+    }
     }
   }
   next()

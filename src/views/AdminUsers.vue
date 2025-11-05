@@ -485,7 +485,6 @@ const loadUsers = async () => {
     // Calcular estadísticas
     calculateStats()
   } catch (err) {
-    console.error('Error loading users:', err)
     error('Error al cargar usuarios')
   } finally {
     loading.value = false
@@ -535,7 +534,6 @@ const exportUsers = () => {
     downloadCSV(csvContent, filename)
     success(`✅ Exportados ${filteredUsers.value.length} usuarios exitosamente`)
   } catch (err) {
-    console.error('Error exporting users:', err)
     error('❌ Error al exportar la lista de usuarios')
   }
 }
@@ -592,7 +590,6 @@ const viewUserDetails = async (user) => {
       selectedUser.value = user
     }
   } catch (err) {
-    console.error('Error loading user details:', err)
     // Si falla, usar los datos que ya tenemos
     selectedUser.value = user
     error('Error al cargar detalles del usuario')
@@ -659,7 +656,6 @@ const submitUserEdit = async () => {
     await loadUsers()
     closeEditModal()
   } catch (err) {
-    console.error('Error updating user:', err)
     error(err.message || 'Error al actualizar usuario')
   } finally {
     submitting.value = false
@@ -681,7 +677,6 @@ const deleteUser = async (user) => {
     success('Usuario eliminado correctamente')
     await loadUsers()
   } catch (err) {
-    console.error('Error deleting user:', err)
     error(err.message || 'Error al eliminar usuario')
   }
 }
@@ -702,7 +697,6 @@ const reactivateUser = async (user) => {
     success('Usuario reactivado correctamente')
     await loadUsers()
   } catch (err) {
-    console.error('Error reactivating user:', err)
     error(err.message || 'Error al reactivar usuario')
   } finally {
     reactivatingUser.value = null

@@ -110,7 +110,6 @@ const loadProducts = async () => {
       }))
     }
   } catch (error) {
-    console.error('Error loading products:', error)
     products.value = []
   } finally {
     loading.value = false
@@ -123,7 +122,6 @@ const featuredProducts = computed(() => {
 })
 
 const viewProduct = (productId) => {
-  console.log('🔍 Home: Navegando a producto con ID:', productId);
   router.push(`/product/${productId}`)
 }
 

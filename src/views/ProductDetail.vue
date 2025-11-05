@@ -139,14 +139,11 @@ const allProducts = ref([])
 const loadProduct = async (productId) => {
   loading.value = true
   try {
-    console.log('🔍 ProductDetail: Cargando producto con ID:', productId);
     const response = await productService.getProductById(productId)
-    console.log('📦 ProductDetail: Respuesta del servidor:', response);
     
     if (response.success && response.data) {
       // Manejar tanto _id como id del backend
       const productId = response.data._id || response.data.id;
-      console.log('🎯 ProductDetail: ID del producto:', productId);
       
       product.value = {
         id: productId,
@@ -157,13 +154,10 @@ const loadProduct = async (productId) => {
         category: response.data.category,
         stock: response.data.stock
       }
-      console.log('✅ ProductDetail: Producto cargado:', product.value);
     } else {
-      console.warn('⚠️ ProductDetail: Respuesta inválida del servidor:', response);
       product.value = null
     }
   } catch (error) {
-    console.error('❌ ProductDetail: Error cargando producto:', error)
     product.value = null
   } finally {
     loading.value = false
@@ -187,7 +181,6 @@ const loadAllProducts = async () => {
       }))
     }
   } catch (error) {
-    console.error('Error loading all products:', error)
     allProducts.value = []
   }
 }
