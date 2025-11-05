@@ -133,10 +133,7 @@
                 <td>
                   <div class="user-info">
                     <div class="user-avatar">
-                      <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
-                      <div v-else class="avatar-placeholder">
-                        {{ user.name?.charAt(0)?.toUpperCase() }}
-                      </div>
+                      <font-awesome-icon icon="user" class="avatar-icon" />
                     </div>
                     <div class="user-details">
                       <h4>{{ user.name || 'Sin nombre' }}</h4>
@@ -238,10 +235,7 @@
           <div class="modal-body" v-if="selectedUser">
             <div class="user-details-section">
               <div class="user-avatar-large">
-                <img v-if="selectedUser.avatar" :src="selectedUser.avatar" :alt="selectedUser.name" />
-                <div v-else class="avatar-placeholder-large">
-                  {{ selectedUser.name?.charAt(0)?.toUpperCase() }}
-                </div>
+                <font-awesome-icon icon="user" class="avatar-icon-large" />
               </div>
               <h3>{{ selectedUser.name || 'Sin nombre' }}</h3>
             </div>
@@ -902,23 +896,15 @@ td:nth-child(7) {
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-}
-
-.user-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: #007bff;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: 2px solid #007bff;
+}
+
+.avatar-icon {
+  color: white;
   font-size: 1.2rem;
 }
 
@@ -1268,24 +1254,15 @@ td:nth-child(7) {
   overflow: hidden;
   margin: 0 auto 1rem;
   border: 4px solid #007bff;
-}
-
-.user-avatar-large img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-placeholder-large {
-  width: 100%;
-  height: 100%;
-  background: #007bff;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 3rem;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.avatar-icon-large {
+  color: white;
+  font-size: 4rem;
 }
 
 .user-details-section h3 {

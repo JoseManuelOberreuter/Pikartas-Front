@@ -109,20 +109,6 @@ export const authService = {
     }
   },
 
-  async uploadAvatar(formData) {
-    try {
-      const routesStore = useRoutesStore();
-      const response = await axios.post(routesStore.fullUserRoutes.uploadAvatar, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
-    } catch (error) {
-      logger.error('Upload avatar error:', error);
-      throw error.response?.data || { error: error.message };
-    }
-  },
 
   async updateProfile(profileData) {
     try {

@@ -71,7 +71,6 @@ export const useRoutesStore = defineStore('routes', () => {
     resetPassword: '/users/reset-password',
     profile: '/users/profile',
     updateProfile: '/users/profile', // Ruta PUT para actualizar perfil
-    uploadAvatar: '/users/upload-avatar',
     getAllAdmin: '/users/all', // Ruta GET para obtener todos los usuarios (Admin)
     getById: '/users', // Base para obtener usuario por ID
     updateById: '/users', // Base para actualizar usuario por ID
