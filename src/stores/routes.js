@@ -34,7 +34,33 @@ import { ref, computed } from 'vue';
 
 export const useRoutesStore = defineStore('routes', () => {
   // Base URL del backend
-  const baseURL = ref('http://localhost:4005');
+  // In development: use localhost
+  // In production: use VITE_API_BASE_URL or auto-detect
+  const getBaseURL = () => {
+    if (import.meta.env.MODE === 'production') {
+      // Use environment variable if set
+      if (import.meta.env.VITE_API_BASE_URL) {
+        return import.meta.env.VITE_API_BASE_URL;
+      }
+      // Auto-detect: try to infer backend URL from frontend URL
+      // For Vercel deployments, backend and frontend often follow a pattern
+      // This is a fallback - explicit VITE_API_BASE_URL is recommended
+      const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+      // Replace frontend project name with backend project name pattern
+      // Example: shop-vue-core -> shop-node-core
+      const inferredBackendUrl = currentOrigin.replace(/shop-vue-core/i, 'shop-node-core');
+      // Only use inferred URL if it's different from current origin (avoid loop)
+      if (inferredBackendUrl !== currentOrigin && inferredBackendUrl.startsWith('http')) {
+        return inferredBackendUrl;
+      }
+      // Last resort: return original (should never happen in production with proper config)
+      return currentOrigin || 'http://localhost:4005';
+    }
+    // Development mode
+    return 'http://localhost:4005';
+  };
+  
+  const baseURL = ref(getBaseURL());
   
   // Rutas de usuarios
   const userRoutes = ref({

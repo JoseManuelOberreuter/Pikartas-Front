@@ -1,11 +1,16 @@
 // Transbank Payment Service
 // Handles all Transbank Webpay Plus API calls
 
-const BASE_URL = 'http://localhost:4005/api/payments'
+import { useRoutesStore } from '../stores/routes';
 
 class TransbankService {
-  constructor() {
-    this.baseURL = BASE_URL
+  // Get base URL dynamically from routes store
+  getBaseURL() {
+    const routesStore = useRoutesStore();
+    // Use the same base URL as the API routes, but append /api/payments
+    // baseURL is a ref, so access with .value
+    const apiBase = routesStore.baseURL.value;
+    return `${apiBase}/api/payments`;
   }
 
   // Get authentication headers
@@ -23,7 +28,7 @@ class TransbankService {
   // Initiate payment with Transbank
   async initiatePayment(shippingAddress) {
     try {
-      const response = await fetch(`${this.baseURL}/initiate`, {
+      const response = await fetch(`${this.getBaseURL()}/initiate`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify({ shippingAddress })
@@ -45,7 +50,7 @@ class TransbankService {
   // Confirm payment after Transbank callback
   async confirmPayment(tokenWs) {
     try {
-      const response = await fetch(`${this.baseURL}/confirm`, {
+      const response = await fetch(`${this.getBaseURL()}/confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -69,7 +74,7 @@ class TransbankService {
   // Get payment status
   async getPaymentStatus(orderId) {
     try {
-      const response = await fetch(`${this.baseURL}/status/${orderId}`, {
+      const response = await fetch(`${this.getBaseURL()}/status/${orderId}`, {
         method: 'GET',
         headers: this.getAuthHeaders()
       })
@@ -92,7 +97,7 @@ class TransbankService {
     try {
       const body = amount ? { amount } : {}
       
-      const response = await fetch(`${this.baseURL}/refund/${orderId}`, {
+      const response = await fetch(`${this.getBaseURL()}/refund/${orderId}`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(body)
