@@ -2,6 +2,16 @@
   <div class="product-card">
     <div class="product-image">
       <img :src="product.image" :alt="product.name" />
+      <div class="product-stock-badge" v-if="product.stock <= 10">
+        <span class="stock-warning" v-if="product.stock > 0">
+          <font-awesome-icon icon="exclamation-triangle" class="warning-icon" />
+          Solo quedan {{ product.stock }}
+        </span>
+        <span class="out-of-stock" v-else>
+          <font-awesome-icon icon="times-circle" class="error-icon" />
+          Sin stock
+        </span>
+      </div>
       <div class="product-actions">
         <button class="quick-view-btn" @click="viewProduct">
           <font-awesome-icon icon="eye" class="btn-icon" />
@@ -19,16 +29,6 @@
       <p class="product-category">{{ product.category }}</p>
       <div class="product-price">
         ${{ formatCLP(product.price) }}
-      </div>
-      <div class="product-stock" v-if="product.stock <= 10">
-        <span class="stock-warning" v-if="product.stock > 0">
-          <font-awesome-icon icon="exclamation-triangle" class="warning-icon" />
-          Solo quedan {{ product.stock }} unidades
-        </span>
-        <span class="out-of-stock" v-else>
-          <font-awesome-icon icon="times-circle" class="error-icon" />
-          Sin stock
-        </span>
       </div>
     </div>
   </div>
@@ -79,6 +79,18 @@ const viewProduct = () => {
   position: relative;
   overflow: hidden;
   height: 240px;
+}
+
+.product-stock-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  padding: 0.375rem 0.625rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
 }
 
 .product-image img {
@@ -196,37 +208,39 @@ const viewProduct = () => {
   font-size: 1.25rem;
   font-weight: 700;
   color: #28a745;
-  margin-bottom: 0.5rem;
-}
-
-.product-stock {
-  font-size: 0.875rem;
+  margin-bottom: 0;
 }
 
 .stock-warning {
   color: #ffc107;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
 }
 
 .stock-warning .warning-icon {
   color: #ffc107;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 .out-of-stock {
   color: #dc3545;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
 }
 
 .out-of-stock .error-icon {
   color: #dc3545;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
