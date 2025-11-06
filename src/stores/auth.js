@@ -19,40 +19,24 @@ export const useAuthStore = defineStore('auth', () => {
         
         if (identifier) {
           const userProfile = await authService.getUserProfile(identifier);
-          if (userProfile && userProfile.user) {
+          // El backend devuelve { success: true, data: { ...user } }
+          // Intentar acceder a data primero, luego user, luego directamente
+          const userData = userProfile?.data || userProfile?.user || userProfile;
+          
+          if (userData) {
             // Asegurar que el objeto usuario tenga todas las propiedades necesarias
             user.value = {
-              _id: userProfile.user._id || userProfile.user.id || null,
-              name: userProfile.user.name || 'Usuario',
-              email: userProfile.user.email || 'usuario@ejemplo.com',
-              telefono: userProfile.user.telefono || userProfile.user.phone || '',
-              fechaNacimiento: userProfile.user.fechaNacimiento || userProfile.user.birthDate || '',
-              direccion: userProfile.user.direccion || userProfile.user.address || '',
-              avatar: userProfile.user.avatar || '',
-              role: userProfile.user.role || 'user',
-              ...userProfile.user
-            };
-            isAuthenticated.value = true;
-            
-            // Inicializar carrito después de autenticación
-            try {
-              const { useCartStore } = await import('./cart');
-              const cartStore = useCartStore();
-              await cartStore.initializeCart();
-            } catch (cartError) {
-              // Error initializing cart - silently fail
-            }
-          } else if (userProfile) {
-            user.value = {
-              _id: userProfile._id || userProfile.id || null,
-              name: userProfile.name || 'Usuario',
-              email: userProfile.email || 'usuario@ejemplo.com',
-              telefono: userProfile.telefono || userProfile.phone || '',
-              fechaNacimiento: userProfile.fechaNacimiento || userProfile.birthDate || '',
-              direccion: userProfile.direccion || userProfile.address || '',
-              avatar: userProfile.avatar || '',
-              role: userProfile.role || 'user',
-              ...userProfile
+              _id: userData.id || userData._id || null,
+              id: userData.id || userData._id || null,
+              name: userData.name || 'Usuario',
+              email: userData.email || 'usuario@ejemplo.com',
+              telefono: userData.telefono || userData.phone || '',
+              fechaNacimiento: userData.fecha_nacimiento || userData.fechaNacimiento || userData.birthDate || '',
+              direccion: userData.direccion || userData.address || '',
+              avatar: userData.avatar || '',
+              role: userData.role || 'user',
+              isVerified: userData.is_verified !== undefined ? userData.is_verified : (userData.isVerified !== undefined ? userData.isVerified : false),
+              ...userData
             };
             isAuthenticated.value = true;
             
@@ -123,31 +107,24 @@ export const useAuthStore = defineStore('auth', () => {
           // Usamos el email como identificador
           const userProfile = await authService.getUserProfile(credentials.email);
           
-          if (userProfile && userProfile.user) {
+          // El backend devuelve { success: true, data: { ...user } }
+          // Intentar acceder a data primero, luego user, luego directamente
+          const userData = userProfile?.data || userProfile?.user || userProfile;
+          
+          if (userData) {
             // Asegurar que el objeto usuario tenga todas las propiedades necesarias
             user.value = {
-              _id: userProfile.user._id || userProfile.user.id || null,
-              name: userProfile.user.name || 'Usuario',
-              email: userProfile.user.email || credentials.email,
-              telefono: userProfile.user.telefono || userProfile.user.phone || '',
-              fechaNacimiento: userProfile.user.fechaNacimiento || userProfile.user.birthDate || '',
-              direccion: userProfile.user.direccion || userProfile.user.address || '',
-              avatar: userProfile.user.avatar || '',
-              role: userProfile.user.role || 'user',
-              ...userProfile.user
-            };
-          } else if (userProfile) {
-            // Si la respuesta es directamente los datos del usuario
-            user.value = {
-              _id: userProfile._id || userProfile.id || null,
-              name: userProfile.name || 'Usuario',
-              email: userProfile.email || credentials.email,
-              telefono: userProfile.telefono || userProfile.phone || '',
-              fechaNacimiento: userProfile.fechaNacimiento || userProfile.birthDate || '',
-              direccion: userProfile.direccion || userProfile.address || '',
-              avatar: userProfile.avatar || '',
-              role: userProfile.role || 'user',
-              ...userProfile
+              _id: userData.id || userData._id || null,
+              id: userData.id || userData._id || null,
+              name: userData.name || 'Usuario',
+              email: userData.email || credentials.email,
+              telefono: userData.telefono || userData.phone || '',
+              fechaNacimiento: userData.fecha_nacimiento || userData.fechaNacimiento || userData.birthDate || '',
+              direccion: userData.direccion || userData.address || '',
+              avatar: userData.avatar || '',
+              role: userData.role || 'user',
+              isVerified: userData.is_verified !== undefined ? userData.is_verified : (userData.isVerified !== undefined ? userData.isVerified : false),
+              ...userData
             };
           } else {
             // Fallback si no hay datos
@@ -163,7 +140,8 @@ export const useAuthStore = defineStore('auth', () => {
             };
           }
         } catch (profileError) {
-          // Error fetching user profile - silently fail and use basic data
+          // Error fetching user profile - log error for debugging
+          console.error('[Auth] Error obteniendo perfil:', profileError);
           // Aunque falle obtener el perfil, mantenemos autenticado con datos básicos
           user.value = {
             _id: null,
