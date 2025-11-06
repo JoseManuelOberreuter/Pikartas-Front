@@ -39,6 +39,11 @@
           </div>
         </div>
         
+        <button @click="resetFilters" class="reset-btn" title="Limpiar filtros">
+          <font-awesome-icon icon="times" class="reset-icon" />
+          Limpiar
+        </button>
+        
         <div class="search-box">
           <input 
             type="text" 
@@ -104,13 +109,8 @@ const sortBy = ref('name')
 const maxPrice = ref(2000)
 const searchQuery = ref('')
 
-// Categorías (se pueden cargar desde el backend también)
-const categories = ref([
-  'Todos',
-  'Electrónicos', 
-  'Accesorios',
-  'Fotografía'
-])
+// Categorías (se cargan dinámicamente desde el backend)
+const categories = ref(['Todos'])
 
 // Cargar productos desde el backend
 const loadProducts = async () => {
@@ -153,6 +153,35 @@ const loadProducts = async () => {
     products.value = []
   } finally {
     loading.value = false
+  }
+}
+
+// Cargar categorías desde el backend
+const loadCategories = async () => {
+  try {
+    // Intentar cargar categorías desde el endpoint específico
+    const response = await productService.getCategories()
+    if (response.success && response.data && Array.isArray(response.data)) {
+      // Agregar "Todos" al inicio y ordenar el resto
+      const uniqueCategories = [...new Set(response.data.filter(Boolean))].sort()
+      categories.value = ['Todos', ...uniqueCategories]
+    } else {
+      // Fallback: extraer categorías de productos cargados
+      loadCategoriesFromProducts()
+    }
+  } catch (error) {
+    console.error('[Shop] Error loading categories from endpoint:', error);
+    // Fallback: extraer categorías de productos cargados
+    loadCategoriesFromProducts()
+  }
+}
+
+// Fallback: extraer categorías de productos cargados
+const loadCategoriesFromProducts = () => {
+  if (products.value.length > 0) {
+    // Extraer categorías únicas de los productos
+    const uniqueCategories = [...new Set(products.value.map(p => p.category).filter(Boolean))].sort()
+    categories.value = ['Todos', ...uniqueCategories]
   }
 }
 
@@ -221,6 +250,9 @@ onMounted(async () => {
   // Cargar productos primero
   await loadProducts()
   
+  // Cargar categorías después de cargar productos (para tener fallback)
+  await loadCategories()
+  
   // Set initial max price based on the highest product price
   if (products.value.length > 0) {
     const highestPrice = Math.max(...products.value.map(p => p.price))
@@ -279,7 +311,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 2rem;
-  gap: 2rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
 }
 
@@ -308,6 +340,33 @@ onMounted(async () => {
   background: white;
   font-size: 0.875rem;
   min-width: 120px;
+}
+
+.reset-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.reset-btn:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+  transform: translateY(-1px);
+}
+
+.reset-icon {
+  font-size: 0.875rem;
 }
 
 .price-input {
