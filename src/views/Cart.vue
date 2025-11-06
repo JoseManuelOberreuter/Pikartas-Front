@@ -111,18 +111,18 @@
             </div>
             
             <div class="cart-actions">
-              <button class="btn btn-outline" @click="clearCart">
-                <font-awesome-icon icon="trash" class="btn-icon" />
-                Limpiar Carrito
-              </button>
-              <router-link to="/shop" class="btn btn-secondary">
-                <font-awesome-icon icon="store" class="btn-icon" />
-                Seguir Comprando
-              </router-link>
               <router-link to="/checkout" class="btn btn-primary">
                 <font-awesome-icon icon="credit-card" class="btn-icon" />
                 Proceder al Pago
               </router-link>
+              <router-link to="/shop" class="btn btn-secondary">
+                <font-awesome-icon icon="store" class="btn-icon" />
+                Seguir Comprando
+              </router-link>
+              <button class="btn btn-outline" @click="clearCart">
+                <font-awesome-icon icon="trash" class="btn-icon" />
+                Limpiar Carrito
+              </button>
             </div>
           </div>
         </div>
@@ -483,18 +483,18 @@ const clearCart = async () => {
   background: none;
   border: 1px solid #dc3545;
   color: #dc3545;
-  padding: 0.5rem 1rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   transition: all 0.3s;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
 .remove-icon {
-  font-size: 0.875rem;
+  font-size: 0.7rem;
   color: var(--icon-cart-remove);
   transition: all var(--transition-normal);
 }
