@@ -31,14 +31,14 @@
                 Información de Envío
               </h2>
               
-              <div class="form-group">
+                <div class="form-group">
                 <label for="name">Nombre *</label>
-                <input 
-                  type="text" 
+                  <input 
+                    type="text" 
                   id="name"
                   v-model="shippingForm.name" 
-                  required
-                />
+                    required
+                  />
               </div>
 
               <div class="form-group">

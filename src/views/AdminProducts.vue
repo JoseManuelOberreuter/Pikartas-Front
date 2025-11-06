@@ -6,10 +6,16 @@
           <font-awesome-icon icon="box" class="header-icon" />
           Gestión de Productos
         </h1>
-        <button @click="openCreateModal" class="btn btn-primary">
-          <font-awesome-icon icon="plus" class="btn-icon" />
-          Crear Producto
-        </button>
+        <div class="header-actions">
+          <button @click="openCategoryManager" class="btn btn-outline">
+            <font-awesome-icon icon="tag" class="btn-icon" />
+            Gestionar Categorías
+          </button>
+          <button @click="openCreateModal" class="btn btn-primary">
+            <font-awesome-icon icon="plus" class="btn-icon" />
+            Crear Producto
+          </button>
+        </div>
       </div>
 
       <!-- Filtros -->
@@ -144,6 +150,89 @@
         </div>
       </div>
 
+      <!-- Modal for Category Management -->
+      <div v-if="showCategoryModal" class="modal-overlay" @click="closeCategoryModal">
+        <div class="modal-content category-modal" @click.stop>
+          <div class="modal-header">
+            <h2>
+              <font-awesome-icon icon="tag" class="modal-header-icon" />
+              Gestión de Categorías
+            </h2>
+            <button @click="closeCategoryModal" class="close-btn">
+              <font-awesome-icon icon="times" class="close-icon" />
+            </button>
+          </div>
+          
+          <div class="category-manager-content">
+            <!-- Add New Category -->
+            <div class="category-add-section">
+              <label>Agregar Nueva Categoría</label>
+              <div class="category-add-input">
+                <input 
+                  v-model="newCategoryName" 
+                  type="text" 
+                  placeholder="Nombre de la nueva categoría"
+                  class="form-input"
+                  @keyup.enter="addNewCategoryFromManager"
+                />
+                <button 
+                  type="button" 
+                  @click="addNewCategoryFromManager" 
+                  class="btn btn-primary"
+                  :disabled="!newCategoryName.trim()"
+                >
+                  <font-awesome-icon icon="plus" class="btn-icon" />
+                  Agregar
+                </button>
+              </div>
+            </div>
+
+            <!-- Categories List -->
+            <div class="categories-list">
+              <label>Categorías Existentes</label>
+              <div v-if="availableCategories.length === 0" class="no-categories">
+                <p>No hay categorías disponibles</p>
+              </div>
+              <div v-else class="categories-grid">
+                <div 
+                  v-for="category in availableCategories" 
+                  :key="category" 
+                  class="category-item"
+                  :class="{ 'category-has-products': getCategoryProductCount(category) > 0 }"
+                >
+                  <div class="category-info">
+                    <span class="category-name">{{ category }}</span>
+                    <span 
+                      v-if="getCategoryProductCount(category) > 0" 
+                      class="category-badge-count"
+                      :title="`${getCategoryProductCount(category)} producto(s) activo(s) en esta categoría`"
+                    >
+                      <font-awesome-icon icon="box" class="count-icon" />
+                      {{ getCategoryProductCount(category) }}
+                    </span>
+                    <span v-else class="category-empty">Sin productos</span>
+                  </div>
+                  <button 
+                    @click="deleteCategory(category)" 
+                    class="btn btn-sm btn-danger category-delete-btn"
+                    :disabled="!canDeleteCategory(category)"
+                    :title="canDeleteCategory(category) ? 'Eliminar categoría' : 'No se puede eliminar: hay productos activos vinculados'"
+                  >
+                    <font-awesome-icon icon="trash" class="action-icon" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" @click="closeCategoryModal" class="btn btn-secondary">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Modal for Create/Edit Product -->
       <div v-if="showModal" class="modal-overlay" @click="closeModal">
         <div class="modal-content" @click.stop>
@@ -207,33 +296,44 @@
             <div class="form-group">
               <label>Categoría *</label>
               <div class="category-selector">
-                <select v-model="productForm.category" required class="form-select">
-                  <option value="">Seleccionar categoría</option>
-                  <option v-for="category in availableCategories" :key="category" :value="category">
-                    {{ category }}
-                  </option>
-                  <option value="__new__">
-                    <font-awesome-icon icon="plus" class="option-icon" />
-                    Crear nueva categoría
-                  </option>
-                </select>
-                
-                <div v-if="productForm.category === '__new__'" class="new-category-input">
-                  <input 
-                    v-model="newCategoryName" 
-                    type="text" 
-                    placeholder="Nombre de la nueva categoría"
-                    class="form-input"
-                    @keyup.enter="addNewCategory"
-                  />
+                <div class="category-select-row">
+                  <select v-model="productForm.category" required class="form-select">
+                    <option value="">Seleccionar categoría</option>
+                    <option v-for="category in availableCategories" :key="category" :value="category">
+                      {{ category }}
+                    </option>
+                  </select>
                   <button 
+                    v-if="productForm.category && canDeleteCategory(productForm.category)"
                     type="button" 
-                    @click="addNewCategory" 
-                    class="btn btn-sm btn-primary"
-                    :disabled="!newCategoryName.trim()"
+                    @click="deleteCategoryFromForm(productForm.category)" 
+                    class="btn btn-sm btn-danger category-delete-inline"
+                    :title="'Eliminar categoría ' + productForm.category"
                   >
-                    Agregar
+                    <font-awesome-icon icon="trash" class="action-icon" />
                   </button>
+                </div>
+                
+                <div class="new-category-input">
+                  <label class="new-category-label">Crear nueva categoría</label>
+                  <div class="new-category-controls">
+                    <input 
+                      v-model="newCategoryName" 
+                      type="text" 
+                      placeholder="Nombre de la nueva categoría"
+                      class="form-input"
+                      @keyup.enter="addNewCategory"
+                    />
+                    <button 
+                      type="button" 
+                      @click="addNewCategory" 
+                      class="btn btn-sm btn-primary"
+                      :disabled="!newCategoryName.trim()"
+                    >
+                      <font-awesome-icon icon="plus" class="btn-icon" />
+                      Agregar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -301,6 +401,7 @@ const { success, error } = useNotifications()
 const products = ref([])
 const loading = ref(false)
 const showModal = ref(false)
+const showCategoryModal = ref(false)
 const isEditing = ref(false)
 const submitting = ref(false)
 const searchTerm = ref('')
@@ -411,14 +512,111 @@ const loadCategoriesFromProducts = async () => {
 
 const addNewCategory = () => {
   const categoryName = newCategoryName.value.trim()
-  if (!categoryName) return
-  
-  if (!availableCategories.value.includes(categoryName)) {
-    availableCategories.value.push(categoryName)
-    availableCategories.value.sort()
+  if (!categoryName) {
+    error('El nombre de la categoría no puede estar vacío')
+    return
   }
   
+  if (availableCategories.value.includes(categoryName)) {
+    error('Esta categoría ya existe')
+    return
+  }
+  
+  availableCategories.value.push(categoryName)
+  availableCategories.value.sort()
   productForm.value.category = categoryName
+  success(`Categoría "${categoryName}" agregada y seleccionada`)
+  newCategoryName.value = ''
+}
+
+const deleteCategoryFromForm = (categoryName) => {
+  if (!canDeleteCategory(categoryName)) {
+    const count = getCategoryProductCount(categoryName)
+    error(`No se puede eliminar la categoría "${categoryName}" porque tiene ${count} producto(s) activo(s) vinculado(s)`)
+    return
+  }
+  
+  if (!confirm(`¿Estás seguro de que quieres eliminar la categoría "${categoryName}"?`)) {
+    return
+  }
+  
+  try {
+    // Remove from available categories
+    availableCategories.value = availableCategories.value.filter(cat => cat !== categoryName)
+    
+    // Clear selection if this category was selected
+    if (productForm.value.category === categoryName) {
+      productForm.value.category = ''
+    }
+    
+    success(`Categoría "${categoryName}" eliminada correctamente`)
+  } catch (err) {
+    error('Error al eliminar la categoría')
+  }
+}
+
+const addNewCategoryFromManager = () => {
+  const categoryName = newCategoryName.value.trim()
+  if (!categoryName) {
+    error('El nombre de la categoría no puede estar vacío')
+    return
+  }
+  
+  if (availableCategories.value.includes(categoryName)) {
+    error('Esta categoría ya existe')
+    return
+  }
+  
+  availableCategories.value.push(categoryName)
+  availableCategories.value.sort()
+  success(`Categoría "${categoryName}" agregada correctamente`)
+  newCategoryName.value = ''
+}
+
+const getCategoryProductCount = (categoryName) => {
+  return products.value.filter(p => 
+    p.category === categoryName && 
+    p.is_active !== false && 
+    p.is_active !== null
+  ).length
+}
+
+const canDeleteCategory = (categoryName) => {
+  return getCategoryProductCount(categoryName) === 0
+}
+
+const deleteCategory = async (categoryName) => {
+  if (!canDeleteCategory(categoryName)) {
+    const count = getCategoryProductCount(categoryName)
+    error(`No se puede eliminar la categoría "${categoryName}" porque tiene ${count} producto(s) activo(s) vinculado(s)`)
+    return
+  }
+  
+  if (!confirm(`¿Estás seguro de que quieres eliminar la categoría "${categoryName}"?`)) {
+    return
+  }
+  
+  try {
+    // Remove from available categories
+    availableCategories.value = availableCategories.value.filter(cat => cat !== categoryName)
+    success(`Categoría "${categoryName}" eliminada correctamente`)
+    
+    // If this category was selected in the product form, clear it
+    if (productForm.value.category === categoryName) {
+      productForm.value.category = ''
+    }
+  } catch (err) {
+    error('Error al eliminar la categoría')
+  }
+}
+
+const openCategoryManager = () => {
+  showCategoryModal.value = true
+  newCategoryName.value = ''
+}
+
+const closeCategoryModal = () => {
+  showCategoryModal.value = false
   newCategoryName.value = ''
 }
 
@@ -650,6 +848,13 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
 .products-header h1 {
@@ -960,7 +1165,7 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal-backdrop);
 }
 
 .modal-content {
@@ -970,6 +1175,12 @@ th {
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
+  z-index: var(--z-modal);
+  position: relative;
+}
+
+.category-modal {
+  max-width: 700px;
 }
 
 .modal-header {
@@ -1072,6 +1283,15 @@ th {
     align-items: flex-start;
   }
   
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .header-actions .btn {
+    width: 100%;
+  }
+  
   .filters {
     flex-direction: column;
   }
@@ -1087,31 +1307,90 @@ th {
   .form-actions {
     flex-direction: column;
   }
+  
+  .category-select-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .category-delete-inline {
+    width: 100%;
+  }
+  
+  .category-add-input {
+    flex-direction: column;
+  }
+  
+  .category-add-input .btn {
+    width: 100%;
+  }
+  
+  .new-category-controls {
+    flex-direction: column;
+  }
+  
+  .new-category-controls .btn {
+    width: 100%;
+  }
+  
+  .category-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .category-delete-btn {
+    width: 100%;
+  }
 }
 
 .category-selector {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
-.new-category-input {
+.category-select-row {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
+}
+
+.category-select-row .form-select {
+  flex: 1;
+}
+
+.category-delete-inline {
+  flex-shrink: 0;
+}
+
+.new-category-input {
+  padding: 1rem;
   background: #f8f9fa;
-  border-radius: 4px;
+  border-radius: 8px;
   border: 1px solid #e9ecef;
 }
 
-.new-category-input input {
+.new-category-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+  font-size: 0.875rem;
+}
+
+.new-category-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.new-category-controls input {
   flex: 1;
   margin: 0;
 }
 
-.new-category-input .btn {
+.new-category-controls .btn {
   margin: 0;
   white-space: nowrap;
 }
@@ -1220,5 +1499,128 @@ th {
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 0.75rem;
+}
+
+/* Category Manager Styles */
+.category-manager-content {
+  padding: 2rem;
+}
+
+.category-add-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+}
+
+.category-add-section label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.category-add-input {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.category-add-input .form-input {
+  flex: 1;
+}
+
+.categories-list label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.no-categories {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.categories-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.category-item:hover {
+  background: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.category-item.category-has-products {
+  background: #e7f3ff;
+  border-color: #b3d9ff;
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.category-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 1rem;
+}
+
+.category-badge-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #007bff;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.count-icon {
+  font-size: 0.75rem;
+}
+
+.category-empty {
+  color: #999;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.category-delete-btn {
+  opacity: 1;
+  transition: all 0.3s;
+}
+
+.category-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.category-delete-btn:disabled:hover {
+  background: #dc3545;
+  transform: none;
+}
+
+.modal-header-icon {
+  margin-right: 0.5rem;
+  color: #007bff;
 }
 </style> 

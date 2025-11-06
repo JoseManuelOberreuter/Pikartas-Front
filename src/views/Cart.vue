@@ -113,16 +113,11 @@
             <div class="cart-actions">
               <router-link to="/checkout" class="btn btn-primary">
                 <font-awesome-icon icon="credit-card" class="btn-icon" />
-                Proceder al Pago
+                Comprar
               </router-link>
               <router-link to="/shop" class="btn btn-secondary">
-                <font-awesome-icon icon="store" class="btn-icon" />
                 Seguir Comprando
               </router-link>
-              <button class="btn btn-outline" @click="clearCart">
-                <font-awesome-icon icon="trash" class="btn-icon" />
-                Limpiar Carrito
-              </button>
             </div>
           </div>
         </div>
@@ -170,12 +165,6 @@ const updateItemQuantity = async (productId, newQuantity) => {
   const quantity = parseInt(newQuantity)
   if (quantity > 0) {
     await cartStore.updateQuantity(productId, quantity)
-  }
-}
-
-const clearCart = async () => {
-  if (confirm('¿Estás seguro de que quieres limpiar todo el carrito?')) {
-    await cartStore.clearCart()
   }
 }
 </script>
@@ -594,8 +583,8 @@ const clearCart = async () => {
 
 .btn {
   padding: 0.75rem 1rem;
-  border: 1px solid;
-  border-radius: 6px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   text-align: center;
@@ -616,53 +605,37 @@ const clearCart = async () => {
   transform: scale(1.1);
 }
 
-.btn-primary .btn-icon {
-  color: var(--icon-cart-shop-btn);
-}
-
-.btn-secondary .btn-icon {
-  color: var(--icon-cart-continue-btn);
-}
-
-.btn-outline .btn-icon {
-  color: var(--icon-cart-clear-btn);
-}
-
-.btn-outline:hover .btn-icon {
-  color: var(--icon-cart-remove-hover);
-}
-
-.btn-outline {
-  background: transparent;
-  color: #6c757d;
-  border-color: #6c757d;
-}
-
-.btn-outline:hover {
-  background: #6c757d;
-  color: white;
-}
-
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-  border-color: #6c757d;
-}
-
-.btn-secondary:hover {
-  background: #5a6268;
-  border-color: #5a6268;
-}
-
 .btn-primary {
-  background: #007bff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  border-color: #007bff;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .btn-primary:hover {
-  background: #0056b3;
-  border-color: #0056b3;
+  background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-primary .btn-icon {
+  color: white;
+  font-size: 1rem;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+  font-size: 0.95rem;
+}
+
+.btn-secondary:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+  color: #495057;
 }
 
 /* Responsive Design */
