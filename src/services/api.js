@@ -171,7 +171,15 @@ export const productService = {
   async getAllProducts() {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.get(routesStore.fullProductRoutes.getAll);
+      // Add cache-busting parameter to avoid 304 responses
+      const url = `${routesStore.fullProductRoutes.getAll}?_t=${Date.now()}`;
+      const response = await axios.get(url, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
       // Response.data from axios is: { success: true, data: { products: [...], pagination: {...} } }
       // Log for debugging in production - show the actual structure
       if (import.meta.env.MODE === 'production') {
