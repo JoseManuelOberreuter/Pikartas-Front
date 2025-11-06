@@ -378,9 +378,13 @@ const loadCategories = async () => {
 const loadCategoriesFromProducts = async () => {
   try {
     const response = await adminService.getAllProducts()
-    if (response.success && response.data) {
+    // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
+    // Or legacy format: { success: true, data: [...] }
+    const productsArray = response.data?.products || response.data || []
+    
+    if (response.success && productsArray.length > 0) {
       // Extraer categorías únicas de los productos
-      const categories = [...new Set(response.data.map(p => p.category).filter(Boolean))]
+      const categories = [...new Set(productsArray.map(p => p.category).filter(Boolean))]
       availableCategories.value = categories.sort()
     } else {
       // Fallback a categorías básicas
@@ -409,7 +413,10 @@ const loadProducts = async () => {
   loading.value = true
   try {
     const response = await adminService.getAllProducts()
-    products.value = response.data || []
+    // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
+    // Or legacy format: { success: true, data: [...] }
+    const productsArray = response.data?.products || response.data || []
+    products.value = productsArray
   } catch (err) {
     error('Error al cargar productos')
   } finally {

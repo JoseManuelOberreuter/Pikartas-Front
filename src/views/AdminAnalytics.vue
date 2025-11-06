@@ -104,9 +104,13 @@ const loadAnalytics = async () => {
       adminService.getAllProducts().catch(() => ({ data: [] }))
     ])
 
+    // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
+    // Or legacy format: { success: true, data: [...] }
+    const productsArray = allProducts.data?.products || (Array.isArray(allProducts.data) ? allProducts.data : [])
+    
     // 🎯 CONTAR SOLO PRODUCTOS ACTIVOS
-    const activeProducts = Array.isArray(allProducts.data) 
-      ? allProducts.data.filter(p => p.isActive !== false)
+    const activeProducts = Array.isArray(productsArray) 
+      ? productsArray.filter(p => p.isActive !== false)
       : []
 
     stats.value = {

@@ -408,7 +408,10 @@ const loadOrders = async () => {
       adminService.getOrderStats()
     ])
     
-    orders.value = ordersResponse.data || []
+    // Handle new response format: { success: true, data: { orders: [...], pagination: {...} } }
+    // Or legacy format: { success: true, data: [...] }
+    const ordersArray = ordersResponse.data?.orders || (Array.isArray(ordersResponse.data) ? ordersResponse.data : [])
+    orders.value = ordersArray
     stats.value = statsResponse.data || {}
   } catch (err) {
     error('Error al cargar órdenes')

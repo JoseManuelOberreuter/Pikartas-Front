@@ -480,7 +480,10 @@ const loadUsers = async () => {
   loading.value = true
   try {
     const response = await adminService.getAllUsers()
-    users.value = response.data || []
+    // Handle new response format: { success: true, data: { users: [...], total: ... } }
+    // Or legacy format: { success: true, data: [...] }
+    const usersArray = response.data?.users || (Array.isArray(response.data) ? response.data : [])
+    users.value = usersArray
     
     // Calcular estadísticas
     calculateStats()

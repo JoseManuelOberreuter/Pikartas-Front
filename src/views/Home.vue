@@ -98,8 +98,12 @@ const loadProducts = async () => {
   try {
     const response = await productService.getAllProducts()
     
-    if (response.success && response.data) {
-      products.value = response.data.map(product => ({
+    // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
+    // Or legacy format: { success: true, data: [...] }
+    const productsArray = response.data?.products || response.data || []
+    
+    if (response.success && productsArray.length > 0) {
+      products.value = productsArray.map(product => ({
         id: product._id || product.id, // Manejar tanto _id como id
         name: product.name,
         price: product.price,

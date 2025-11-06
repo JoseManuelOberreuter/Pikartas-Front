@@ -241,13 +241,21 @@ const loadDashboardData = async () => {
       })
     ])
 
+    // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
+    // Or legacy format: { success: true, data: [...] }
+    const productsArray = allProducts.data?.products || (Array.isArray(allProducts.data) ? allProducts.data : [])
+    
     // 🎯 CONTAR SOLO PRODUCTOS ACTIVOS
-    const activeProducts = Array.isArray(allProducts.data) 
-      ? allProducts.data.filter(p => p.isActive !== false)
+    const activeProducts = Array.isArray(productsArray) 
+      ? productsArray.filter(p => p.isActive !== false)
       : []
 
+    // Handle orders format: { success: true, data: { orders: [...], pagination: {...} } }
+    // Or legacy format: { success: true, data: [...] }
+    const ordersArray = orders.data?.orders || (Array.isArray(orders.data) ? orders.data : [])
+    
     // Calculate payment statistics
-    const allOrders = Array.isArray(orders.data) ? orders.data : []
+    const allOrders = ordersArray
     const paidOrders = allOrders.filter(order => order.paymentStatus === 'paid').length
     const pendingPayments = allOrders.filter(order => order.paymentStatus === 'pending').length
     const refundedOrders = allOrders.filter(order => order.paymentStatus === 'refunded').length
@@ -257,7 +265,9 @@ const loadDashboardData = async () => {
       totalProducts: activeProducts.length,
       totalOrders: ordersStats.data?.totalOrders || 0,
       totalRevenue: ordersStats.data?.totalRevenue || 0,
-      totalUsers: usersData.total || 0, // Usar el total del endpoint de usuarios
+      // Handle new response format: { success: true, data: { users: [...], total: ... } }
+      // Or legacy format: { success: true, data: [...] }
+      totalUsers: usersData.data?.total || usersData.total || (Array.isArray(usersData.data) ? usersData.data.length : 0) || 0,
       paidOrders,
       pendingPayments,
       refundedOrders,
@@ -265,8 +275,11 @@ const loadDashboardData = async () => {
     }
 
     // Obtener órdenes recientes (últimas 5)
-    if (Array.isArray(orders.data)) {
-      recentOrders.value = orders.data
+    // Handle orders format: { success: true, data: { orders: [...], pagination: {...} } }
+    // Or legacy format: { success: true, data: [...] }
+    const ordersArrayForRecent = orders.data?.orders || (Array.isArray(orders.data) ? orders.data : [])
+    if (Array.isArray(ordersArrayForRecent) && ordersArrayForRecent.length > 0) {
+      recentOrders.value = ordersArrayForRecent
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 5)
     }
