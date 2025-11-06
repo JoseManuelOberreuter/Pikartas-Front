@@ -41,7 +41,7 @@
             <div class="item-controls">
               <div class="item-price">
                 <span class="price-label">Precio unitario:</span>
-                <span class="price">${{ item.price.toFixed(2) }}</span>
+                <span class="price">${{ formatCLP(item.price) }}</span>
               </div>
               
               <div class="quantity-controls">
@@ -69,7 +69,7 @@
               
               <div class="item-subtotal">
                 <span class="subtotal-label">Subtotal:</span>
-                <span class="subtotal">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                <span class="subtotal">${{ formatCLP(item.price * item.quantity) }}</span>
               </div>
               
               <button class="remove-btn" @click="removeFromCart(item.id)">
@@ -86,31 +86,31 @@
             
             <div class="summary-line">
               <span>Subtotal ({{ cartItemCount }} artículos):</span>
-              <span>${{ cartTotal.toFixed(2) }}</span>
+              <span>${{ formatCLP(cartTotal) }}</span>
             </div>
             
             <div class="summary-line">
               <span>Envío:</span>
               <span v-if="cartTotal >= 500" class="free-shipping">Gratis</span>
-              <span v-else>$25.00</span>
+              <span v-else>${{ formatCLP(25) }}</span>
             </div>
             
             <div class="summary-line">
               <span>Impuestos (estimado):</span>
-              <span>${{ tax.toFixed(2) }}</span>
+              <span>${{ formatCLP(tax) }}</span>
             </div>
             
             <hr class="summary-divider">
             
             <div class="summary-line total-line">
               <span>Total:</span>
-              <span class="total-amount">${{ finalTotal.toFixed(2) }}</span>
+              <span class="total-amount">${{ formatCLP(finalTotal) }}</span>
             </div>
             
             <div v-if="cartTotal < 500" class="shipping-notice">
               <p>
                 <font-awesome-icon icon="lightbulb" class="notice-icon" />
-                Agrega ${{ (500 - cartTotal).toFixed(2) }} más para obtener envío gratis
+                Agrega ${{ formatCLP(500 - cartTotal) }} más para obtener envío gratis
               </p>
             </div>
             
@@ -139,6 +139,7 @@
 import { computed } from 'vue'
 import { useCartStore } from '../stores/cart.js'
 import { storeToRefs } from 'pinia'
+import { formatCLP } from '../utils/formatters.js'
 
 const cartStore = useCartStore()
 const { cartItems, cartTotal, cartItemCount } = storeToRefs(cartStore)

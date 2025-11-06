@@ -1,6 +1,5 @@
 <template>
 
-<!-- TODO: eliminar decimales de los precios -->
 
   <div class="cart-sidebar-overlay" v-show="isCartOpen" @click="closeCart">
     <div class="cart-sidebar" @click.stop :class="{ 'is-open': isCartOpen }" >
@@ -59,7 +58,7 @@
             
             <div class="item-details">
               <h4 class="item-name">{{ item.name }}</h4>
-              <div class="item-price">${{ item.price.toFixed(2) }}</div>
+              <div class="item-price">${{ formatCLP(item.price) }}</div>
               
               <div class="quantity-controls">
                 <button class="qty-btn decrease" @click="decreaseQuantity(item.id)" :disabled="item.quantity <= 1">
@@ -72,7 +71,7 @@
               </div>
               
               <div class="item-total">
-                Total: ${{ (item.price * item.quantity).toFixed(2) }}
+                Total: ${{ formatCLP(item.price * item.quantity) }}
               </div>
             </div>
             
@@ -86,7 +85,7 @@
       <div v-if="cartItems.length > 0" class="cart-footer">
         <div class="cart-total">
           <div class="total-items">{{ cartItemCount }} artículos</div>
-          <div class="total-price">Total: ${{ cartTotal.toFixed(2) }}</div>
+          <div class="total-price">Total: ${{ formatCLP(cartTotal) }}</div>
         </div>
         
         <div class="cart-actions">
@@ -114,6 +113,7 @@
 import { useCartStore } from '../stores/cart.js'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth.js'
+import { formatCLP } from '../utils/formatters.js'
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
