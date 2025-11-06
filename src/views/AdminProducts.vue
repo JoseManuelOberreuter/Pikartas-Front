@@ -82,7 +82,7 @@
                   <span class="category-badge">{{ product.category }}</span>
                 </td>
                 <td>
-                  <span class="price">${{ product.price }}</span>
+                  <span class="price">${{ formatCLP(product.price) }}</span>
                 </td>
                 <td>
                   <div class="stock-control">
@@ -293,6 +293,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { adminService, productService } from '../services/api'
 import { useNotifications } from '../composables/useNotifications'
+import { formatCLP } from '../utils/formatters.js'
 
 const { success, error } = useNotifications()
 

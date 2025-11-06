@@ -18,7 +18,7 @@
       <h3 class="product-name">{{ product.name }}</h3>
       <p class="product-category">{{ product.category }}</p>
       <div class="product-price">
-        ${{ product.price }}
+        ${{ formatCLP(product.price) }}
       </div>
       <div class="product-stock" v-if="product.stock <= 10">
         <span class="stock-warning" v-if="product.stock > 0">
@@ -36,6 +36,7 @@
 
 <script setup>
 import { useCartStore } from '../stores/cart.js'
+import { formatCLP } from '../utils/formatters.js'
 
 const props = defineProps({
   product: {

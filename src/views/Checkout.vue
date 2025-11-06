@@ -172,7 +172,7 @@
                   :spin="isProcessing"
                   class="btn-icon" 
                 />
-                {{ isProcessing ? 'Procesando...' : `Pagar $${finalTotal.toFixed(2)}` }}
+                {{ isProcessing ? 'Procesando...' : `Pagar $${formatCLP(finalTotal)}` }}
               </button>
             </div>
           </form>
@@ -193,7 +193,7 @@
                   <p>Cantidad: {{ item.quantity }}</p>
                 </div>
                 <div class="item-price">
-                  ${{ (item.price * item.quantity).toFixed(2) }}
+                  ${{ formatCLP(item.price * item.quantity) }}
                 </div>
               </div>
             </div>
@@ -201,25 +201,25 @@
             <div class="summary-totals">
               <div class="summary-line">
                 <span>Subtotal:</span>
-                <span>${{ cartTotal.toFixed(2) }}</span>
+                <span>${{ formatCLP(cartTotal) }}</span>
               </div>
               
               <div class="summary-line">
                 <span>Envío:</span>
                 <span v-if="cartTotal >= 500" class="free-shipping">Gratis</span>
-                <span v-else>$25.00</span>
+                <span v-else>${{ formatCLP(25) }}</span>
               </div>
               
               <div class="summary-line">
                 <span>Impuestos:</span>
-                <span>${{ tax.toFixed(2) }}</span>
+                <span>${{ formatCLP(tax) }}</span>
               </div>
               
               <hr class="summary-divider">
               
               <div class="summary-line total-line">
                 <span>Total:</span>
-                <span class="total-amount">${{ finalTotal.toFixed(2) }}</span>
+                <span class="total-amount">${{ formatCLP(finalTotal) }}</span>
               </div>
             </div>
 
@@ -250,6 +250,7 @@ import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart.js'
 import { storeToRefs } from 'pinia'
 import { useNotifications } from '../composables/useNotifications'
+import { formatCLP } from '../utils/formatters.js'
 
 const router = useRouter()
 const { success, error } = useNotifications()

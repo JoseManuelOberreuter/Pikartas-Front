@@ -27,7 +27,7 @@
             
             <div class="detail-row">
               <span class="label">Monto:</span>
-              <span class="value amount">${{ orderDetails.amount?.toFixed(2) }}</span>
+              <span class="value amount">${{ formatCLP(orderDetails.amount || 0) }}</span>
             </div>
             
             <div class="detail-row">
@@ -128,6 +128,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useNotifications } from '../composables/useNotifications'
 import transbankService from '../services/transbank.js'
+import { formatCLP } from '../utils/formatters.js'
 
 const route = useRoute()
 const router = useRouter()

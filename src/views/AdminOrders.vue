@@ -331,10 +331,10 @@
                 <div class="item-details">
                   <h4>{{ item.name }}</h4>
                   <p>Cantidad: {{ item.quantity }}</p>
-                  <p>Precio: ${{ item.price }}</p>
+                  <p>Precio: ${{ formatCLP(item.price) }}</p>
                 </div>
                 <div class="item-total">
-                  ${{ (item.price * item.quantity).toFixed(2) }}
+                  ${{ formatCLP(item.price * item.quantity) }}
                 </div>
               </div>
             </div>
@@ -361,6 +361,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { adminService } from '../services/api'
 import { useNotifications } from '../composables/useNotifications'
+import { formatCLP } from '../utils/formatters.js'
 
 const { success, error } = useNotifications()
 

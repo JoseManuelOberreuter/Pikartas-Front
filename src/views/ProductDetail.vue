@@ -35,7 +35,7 @@
           <h1 class="product-title">{{ product.name }}</h1>
           
           <div class="product-price">
-            <span class="price">${{ product.price }}</span>
+            <span class="price">${{ formatCLP(product.price) }}</span>
           </div>
 
           <div class="product-description">
@@ -124,6 +124,7 @@ import { productService } from '../services/api'
 import { useCartStore } from '../stores/cart.js'
 import ProductCard from '../components/ProductCard.vue'
 import { useNotifications } from '../composables/useNotifications'
+import { formatCLP } from '../utils/formatters.js'
 
 const route = useRoute()
 const router = useRouter()

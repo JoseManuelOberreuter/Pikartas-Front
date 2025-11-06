@@ -248,6 +248,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useNotifications } from '../composables/useNotifications'
 import { orderService } from '../services/api.js'
+import { formatCLP } from '../utils/formatters.js'
 
 const { success, error } = useNotifications()
 
@@ -403,8 +404,8 @@ const formatDate = (dateString) => {
 }
 
 const formatPrice = (price) => {
-  if (typeof price !== 'number' || isNaN(price)) return '0.00'
-  return price.toFixed(2)
+  if (typeof price !== 'number' || isNaN(price)) return '0'
+  return formatCLP(price)
 }
 
 const getOrderNumber = (orderId) => {
