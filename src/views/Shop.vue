@@ -27,15 +27,14 @@
           </div>
           
           <div class="filter-group">
-            <label>Precio máximo: ${{ maxPrice }}</label>
+            <label>Precio máximo:</label>
             <input 
-              type="range" 
-              v-model="maxPrice" 
-              :min="0" 
-              :max="2000" 
-              :step="50"
+              type="number" 
+              v-model.number="maxPrice" 
+              :min="0"
               @input="filterProducts"
-              class="price-slider"
+              placeholder="2000"
+              class="price-input"
             >
           </div>
         </div>
@@ -311,9 +310,19 @@ onMounted(async () => {
   min-width: 120px;
 }
 
-.price-slider {
-  width: 150px;
-  margin: 0;
+.price-input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 0.875rem;
+  min-width: 120px;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .search-box {
