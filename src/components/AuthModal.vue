@@ -21,13 +21,27 @@
         </div>
         <div class="form-group">
           <label for="loginPassword">Contraseña</label>
-          <input 
-            type="password" 
-            id="loginPassword"
-            v-model="loginForm.password" 
-            placeholder="Tu contraseña" 
-            required
-          >
+          <div class="password-input-wrapper">
+            <input 
+              :type="showLoginPassword ? 'text' : 'password'" 
+              id="loginPassword"
+              v-model="loginForm.password" 
+              placeholder="Tu contraseña" 
+              required
+            >
+            <button 
+              type="button" 
+              class="password-toggle-btn"
+              @mousedown.prevent="showLoginPassword = true"
+              @mouseup="showLoginPassword = false"
+              @mouseleave="showLoginPassword = false"
+              @touchstart.prevent="showLoginPassword = true"
+              @touchend="showLoginPassword = false"
+              title="Mantén presionado para ver la contraseña"
+            >
+              <font-awesome-icon :icon="showLoginPassword ? 'eye-slash' : 'eye'" class="password-icon" />
+            </button>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
         <p class="forgot-password">
@@ -73,24 +87,52 @@
         </div>
         <div class="form-group">
           <label for="registerPassword">Contraseña</label>
-          <input 
-            type="password" 
-            id="registerPassword"
-            v-model="registerForm.password" 
-            placeholder="Mínimo 6 caracteres" 
-            required
-            minlength="6"
-          >
+          <div class="password-input-wrapper">
+            <input 
+              :type="showRegisterPassword ? 'text' : 'password'" 
+              id="registerPassword"
+              v-model="registerForm.password" 
+              placeholder="Mínimo 6 caracteres" 
+              required
+              minlength="6"
+            >
+            <button 
+              type="button" 
+              class="password-toggle-btn"
+              @mousedown.prevent="showRegisterPassword = true"
+              @mouseup="showRegisterPassword = false"
+              @mouseleave="showRegisterPassword = false"
+              @touchstart.prevent="showRegisterPassword = true"
+              @touchend="showRegisterPassword = false"
+              title="Mantén presionado para ver la contraseña"
+            >
+              <font-awesome-icon :icon="showRegisterPassword ? 'eye-slash' : 'eye'" class="password-icon" />
+            </button>
+          </div>
         </div>
         <div class="form-group">
           <label for="confirmPassword">Confirmar Contraseña</label>
-          <input 
-            type="password" 
-            id="confirmPassword"
-            v-model="registerForm.confirmPassword" 
-            placeholder="Repite tu contraseña" 
-            required
-          >
+          <div class="password-input-wrapper">
+            <input 
+              :type="showConfirmPassword ? 'text' : 'password'" 
+              id="confirmPassword"
+              v-model="registerForm.confirmPassword" 
+              placeholder="Repite tu contraseña" 
+              required
+            >
+            <button 
+              type="button" 
+              class="password-toggle-btn"
+              @mousedown.prevent="showConfirmPassword = true"
+              @mouseup="showConfirmPassword = false"
+              @mouseleave="showConfirmPassword = false"
+              @touchstart.prevent="showConfirmPassword = true"
+              @touchend="showConfirmPassword = false"
+              title="Mantén presionado para ver la contraseña"
+            >
+              <font-awesome-icon :icon="showConfirmPassword ? 'eye-slash' : 'eye'" class="password-icon" />
+            </button>
+          </div>
         </div>
         <button 
           type="submit" 
@@ -171,6 +213,11 @@ const emit = defineEmits(['close-modals', 'switch-to-register', 'switch-to-login
 const authStore = useAuthStore()
 const { success, error, warning, info } = useNotifications()
 
+// Password visibility states
+const showLoginPassword = ref(false)
+const showRegisterPassword = ref(false)
+const showConfirmPassword = ref(false)
+
 // Auth forms data
 const loginForm = reactive({
   email: '',
@@ -195,6 +242,10 @@ const closeModals = () => {
   Object.assign(loginForm, { email: '', password: '' })
   Object.assign(registerForm, { name: '', email: '', password: '', confirmPassword: '' })
   Object.assign(forgotPasswordForm, { email: '' })
+  // Reset password visibility
+  showLoginPassword.value = false
+  showRegisterPassword.value = false
+  showConfirmPassword.value = false
 }
 
 const switchToRegister = () => {
@@ -363,6 +414,39 @@ const handleForgotPassword = async () => {
   color: var(--color-gray-700);
   background-color: var(--color-white);
   transition: all var(--transition-normal);
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper input {
+  padding-right: 45px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-500);
+  transition: color var(--transition-normal);
+  z-index: 10;
+}
+
+.password-toggle-btn:hover {
+  color: var(--color-primary);
+}
+
+.password-icon {
+  font-size: 1rem;
 }
 
 .form-group input:focus {
