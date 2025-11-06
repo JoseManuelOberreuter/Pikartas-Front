@@ -480,14 +480,28 @@ const loadUsers = async () => {
   loading.value = true
   try {
     const response = await adminService.getAllUsers()
-    // Handle new response format: { success: true, data: { users: [...], total: ... } }
-    // Or legacy format: { success: true, data: [...] }
-    const usersArray = response.data?.users || (Array.isArray(response.data) ? response.data : [])
+    // Response from service is: { success: true, data: { users: [...], total: ... } }
+    // Handle new response format: { success: true, data: { users: [...] } }
+    // Or legacy format: { success: true, data: [...] } (array directly)
+    let usersArray = []
+    
+    if (response?.success) {
+      // New format: response.data is an object with users property
+      if (response.data?.users && Array.isArray(response.data.users)) {
+        usersArray = response.data.users
+      }
+      // Legacy format: response.data is directly an array
+      else if (Array.isArray(response.data)) {
+        usersArray = response.data
+      }
+    }
+    
     users.value = usersArray
     
     // Calcular estadísticas
     calculateStats()
   } catch (err) {
+    console.error('[AdminUsers] Error loading users:', err);
     error('Error al cargar usuarios')
   } finally {
     loading.value = false

@@ -242,8 +242,15 @@ const loadDashboardData = async () => {
     ])
 
     // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
-    // Or legacy format: { success: true, data: [...] }
-    const productsArray = allProducts.data?.products || (Array.isArray(allProducts.data) ? allProducts.data : [])
+    // allProducts is already the response.data from axios, so it's: { success: true, data: { products: [...] } }
+    let productsArray = []
+    if (allProducts?.success) {
+      if (allProducts.data?.products && Array.isArray(allProducts.data.products)) {
+        productsArray = allProducts.data.products
+      } else if (Array.isArray(allProducts.data)) {
+        productsArray = allProducts.data
+      }
+    }
     
     // 🎯 CONTAR SOLO PRODUCTOS ACTIVOS
     const activeProducts = Array.isArray(productsArray) 
@@ -251,8 +258,15 @@ const loadDashboardData = async () => {
       : []
 
     // Handle orders format: { success: true, data: { orders: [...], pagination: {...} } }
-    // Or legacy format: { success: true, data: [...] }
-    const ordersArray = orders.data?.orders || (Array.isArray(orders.data) ? orders.data : [])
+    // orders is already the response.data from axios, so it's: { success: true, data: { orders: [...] } }
+    let ordersArray = []
+    if (orders?.success) {
+      if (orders.data?.orders && Array.isArray(orders.data.orders)) {
+        ordersArray = orders.data.orders
+      } else if (Array.isArray(orders.data)) {
+        ordersArray = orders.data
+      }
+    }
     
     // Calculate payment statistics
     const allOrders = ordersArray
@@ -266,8 +280,8 @@ const loadDashboardData = async () => {
       totalOrders: ordersStats.data?.totalOrders || 0,
       totalRevenue: ordersStats.data?.totalRevenue || 0,
       // Handle new response format: { success: true, data: { users: [...], total: ... } }
-      // Or legacy format: { success: true, data: [...] }
-      totalUsers: usersData.data?.total || usersData.total || (Array.isArray(usersData.data) ? usersData.data.length : 0) || 0,
+      // usersData is already the response.data from axios, so it's: { success: true, data: { users: [...], total: ... } }
+      totalUsers: usersData?.data?.total || usersData?.total || (Array.isArray(usersData?.data?.users) ? usersData.data.users.length : 0) || 0,
       paidOrders,
       pendingPayments,
       refundedOrders,
@@ -275,11 +289,9 @@ const loadDashboardData = async () => {
     }
 
     // Obtener órdenes recientes (últimas 5)
-    // Handle orders format: { success: true, data: { orders: [...], pagination: {...} } }
-    // Or legacy format: { success: true, data: [...] }
-    const ordersArrayForRecent = orders.data?.orders || (Array.isArray(orders.data) ? orders.data : [])
-    if (Array.isArray(ordersArrayForRecent) && ordersArrayForRecent.length > 0) {
-      recentOrders.value = ordersArrayForRecent
+    // orders is already the response.data from axios, so it's: { success: true, data: { orders: [...] } }
+    if (Array.isArray(ordersArray) && ordersArray.length > 0) {
+      recentOrders.value = ordersArray
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 5)
     }

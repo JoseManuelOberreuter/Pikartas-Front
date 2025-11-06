@@ -408,9 +408,22 @@ const loadOrders = async () => {
       adminService.getOrderStats()
     ])
     
-    // Handle new response format: { success: true, data: { orders: [...], pagination: {...} } }
-    // Or legacy format: { success: true, data: [...] }
-    const ordersArray = ordersResponse.data?.orders || (Array.isArray(ordersResponse.data) ? ordersResponse.data : [])
+    // Response from service is: { success: true, data: { orders: [...], pagination: {...} } }
+    // Handle new response format: { success: true, data: { orders: [...] } }
+    // Or legacy format: { success: true, data: [...] } (array directly)
+    let ordersArray = []
+    
+    if (ordersResponse?.success) {
+      // New format: ordersResponse.data is an object with orders property
+      if (ordersResponse.data?.orders && Array.isArray(ordersResponse.data.orders)) {
+        ordersArray = ordersResponse.data.orders
+      }
+      // Legacy format: ordersResponse.data is directly an array
+      else if (Array.isArray(ordersResponse.data)) {
+        ordersArray = ordersResponse.data
+      }
+    }
+    
     orders.value = ordersArray
     stats.value = statsResponse.data || {}
   } catch (err) {

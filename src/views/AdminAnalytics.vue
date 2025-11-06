@@ -105,8 +105,15 @@ const loadAnalytics = async () => {
     ])
 
     // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
-    // Or legacy format: { success: true, data: [...] }
-    const productsArray = allProducts.data?.products || (Array.isArray(allProducts.data) ? allProducts.data : [])
+    // allProducts is already the response.data from axios, so it's: { success: true, data: { products: [...] } }
+    let productsArray = []
+    if (allProducts?.success) {
+      if (allProducts.data?.products && Array.isArray(allProducts.data.products)) {
+        productsArray = allProducts.data.products
+      } else if (Array.isArray(allProducts.data)) {
+        productsArray = allProducts.data
+      }
+    }
     
     // 🎯 CONTAR SOLO PRODUCTOS ACTIVOS
     const activeProducts = Array.isArray(productsArray) 

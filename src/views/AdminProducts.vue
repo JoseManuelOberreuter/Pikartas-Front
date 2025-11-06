@@ -378,11 +378,23 @@ const loadCategories = async () => {
 const loadCategoriesFromProducts = async () => {
   try {
     const response = await adminService.getAllProducts()
-    // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
-    // Or legacy format: { success: true, data: [...] }
-    const productsArray = response.data?.products || response.data || []
+    // Response from service is: { success: true, data: { products: [...], pagination: {...} } }
+    // Handle new response format: { success: true, data: { products: [...] } }
+    // Or legacy format: { success: true, data: [...] } (array directly)
+    let productsArray = []
     
-    if (response.success && productsArray.length > 0) {
+    if (response?.success) {
+      // New format: response.data is an object with products property
+      if (response.data?.products && Array.isArray(response.data.products)) {
+        productsArray = response.data.products
+      }
+      // Legacy format: response.data is directly an array
+      else if (Array.isArray(response.data)) {
+        productsArray = response.data
+      }
+    }
+    
+    if (productsArray.length > 0) {
       // Extraer categorías únicas de los productos
       const categories = [...new Set(productsArray.map(p => p.category).filter(Boolean))]
       availableCategories.value = categories.sort()
@@ -413,11 +425,25 @@ const loadProducts = async () => {
   loading.value = true
   try {
     const response = await adminService.getAllProducts()
-    // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
-    // Or legacy format: { success: true, data: [...] }
-    const productsArray = response.data?.products || response.data || []
+    // Response from service is: { success: true, data: { products: [...], pagination: {...} } }
+    // Handle new response format: { success: true, data: { products: [...] } }
+    // Or legacy format: { success: true, data: [...] } (array directly)
+    let productsArray = []
+    
+    if (response?.success) {
+      // New format: response.data is an object with products property
+      if (response.data?.products && Array.isArray(response.data.products)) {
+        productsArray = response.data.products
+      }
+      // Legacy format: response.data is directly an array
+      else if (Array.isArray(response.data)) {
+        productsArray = response.data
+      }
+    }
+    
     products.value = productsArray
   } catch (err) {
+    console.error('[AdminProducts] Error loading products:', err);
     error('Error al cargar productos')
   } finally {
     loading.value = false

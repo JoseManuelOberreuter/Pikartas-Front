@@ -50,12 +50,47 @@ export const authService = {
   async login(credentials) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.post(routesStore.fullUserRoutes.login, credentials);
+      const loginUrl = routesStore.fullUserRoutes.login;
+      
+      // Log for debugging in production
+      if (import.meta.env.MODE === 'production') {
+        console.log('[AuthService] Login attempt:', {
+          url: loginUrl,
+          hasEmail: !!credentials.email,
+          emailLength: credentials.email?.length || 0,
+          hasPassword: !!credentials.password,
+          passwordLength: credentials.password?.length || 0
+        });
+      }
+      
+      const response = await axios.post(loginUrl, credentials);
+      
+      // Log response structure in production
+      if (import.meta.env.MODE === 'production') {
+        console.log('[AuthService] Login response:', {
+          status: response.status,
+          hasToken: !!response.data?.token,
+          hasSuccess: !!response.data?.success,
+          hasError: !!response.data?.error,
+          errorMessage: response.data?.error
+        });
+      }
+      
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
       return response.data;
     } catch (error) {
+      // Enhanced error logging for production
+      if (import.meta.env.MODE === 'production') {
+        console.error('[AuthService] Login error:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          errorData: error.response?.data,
+          message: error.message,
+          url: error.config?.url
+        });
+      }
       logger.error('Login error:', error);
       throw error.response?.data || { error: error.message };
     }
@@ -137,6 +172,17 @@ export const productService = {
     try {
       const routesStore = useRoutesStore();
       const response = await axios.get(routesStore.fullProductRoutes.getAll);
+      // Response.data from axios is: { success: true, data: { products: [...], pagination: {...} } }
+      // Log for debugging in production
+      if (import.meta.env.MODE === 'production') {
+        console.log('[ProductService] Response structure:', {
+          hasSuccess: !!response.data?.success,
+          hasData: !!response.data?.data,
+          hasProducts: !!response.data?.data?.products,
+          isArray: Array.isArray(response.data?.data),
+          dataType: typeof response.data?.data
+        });
+      }
       return response.data;
     } catch (error) {
       logger.error('Get products error:', error);

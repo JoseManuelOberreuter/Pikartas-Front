@@ -98,11 +98,35 @@ const loadProducts = async () => {
   try {
     const response = await productService.getAllProducts()
     
-    // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
-    // Or legacy format: { success: true, data: [...] }
-    const productsArray = response.data?.products || response.data || []
+    // Response from service is: { success: true, data: { products: [...], pagination: {...} } }
+    // Handle new response format: { success: true, data: { products: [...] } }
+    // Or legacy format: { success: true, data: [...] } (array directly)
+    let productsArray = []
     
-    if (response.success && productsArray.length > 0) {
+    if (response?.success) {
+      // New format: response.data is an object with products property
+      if (response.data?.products && Array.isArray(response.data.products)) {
+        productsArray = response.data.products
+      }
+      // Legacy format: response.data is directly an array
+      else if (Array.isArray(response.data)) {
+        productsArray = response.data
+      }
+    }
+    
+    // Log for debugging in production
+    if (import.meta.env.MODE === 'production' && productsArray.length === 0) {
+      console.warn('[Home] No products found. Response:', {
+        success: response?.success,
+        hasData: !!response?.data,
+        dataType: typeof response?.data,
+        isArray: Array.isArray(response?.data),
+        hasProducts: !!response?.data?.products,
+        productsLength: response?.data?.products?.length || 0
+      });
+    }
+    
+    if (productsArray.length > 0) {
       products.value = productsArray.map(product => ({
         id: product._id || product.id, // Manejar tanto _id como id
         name: product.name,
@@ -114,6 +138,7 @@ const loadProducts = async () => {
       }))
     }
   } catch (error) {
+    console.error('[Home] Error loading products:', error);
     products.value = []
   } finally {
     loading.value = false

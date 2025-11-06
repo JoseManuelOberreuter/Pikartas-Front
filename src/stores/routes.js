@@ -41,7 +41,10 @@ export const useRoutesStore = defineStore('routes', () => {
       // Use environment variable if set (remove trailing slash if present)
       if (import.meta.env.VITE_API_BASE_URL) {
         const url = import.meta.env.VITE_API_BASE_URL.trim();
-        return url.endsWith('/') ? url.slice(0, -1) : url;
+        const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+        // Log for debugging
+        console.log('[RoutesStore] Using VITE_API_BASE_URL:', cleanUrl);
+        return cleanUrl;
       }
       // Auto-detect: try to infer backend URL from frontend URL
       // For Vercel deployments, backend and frontend often follow a pattern
@@ -52,9 +55,12 @@ export const useRoutesStore = defineStore('routes', () => {
       const inferredBackendUrl = currentOrigin.replace(/shop-vue-core/i, 'shop-node-core');
       // Only use inferred URL if it's different from current origin (avoid loop)
       if (inferredBackendUrl !== currentOrigin && inferredBackendUrl.startsWith('http')) {
+        console.warn('[RoutesStore] Auto-detecting backend URL:', inferredBackendUrl);
+        console.warn('[RoutesStore] ⚠️ Consider setting VITE_API_BASE_URL explicitly in Vercel environment variables');
         return inferredBackendUrl;
       }
       // Last resort: return original (should never happen in production with proper config)
+      console.error('[RoutesStore] ⚠️ No VITE_API_BASE_URL set and auto-detection failed. Using fallback.');
       return currentOrigin || 'http://localhost:4005';
     }
     // Development mode
@@ -62,6 +68,11 @@ export const useRoutesStore = defineStore('routes', () => {
   };
   
   const baseURL = ref(getBaseURL());
+  
+  // Log base URL in production for debugging
+  if (import.meta.env.MODE === 'production') {
+    console.log('[RoutesStore] Base URL initialized:', baseURL.value);
+  }
   
   // Rutas de usuarios
   const userRoutes = ref({

@@ -169,11 +169,23 @@ const loadAllProducts = async () => {
   try {
     const response = await productService.getAllProducts()
     
-    // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
-    // Or legacy format: { success: true, data: [...] }
-    const productsArray = response.data?.products || response.data || []
+    // Response from service is: { success: true, data: { products: [...], pagination: {...} } }
+    // Handle new response format: { success: true, data: { products: [...] } }
+    // Or legacy format: { success: true, data: [...] } (array directly)
+    let productsArray = []
     
-    if (response.success && productsArray.length > 0) {
+    if (response?.success) {
+      // New format: response.data is an object with products property
+      if (response.data?.products && Array.isArray(response.data.products)) {
+        productsArray = response.data.products
+      }
+      // Legacy format: response.data is directly an array
+      else if (Array.isArray(response.data)) {
+        productsArray = response.data
+      }
+    }
+    
+    if (productsArray.length > 0) {
       allProducts.value = productsArray.map(p => ({
         id: p._id || p.id, // Manejar tanto _id como id
         name: p.name,
@@ -185,6 +197,7 @@ const loadAllProducts = async () => {
       }))
     }
   } catch (error) {
+    console.error('[ProductDetail] Error loading all products:', error);
     allProducts.value = []
   }
 }
