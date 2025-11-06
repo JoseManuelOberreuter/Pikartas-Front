@@ -26,23 +26,11 @@
             </select>
           </div>
           
-          <div class="filter-group">
-            <label>Precio máximo:</label>
-            <input 
-              type="number" 
-              v-model.number="maxPrice" 
-              :min="0"
-              @input="filterProducts"
-              placeholder="2000"
-              class="price-input"
-            >
-          </div>
+          <button @click="resetFilters" class="reset-btn" title="Limpiar filtros">
+            <font-awesome-icon icon="times" class="reset-icon" />
+            Limpiar
+          </button>
         </div>
-        
-        <button @click="resetFilters" class="reset-btn" title="Limpiar filtros">
-          <font-awesome-icon icon="times" class="reset-icon" />
-          Limpiar
-        </button>
         
         <div class="search-box">
           <input 
@@ -106,7 +94,6 @@ const products = ref([])
 const loading = ref(false)
 const selectedCategory = ref('Todos')
 const sortBy = ref('name')
-const maxPrice = ref(2000)
 const searchQuery = ref('')
 
 // Categorías (se cargan dinámicamente desde el backend)
@@ -194,9 +181,6 @@ const filteredProducts = computed(() => {
     result = result.filter(product => product.category === selectedCategory.value)
   }
   
-  // Filter by price
-  result = result.filter(product => product.price <= maxPrice.value)
-  
   // Filter by search query
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
@@ -242,7 +226,6 @@ const sortProducts = () => {
 const resetFilters = () => {
   selectedCategory.value = 'Todos'
   sortBy.value = 'name'
-  maxPrice.value = 2000
   searchQuery.value = ''
 }
 
@@ -252,12 +235,6 @@ onMounted(async () => {
   
   // Cargar categorías después de cargar productos (para tener fallback)
   await loadCategories()
-  
-  // Set initial max price based on the highest product price
-  if (products.value.length > 0) {
-    const highestPrice = Math.max(...products.value.map(p => p.price))
-    maxPrice.value = Math.ceil(highestPrice / 100) * 100
-  }
 })
 </script>
 
@@ -317,8 +294,9 @@ onMounted(async () => {
 
 .filters {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
+  align-items: flex-end;
 }
 
 .filter-group {
@@ -369,21 +347,6 @@ onMounted(async () => {
   font-size: 0.875rem;
 }
 
-.price-input {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-  font-size: 0.875rem;
-  min-width: 120px;
-}
-
-.price-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
 .search-box {
   position: relative;
   min-width: 250px;
@@ -393,7 +356,7 @@ onMounted(async () => {
   width: 100%;
   padding: 0.75rem 2.5rem 0.75rem 1rem;
   border: 1px solid #ddd;
-  border-radius: 25px;
+  border-radius: 6px;
   font-size: 1rem;
   background: white;
 }
