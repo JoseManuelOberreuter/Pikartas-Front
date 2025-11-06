@@ -425,8 +425,23 @@ onMounted(async () => {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
+  align-items: start;
+}
+
+/* Responsive: 2 columns on medium screens */
+@media (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Responsive: 1 column on small screens */
+@media (max-width: 640px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .no-results {
