@@ -31,25 +31,14 @@
                 Información de Envío
               </h2>
               
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="firstName">Nombre *</label>
-                  <input 
-                    type="text" 
-                    id="firstName"
-                    v-model="shippingForm.firstName" 
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="lastName">Apellido *</label>
-                  <input 
-                    type="text" 
-                    id="lastName"
-                    v-model="shippingForm.lastName" 
-                    required
-                  />
-                </div>
+              <div class="form-group">
+                <label for="name">Nombre *</label>
+                <input 
+                  type="text" 
+                  id="name"
+                  v-model="shippingForm.name" 
+                  required
+                />
               </div>
 
               <div class="form-group">
@@ -245,9 +234,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart.js'
+import { useAuthStore } from '../stores/auth.js'
 import { storeToRefs } from 'pinia'
 import { useNotifications } from '../composables/useNotifications'
 import { formatCLP } from '../utils/formatters.js'
@@ -255,12 +245,13 @@ import { formatCLP } from '../utils/formatters.js'
 const router = useRouter()
 const { success, error } = useNotifications()
 const cartStore = useCartStore()
+const authStore = useAuthStore()
 const { cartItems, cartTotal, cartItemCount } = storeToRefs(cartStore)
+const { user, isAuthenticated } = storeToRefs(authStore)
 
 // Form data
 const shippingForm = reactive({
-  firstName: '',
-  lastName: '',
+  name: '',
   email: '',
   phone: '',
   address: '',
@@ -280,12 +271,27 @@ const finalTotal = computed(() => cartTotal.value + tax.value + shipping.value)
 
 // Methods
 
+// Cargar datos del usuario desde la sesión
+const loadUserData = () => {
+  if (isAuthenticated.value && user.value) {
+    if (user.value.name) {
+      shippingForm.name = user.value.name
+    }
+    if (user.value.email) {
+      shippingForm.email = user.value.email
+    }
+    if (user.value.telefono || user.value.phone) {
+      shippingForm.phone = user.value.telefono || user.value.phone || ''
+    }
+  }
+}
+
 const submitOrder = async () => {
   isProcessing.value = true
   
   try {
     // Validate shipping form
-    if (!shippingForm.firstName || !shippingForm.lastName || !shippingForm.email || 
+    if (!shippingForm.name || !shippingForm.email || 
         !shippingForm.phone || !shippingForm.address || !shippingForm.city || !shippingForm.zipCode) {
       throw new Error('Por favor completa todos los campos obligatorios')
     }
@@ -296,8 +302,7 @@ const submitOrder = async () => {
       query: {
         // Pass shipping data for payment initiation
         shippingData: JSON.stringify({
-          firstName: shippingForm.firstName,
-          lastName: shippingForm.lastName,
+          name: shippingForm.name,
           email: shippingForm.email,
           phone: shippingForm.phone,
           address: shippingForm.address,
@@ -314,6 +319,11 @@ const submitOrder = async () => {
     isProcessing.value = false
   }
 }
+
+// Load user data when component mounts
+onMounted(() => {
+  loadUserData()
+})
 </script>
 
 <style scoped>
