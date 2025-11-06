@@ -173,14 +173,19 @@ export const productService = {
       const routesStore = useRoutesStore();
       const response = await axios.get(routesStore.fullProductRoutes.getAll);
       // Response.data from axios is: { success: true, data: { products: [...], pagination: {...} } }
-      // Log for debugging in production
+      // Log for debugging in production - show the actual structure
       if (import.meta.env.MODE === 'production') {
-        console.log('[ProductService] Response structure:', {
+        console.log('[ProductService] Raw axios response.data:', response.data);
+        console.log('[ProductService] Response structure analysis:', {
+          status: response.status,
           hasSuccess: !!response.data?.success,
           hasData: !!response.data?.data,
+          dataKeys: response.data?.data ? Object.keys(response.data.data) : [],
           hasProducts: !!response.data?.data?.products,
-          isArray: Array.isArray(response.data?.data),
-          dataType: typeof response.data?.data
+          productsLength: response.data?.data?.products?.length || 0,
+          isProductsArray: Array.isArray(response.data?.data?.products),
+          // What we're returning
+          returning: response.data
         });
       }
       return response.data;

@@ -115,15 +115,28 @@ const loadProducts = async () => {
     }
     
     // Log for debugging in production
-    if (import.meta.env.MODE === 'production' && productsArray.length === 0) {
-      console.warn('[Home] No products found. Response:', {
-        success: response?.success,
-        hasData: !!response?.data,
-        dataType: typeof response?.data,
-        isArray: Array.isArray(response?.data),
-        hasProducts: !!response?.data?.products,
-        productsLength: response?.data?.products?.length || 0
+    if (import.meta.env.MODE === 'production') {
+      console.log('[Home] Full response structure:', {
+        response: response,
+        responseData: response?.data,
+        responseDataProducts: response?.data?.products,
+        productsArray: productsArray,
+        productsArrayLength: productsArray.length
       });
+      
+      if (productsArray.length === 0) {
+        console.warn('[Home] No products found. Response:', {
+          success: response?.success,
+          hasData: !!response?.data,
+          dataType: typeof response?.data,
+          isArray: Array.isArray(response?.data),
+          hasProducts: !!response?.data?.products,
+          productsLength: response?.data?.products?.length || 0,
+          productsType: typeof response?.data?.products,
+          isProductsArray: Array.isArray(response?.data?.products),
+          fullDataKeys: response?.data ? Object.keys(response.data) : []
+        });
+      }
     }
     
     if (productsArray.length > 0) {
