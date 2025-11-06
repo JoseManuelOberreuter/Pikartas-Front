@@ -31,10 +31,6 @@
             <div class="item-details">
               <h3 class="item-name">{{ item.name }}</h3>
               <p class="item-category">{{ item.category }}</p>
-              <div class="item-rating">
-                <span class="stars">{{ getStarRating(item.rating) }}</span>
-                <span class="rating-value">({{ item.rating }})</span>
-              </div>
               <p class="item-description">{{ item.description }}</p>
             </div>
             
@@ -48,7 +44,7 @@
                 <label>Cantidad:</label>
                 <div class="quantity-input">
                   <button 
-                    class="qty-btn" 
+                    class="qty-btn qty-btn-decrease" 
                     @click="decreaseQuantity(item.id)" 
                     :disabled="item.quantity <= 1"
                   >
@@ -61,7 +57,7 @@
                     min="1"
                     class="qty-input"
                   >
-                  <button class="qty-btn" @click="increaseQuantity(item.id)">
+                  <button class="qty-btn qty-btn-increase" @click="increaseQuantity(item.id)">
                     <font-awesome-icon icon="plus" class="qty-icon" />
                   </button>
                 </div>
@@ -150,14 +146,6 @@ const shipping = computed(() => cartTotal.value >= 500 ? 0 : 25)
 const finalTotal = computed(() => cartTotal.value + tax.value + shipping.value)
 
 // Methods
-const getStarRating = (rating) => {
-  const fullStars = Math.floor(rating)
-  const hasHalfStar = rating % 1 !== 0
-  let stars = '★'.repeat(fullStars)
-  if (hasHalfStar) stars += '☆'
-  return stars
-}
-
 const removeFromCart = async (productId) => {
   if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
     await cartStore.removeFromCart(productId)
@@ -330,22 +318,6 @@ const clearCart = async () => {
   font-weight: 500;
 }
 
-.item-rating {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.stars {
-  color: #ffc107;
-}
-
-.rating-value {
-  color: #666;
-  font-size: 0.875rem;
-}
-
 .item-description {
   color: #666;
   font-size: 0.875rem;
@@ -366,8 +338,10 @@ const clearCart = async () => {
 
 .item-price {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .price-label {
@@ -381,74 +355,117 @@ const clearCart = async () => {
   color: #28a745;
 }
 
+.quantity-controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .quantity-controls label {
   font-size: 0.875rem;
   color: #666;
-  margin-bottom: 0.5rem;
-  display: block;
+  margin: 0;
 }
 
 .quantity-input {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
   overflow: hidden;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s;
+}
+
+.quantity-input:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.12);
 }
 
 .qty-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: none;
-  background: #f8f9fa;
+  background: #f5f5f5;
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
+  font-weight: 600;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  border-right: 1px solid #e0e0e0;
 }
 
-.qty-icon {
-  font-size: 0.875rem;
-  color: var(--icon-cart-quantity-minus);
-  transition: all var(--transition-normal);
-}
-
-.qty-btn:hover:not(:disabled) .qty-icon {
-  color: var(--icon-cart-quantity-plus);
-  transform: scale(1.1);
-}
-
-.qty-btn:disabled .qty-icon {
-  color: var(--icon-cart-quantity-disabled);
+.qty-btn:last-of-type {
+  border-right: none;
+  border-left: 1px solid #e0e0e0;
 }
 
 .qty-btn:hover:not(:disabled) {
-  background: #e9ecef;
+  background: #007bff;
+}
+
+.qty-btn:active:not(:disabled) {
+  background: #0056b3;
+  transform: scale(0.95);
+}
+
+.qty-icon {
+  font-size: 0.75rem;
+  color: #666;
+  transition: all 0.2s;
+  position: relative;
+  z-index: 1;
+}
+
+.qty-btn:hover:not(:disabled) .qty-icon {
+  color: white;
 }
 
 .qty-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.35;
   cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+.qty-btn:disabled .qty-icon {
+  color: #bbb;
 }
 
 .qty-input {
-  width: 60px;
+  width: 70px;
   text-align: center;
   border: none;
-  padding: 0.5rem;
-  font-weight: 600;
+  padding: 0.625rem 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #333;
+  background: transparent;
+  appearance: textfield;
+  -moz-appearance: textfield;
 }
 
 .qty-input:focus {
   outline: none;
+  background: #f8f9ff;
+}
+
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .item-subtotal {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .subtotal-label {
