@@ -38,9 +38,10 @@ export const useRoutesStore = defineStore('routes', () => {
   // In production: use VITE_API_BASE_URL or auto-detect
   const getBaseURL = () => {
     if (import.meta.env.MODE === 'production') {
-      // Use environment variable if set
+      // Use environment variable if set (remove trailing slash if present)
       if (import.meta.env.VITE_API_BASE_URL) {
-        return import.meta.env.VITE_API_BASE_URL;
+        const url = import.meta.env.VITE_API_BASE_URL.trim();
+        return url.endsWith('/') ? url.slice(0, -1) : url;
       }
       // Auto-detect: try to infer backend URL from frontend URL
       // For Vercel deployments, backend and frontend often follow a pattern
