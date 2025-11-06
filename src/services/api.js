@@ -168,11 +168,18 @@ export const authService = {
 
 // Servicios de productos
 export const productService = {
-  async getAllProducts() {
+  async getAllProducts(params = {}) {
     try {
       const routesStore = useRoutesStore();
-      // Add cache-busting parameter to avoid 304 responses
-      const url = `${routesStore.fullProductRoutes.getAll}?_t=${Date.now()}`;
+      // Add cache-busting parameter and pagination params
+      const queryParams = new URLSearchParams({
+        _t: Date.now(),
+        ...(params.limit && { limit: params.limit }),
+        ...(params.page && { page: params.page }),
+        ...(params.category && { category: params.category }),
+        ...(params.search && { search: params.search })
+      });
+      const url = `${routesStore.fullProductRoutes.getAll}?${queryParams.toString()}`;
       const response = await axios.get(url, {
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',

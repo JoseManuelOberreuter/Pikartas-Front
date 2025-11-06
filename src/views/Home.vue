@@ -96,7 +96,8 @@ const loading = ref(false)
 const loadProducts = async () => {
   loading.value = true
   try {
-    const response = await productService.getAllProducts()
+    // Request more products for home page (limit: 100 to show all available products)
+    const response = await productService.getAllProducts({ limit: 100, page: 1 })
     
     // Response from service is: { success: true, data: { products: [...], pagination: {...} } }
     // Handle new response format: { success: true, data: { products: [...] } }
@@ -134,7 +135,9 @@ const loadProducts = async () => {
           productsLength: response?.data?.products?.length || 0,
           productsType: typeof response?.data?.products,
           isProductsArray: Array.isArray(response?.data?.products),
-          fullDataKeys: response?.data ? Object.keys(response.data) : []
+          fullDataKeys: response?.data ? Object.keys(response.data) : [],
+          pagination: response?.data?.pagination,
+          fullResponse: JSON.stringify(response, null, 2)
         });
       }
     }
