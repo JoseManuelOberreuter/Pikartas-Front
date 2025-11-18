@@ -98,7 +98,9 @@ export const useRoutesStore = defineStore('routes', () => {
     delete: '/api/products',
     updateStock: '/api/products',
     getAllAdmin: '/api/products/admin/all',
-    getCategories: '/api/products/categories'
+    getCategories: '/api/products/categories',
+    getFeatured: '/api/products/featured',
+    getOffers: '/api/products/offers'
   });
 
   // Rutas de órdenes

@@ -374,6 +374,69 @@
               <small class="form-help">Selecciona una imagen para el producto (JPG, PNG, GIF)</small>
             </div>
 
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input 
+                  v-model="productForm.isFeatured" 
+                  type="checkbox" 
+                  class="form-checkbox"
+                />
+                <span>Producto Destacado</span>
+              </label>
+              <small class="form-help">Los productos destacados aparecerán en la página de inicio</small>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input 
+                  v-model="productForm.isOnSale" 
+                  type="checkbox" 
+                  class="form-checkbox"
+                />
+                <span>En Oferta</span>
+              </label>
+              <small class="form-help">Marca esta opción para poner el producto en oferta</small>
+            </div>
+
+            <div v-if="productForm.isOnSale" class="sale-fields">
+              <div class="form-group">
+                <label>Porcentaje de Descuento *</label>
+                <input 
+                  v-model.number="productForm.discountPercentage" 
+                  type="number" 
+                  step="0.01" 
+                  min="0" 
+                  max="99.99"
+                  :required="productForm.isOnSale"
+                  placeholder="Ej: 20 (para 20% de descuento)"
+                  class="form-input"
+                />
+                <small class="form-help">Ingresa el porcentaje de descuento (0-99.99%)</small>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Fecha de Inicio de Oferta *</label>
+                  <input 
+                    v-model="productForm.saleStartDate" 
+                    type="datetime-local" 
+                    :required="productForm.isOnSale"
+                    class="form-input"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Fecha de Fin de Oferta *</label>
+                  <input 
+                    v-model="productForm.saleEndDate" 
+                    type="datetime-local" 
+                    :required="productForm.isOnSale"
+                    class="form-input"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div class="form-actions">
               <button type="button" @click="closeModal" class="btn btn-secondary">
                 Cancelar
@@ -419,7 +482,12 @@ const productForm = ref({
   price: 0,
   stock: 0,
   category: '',
-  image: ''
+  image: '',
+  isFeatured: false,
+  isOnSale: false,
+  discountPercentage: null,
+  saleStartDate: '',
+  saleEndDate: ''
 })
 
 // Computed
@@ -675,7 +743,12 @@ const openCreateModal = () => {
     price: 0,
     stock: 0,
     category: '',
-    image: ''
+    image: '',
+    isFeatured: false,
+    isOnSale: false,
+    discountPercentage: null,
+    saleStartDate: '',
+    saleEndDate: ''
   }
   selectedImage.value = null
   imagePreviewUrl.value = ''
@@ -700,7 +773,12 @@ const editProduct = (product) => {
     price: product.price,
     stock: product.stock,
     category: product.category,
-    image: product.image
+    image: product.image,
+    isFeatured: product.is_featured || false,
+    isOnSale: product.is_on_sale || false,
+    discountPercentage: product.discount_percentage || null,
+    saleStartDate: product.sale_start_date ? new Date(product.sale_start_date).toISOString().slice(0, 16) : '',
+    saleEndDate: product.sale_end_date ? new Date(product.sale_end_date).toISOString().slice(0, 16) : ''
   }
   
   selectedImage.value = null
@@ -727,6 +805,15 @@ const submitProduct = async () => {
     formData.append('price', productForm.value.price)
     formData.append('stock', productForm.value.stock)
     formData.append('category', productForm.value.category)
+    formData.append('isFeatured', productForm.value.isFeatured)
+    formData.append('isOnSale', productForm.value.isOnSale)
+    
+    // Agregar campos de oferta si está en oferta
+    if (productForm.value.isOnSale) {
+      formData.append('discountPercentage', productForm.value.discountPercentage || 0)
+      formData.append('saleStartDate', productForm.value.saleStartDate)
+      formData.append('saleEndDate', productForm.value.saleEndDate)
+    }
     
     // Agregar imagen si se seleccionó una nueva
     if (selectedImage.value) {
@@ -1266,6 +1353,34 @@ th {
   margin-top: 0.25rem;
   color: #666;
   font-size: 0.875rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #555;
+}
+
+.checkbox-label span {
+  user-select: none;
+}
+
+.form-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #007bff;
+}
+
+.sale-fields {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
 }
 
 .form-actions {

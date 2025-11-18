@@ -320,6 +320,52 @@ export const productService = {
       logger.error('Get categories error:', error);
       throw formatApiError(error);
     }
+  },
+
+  async getFeaturedProducts(params = {}) {
+    try {
+      const routesStore = useRoutesStore();
+      const queryParams = new URLSearchParams({
+        _t: Date.now(),
+        ...(params.limit && { limit: params.limit }),
+        ...(params.page && { page: params.page })
+      });
+      const url = `${routesStore.fullProductRoutes.getFeatured}?${queryParams.toString()}`;
+      const response = await axios.get(url, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Get featured products error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async getOnSaleProducts(params = {}) {
+    try {
+      const routesStore = useRoutesStore();
+      const queryParams = new URLSearchParams({
+        _t: Date.now(),
+        ...(params.limit && { limit: params.limit }),
+        ...(params.page && { page: params.page })
+      });
+      const url = `${routesStore.fullProductRoutes.getOffers}?${queryParams.toString()}`;
+      const response = await axios.get(url, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Get on sale products error:', error);
+      throw formatApiError(error);
+    }
   }
 };
 

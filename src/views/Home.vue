@@ -83,16 +83,14 @@ const router = useRouter()
 const products = ref([])
 const loading = ref(false)
 
-// Cargar productos desde el backend
+// Cargar productos destacados desde el backend
 const loadProducts = async () => {
   loading.value = true
   try {
-    // Request more products for home page (limit: 100 to show all available products)
-    const response = await productService.getAllProducts({ limit: 100, page: 1 })
+    // Request featured products for home page
+    const response = await productService.getFeaturedProducts({ limit: 4, page: 1 })
     
     // Response from service is: { success: true, data: { products: [...], pagination: {...} } }
-    // Handle new response format: { success: true, data: { products: [...] } }
-    // Or legacy format: { success: true, data: [...] } (array directly)
     let productsArray = []
     
     if (response?.success) {
@@ -106,38 +104,17 @@ const loadProducts = async () => {
       }
     }
     
-    // Log for debugging in production
-    if (import.meta.env.MODE === 'production') {
-      console.log('[Home] Full response structure:', {
-        response: response,
-        responseData: response?.data,
-        responseDataProducts: response?.data?.products,
-        productsArray: productsArray,
-        productsArrayLength: productsArray.length
-      });
-      
-      if (productsArray.length === 0) {
-        console.warn('[Home] No products found. Response:', {
-          success: response?.success,
-          hasData: !!response?.data,
-          dataType: typeof response?.data,
-          isArray: Array.isArray(response?.data),
-          hasProducts: !!response?.data?.products,
-          productsLength: response?.data?.products?.length || 0,
-          productsType: typeof response?.data?.products,
-          isProductsArray: Array.isArray(response?.data?.products),
-          fullDataKeys: response?.data ? Object.keys(response.data) : [],
-          pagination: response?.data?.pagination,
-          fullResponse: JSON.stringify(response, null, 2)
-        });
-      }
-    }
-    
     if (productsArray.length > 0) {
       products.value = productsArray.map(product => ({
         id: product._id || product.id, // Manejar tanto _id como id
         name: product.name,
         price: product.price,
+        sale_price: product.sale_price,
+        discount_percentage: product.discount_percentage,
+        is_featured: product.is_featured,
+        is_on_sale: product.is_on_sale,
+        sale_start_date: product.sale_start_date,
+        sale_end_date: product.sale_end_date,
         image: product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: product.description,
         category: product.category,
@@ -145,16 +122,16 @@ const loadProducts = async () => {
       }))
     }
   } catch (error) {
-    console.error('[Home] Error loading products:', error);
+    console.error('[Home] Error loading featured products:', error);
     products.value = []
   } finally {
     loading.value = false
   }
 }
 
-// Mostrar solo los 4 primeros productos
+// Use featured products directly
 const featuredProducts = computed(() => {
-  return products.value.slice(0, 4)
+  return products.value
 })
 
 const viewProduct = (productId) => {
