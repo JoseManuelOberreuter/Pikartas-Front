@@ -17,6 +17,7 @@
           <ul class="nav-menu">
             <li><router-link to="/" class="nav-link">Inicio</router-link></li>
             <li><router-link to="/shop" class="nav-link">Tienda</router-link></li>
+            <li><router-link to="/contact" class="nav-link">Contacto</router-link></li>
           </ul>
         </div>
         
@@ -119,6 +120,7 @@
         <ul class="mobile-nav-menu">
           <li><router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">Inicio</router-link></li>
           <li><router-link to="/shop" class="mobile-nav-link" @click="closeMobileMenu">Tienda</router-link></li>
+          <li><router-link to="/contact" class="mobile-nav-link" @click="closeMobileMenu">Contacto</router-link></li>
         </ul>
         
         <!-- Mobile Auth Section -->
