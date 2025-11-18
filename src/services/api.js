@@ -603,7 +603,8 @@ export const adminService = {
   // Transbank Payment Management
   async getPaymentStatus(orderId) {
     try {
-      const response = await axios.get(`/api/payments/status/${orderId}`);
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.getPaymentStatusUrl(orderId));
       return response.data;
     } catch (error) {
       logger.error('Get payment status error:', error);
@@ -613,8 +614,9 @@ export const adminService = {
 
   async refundPayment(orderId, amount = null) {
     try {
+      const routesStore = useRoutesStore();
       const body = amount ? { amount } : {};
-      const response = await axios.post(`/api/payments/refund/${orderId}`, body);
+      const response = await axios.post(routesStore.getRefundPaymentUrl(orderId), body);
       return response.data;
     } catch (error) {
       logger.error('Refund payment error:', error);
