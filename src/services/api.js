@@ -30,6 +30,31 @@ axios.interceptors.response.use(
   }
 );
 
+const formatApiError = (error) => {
+  const responseData = error.response?.data;
+  const formattedError = (responseData && typeof responseData === 'object')
+    ? { ...responseData }
+    : { error: error.message };
+
+  formattedError.status = error.response?.status;
+  formattedError.statusCode = error.response?.status;
+
+  if (typeof formattedError.message !== 'string' || formattedError.message.length === 0) {
+    formattedError.message = formattedError.error || 'Ocurrió un error inesperado.';
+  }
+
+  if (responseData?.code) {
+    formattedError.code = responseData.code;
+  }
+
+  if (formattedError.code === 'VERIFICATION_REQUIRED') {
+    formattedError.verificationRequired = true;
+    formattedError.message = formattedError.message || 'Debes verificar tu cuenta antes de continuar.';
+  }
+
+  return formattedError;
+};
+
 export const authService = {
   async register(userData) {
     try {
@@ -43,11 +68,11 @@ export const authService = {
     } catch (error) {
       logger.error('Registration error:', error);
       // Propagar el error específico del backend
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
   
-  async login(credentials) {
+  async login(credentials) {git 
     try {
       const routesStore = useRoutesStore();
       const loginUrl = routesStore.fullUserRoutes.login;
@@ -92,7 +117,7 @@ export const authService = {
         });
       }
       logger.error('Login error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
   
@@ -104,7 +129,7 @@ export const authService = {
       return response.data;
     } catch (error) {
       logger.error('Verification error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -115,7 +140,7 @@ export const authService = {
       return response.data;
     } catch (error) {
       logger.error('Resend verification error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -126,7 +151,7 @@ export const authService = {
       return response.data;
     } catch (error) {
       logger.error('Password reset request error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -137,7 +162,7 @@ export const authService = {
       return response.data;
     } catch (error) {
       logger.error('Password reset error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -148,7 +173,7 @@ export const authService = {
       return response.data;
     } catch (error) {
       logger.error('Get user profile error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -161,7 +186,7 @@ export const authService = {
       return response.data;
     } catch (error) {
       logger.error('Update profile error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   }
 };
@@ -206,7 +231,7 @@ export const productService = {
       return response.data;
     } catch (error) {
       logger.error('Get products error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -220,7 +245,7 @@ export const productService = {
       return response.data;
     } catch (error) {
       logger.error('Error obteniendo producto por ID:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -240,7 +265,7 @@ export const productService = {
       return response.data;
     } catch (error) {
       logger.error('Create product error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -260,7 +285,7 @@ export const productService = {
       return response.data;
     } catch (error) {
       logger.error('Update product error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -271,7 +296,7 @@ export const productService = {
       return response.data;
     } catch (error) {
       logger.error('Delete product error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -282,7 +307,7 @@ export const productService = {
       return response.data;
     } catch (error) {
       logger.error('Update stock error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -293,7 +318,7 @@ export const productService = {
       return response.data;
     } catch (error) {
       logger.error('Get categories error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   }
 };
@@ -307,7 +332,7 @@ export const orderService = {
       return response.data;
     } catch (error) {
       logger.error('Create order error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -318,7 +343,7 @@ export const orderService = {
       return response.data;
     } catch (error) {
       logger.error('Get user orders error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -329,7 +354,7 @@ export const orderService = {
       return response.data;
     } catch (error) {
       logger.error('Get order error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -340,7 +365,7 @@ export const orderService = {
       return response.data;
     } catch (error) {
       logger.error('Cancel order error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   }
 };
@@ -354,11 +379,7 @@ export const cartService = {
       return response.data;
     } catch (error) {
       logger.error('Get cart error:', error);
-      // Agregar información del status code al error
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      throw formatApiError(error);
     }
   },
 
@@ -369,10 +390,7 @@ export const cartService = {
       return response.data;
     } catch (error) {
       logger.error('Get cart summary error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      throw formatApiError(error);
     }
   },
 
@@ -383,10 +401,7 @@ export const cartService = {
       return response.data;
     } catch (error) {
       logger.error('Add to cart error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      throw formatApiError(error);
     }
   },
 
@@ -397,10 +412,7 @@ export const cartService = {
       return response.data;
     } catch (error) {
       logger.error('Update cart item error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      throw formatApiError(error);
     }
   },
 
@@ -411,10 +423,7 @@ export const cartService = {
       return response.data;
     } catch (error) {
       logger.error('Remove from cart error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      throw formatApiError(error);
     }
   },
 
@@ -425,10 +434,55 @@ export const cartService = {
       return response.data;
     } catch (error) {
       logger.error('Clear cart error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      throw formatApiError(error);
+    }
+  }
+};
+
+// Servicios de pagos
+export const paymentService = {
+  async initiatePayment(shippingAddress) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(routesStore.fullPaymentRoutes.initiate, { shippingAddress });
+      return response.data;
+    } catch (error) {
+      logger.error('Initiate payment error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async confirmPayment(tokenWs) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(routesStore.fullPaymentRoutes.confirm, { token_ws: tokenWs });
+      return response.data;
+    } catch (error) {
+      logger.error('Confirm payment error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async getPaymentStatus(orderId) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.getPaymentStatusUrl(orderId));
+      return response.data;
+    } catch (error) {
+      logger.error('Get payment status error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async refundPayment(orderId, amount = null) {
+    try {
+      const routesStore = useRoutesStore();
+      const body = amount ? { amount } : {};
+      const response = await axios.post(routesStore.getRefundPaymentUrl(orderId), body);
+      return response.data;
+    } catch (error) {
+      logger.error('Refund payment error:', error);
+      throw formatApiError(error);
     }
   }
 };
@@ -452,7 +506,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Create product error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -472,7 +526,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Update product error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -483,7 +537,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Delete product error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -497,7 +551,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Update stock error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -508,7 +562,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Admin get all products error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -520,7 +574,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Get all orders error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -531,7 +585,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Get order stats error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -542,7 +596,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Update order status error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -553,7 +607,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Get payment status error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -564,7 +618,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Refund payment error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -575,7 +629,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Get order details error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -587,7 +641,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Get all users error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -598,7 +652,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Get user by ID error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -609,7 +663,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Update user error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -620,7 +674,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Delete user error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -633,7 +687,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Reactivate user error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
 
@@ -643,7 +697,7 @@ export const adminService = {
       return response.data;
     } catch (error) {
       logger.error('Get user stats error:', error);
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   }
 }; 

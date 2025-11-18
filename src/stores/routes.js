@@ -122,6 +122,14 @@ export const useRoutesStore = defineStore('routes', () => {
     clear: '/api/cart/clear'
   });
 
+  // Rutas de pagos
+  const paymentRoutes = ref({
+    initiate: '/api/payments/initiate',
+    confirm: '/api/payments/confirm',
+    status: '/api/payments/status',
+    refund: '/api/payments/refund'
+  });
+
   // Computed para obtener URLs completas
   const fullUserRoutes = computed(() => {
     const routes = {};
@@ -151,6 +159,14 @@ export const useRoutesStore = defineStore('routes', () => {
     const routes = {};
     Object.keys(cartRoutes.value).forEach(key => {
       routes[key] = `${baseURL.value}${cartRoutes.value[key]}`;
+    });
+    return routes;
+  });
+
+  const fullPaymentRoutes = computed(() => {
+    const routes = {};
+    Object.keys(paymentRoutes.value).forEach(key => {
+      routes[key] = `${baseURL.value}${paymentRoutes.value[key]}`;
     });
     return routes;
   });
@@ -196,6 +212,14 @@ export const useRoutesStore = defineStore('routes', () => {
     return `${baseURL.value}${cartRoutes.value.remove}/${productId}`;
   };
 
+  const getPaymentStatusUrl = (orderId) => {
+    return `${baseURL.value}${paymentRoutes.value.status}/${orderId}`;
+  };
+
+  const getRefundPaymentUrl = (orderId) => {
+    return `${baseURL.value}${paymentRoutes.value.refund}/${orderId}`;
+  };
+
   // Métodos para URLs de administración de usuarios
   const getUserByIdUrl = (id) => {
     return `${baseURL.value}${userRoutes.value.getById}/${id}`;
@@ -220,7 +244,8 @@ export const useRoutesStore = defineStore('routes', () => {
       users: fullUserRoutes.value,
       products: fullProductRoutes.value,
       orders: fullOrderRoutes.value,
-      cart: fullCartRoutes.value
+      cart: fullCartRoutes.value,
+      payments: fullPaymentRoutes.value
     };
   });
 
@@ -231,12 +256,14 @@ export const useRoutesStore = defineStore('routes', () => {
     productRoutes,
     orderRoutes,
     cartRoutes,
+    paymentRoutes,
     
     // Computed
     fullUserRoutes,
     fullProductRoutes,
     fullOrderRoutes,
     fullCartRoutes,
+    fullPaymentRoutes,
     getAllRoutes,
     
     // Métodos
@@ -251,6 +278,8 @@ export const useRoutesStore = defineStore('routes', () => {
     getCancelOrderUrl,
     getUpdateOrderStatusUrl,
     getRemoveFromCartUrl,
+    getPaymentStatusUrl,
+    getRefundPaymentUrl,
     getUserByIdUrl,
     getUpdateUserUrl,
     getDeleteUserUrl

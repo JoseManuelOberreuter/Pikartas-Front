@@ -14,6 +14,15 @@ export const useCartStore = defineStore('cart', () => {
   // Composables
   const { success, error: errorNotification } = useNotifications();
 
+  const verificationRequiredMessage = 'Debes verificar tu cuenta para usar el carrito. Revisa tu correo electrónico.';
+
+  const resolveCartErrorMessage = (err, fallbackMessage) => {
+    if (err?.verificationRequired) {
+      return verificationRequiredMessage;
+    }
+    return err?.message || err?.error || fallbackMessage;
+  };
+
   // Función para obtener información completa de productos
   async function getProductDetails(productIds) {
     const productDetails = {};
@@ -217,13 +226,15 @@ export const useCartStore = defineStore('cart', () => {
       }
     } catch (err) {
       // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        error.value = resolveCartErrorMessage(err, verificationRequiredMessage);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para ver tu carrito';
         // Limpiar carrito local si no está autenticado
         items.value = [];
       } else {
-      error.value = err.message || 'Error al cargar el carrito';
-      items.value = [];
+        error.value = resolveCartErrorMessage(err, 'Error al cargar el carrito');
+        items.value = [];
       }
     } finally {
       loading.value = false;
@@ -254,13 +265,17 @@ export const useCartStore = defineStore('cart', () => {
       success(`${product.name} agregado al carrito`);
       
     } catch (err) {
-      // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        const message = resolveCartErrorMessage(err, verificationRequiredMessage);
+        error.value = message;
+        errorNotification(message);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para agregar productos al carrito';
         errorNotification(error.value);
       } else {
-      error.value = err.message || 'Error al agregar producto al carrito';
-      errorNotification(error.value);
+        const message = resolveCartErrorMessage(err, 'Error al agregar producto al carrito');
+        error.value = message;
+        errorNotification(message);
       }
     } finally {
       loading.value = false;
@@ -285,13 +300,17 @@ export const useCartStore = defineStore('cart', () => {
       success('Producto eliminado del carrito');
       
     } catch (err) {
-      // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        const message = resolveCartErrorMessage(err, verificationRequiredMessage);
+        error.value = message;
+        errorNotification(message);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para modificar el carrito';
         errorNotification(error.value);
       } else {
-      error.value = err.message || 'Error al eliminar producto del carrito';
-      errorNotification(error.value);
+        const message = resolveCartErrorMessage(err, 'Error al eliminar producto del carrito');
+        error.value = message;
+        errorNotification(message);
       }
     } finally {
       loading.value = false;
@@ -325,13 +344,17 @@ export const useCartStore = defineStore('cart', () => {
       await loadCart(); // Recargar carrito después de actualizar
       
     } catch (err) {
-      // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        const message = resolveCartErrorMessage(err, verificationRequiredMessage);
+        error.value = message;
+        errorNotification(message);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para modificar el carrito';
         errorNotification(error.value);
       } else {
-      error.value = err.message || 'Error al actualizar cantidad';
-      errorNotification(error.value);
+        const message = resolveCartErrorMessage(err, 'Error al actualizar cantidad');
+        error.value = message;
+        errorNotification(message);
       }
     } finally {
       loading.value = false;
@@ -355,13 +378,17 @@ export const useCartStore = defineStore('cart', () => {
       success('Carrito vaciado');
       
     } catch (err) {
-      // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        const message = resolveCartErrorMessage(err, verificationRequiredMessage);
+        error.value = message;
+        errorNotification(message);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para vaciar el carrito';
         errorNotification(error.value);
       } else {
-      error.value = err.message || 'Error al vaciar el carrito';
-      errorNotification(error.value);
+        const message = resolveCartErrorMessage(err, 'Error al vaciar el carrito');
+        error.value = message;
+        errorNotification(message);
       }
     } finally {
       loading.value = false;
