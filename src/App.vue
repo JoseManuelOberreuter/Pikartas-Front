@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import Header from './components/Header.vue'
 import CartSidebar from './components/CartSidebar.vue'
 import AuthModal from './components/AuthModal.vue'
@@ -57,6 +57,16 @@ watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
     await cartStore.initializeCart()
   }
 }, { immediate: true })
+
+// Listen for custom event from Home.vue to open register modal
+onMounted(() => {
+  window.addEventListener('open-register-modal', openRegisterModal)
+})
+
+// Cleanup event listener
+onUnmounted(() => {
+  window.removeEventListener('open-register-modal', openRegisterModal)
+})
 
 // Modal functions
 const openLoginModal = () => {

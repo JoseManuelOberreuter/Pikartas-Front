@@ -59,18 +59,12 @@
       <div class="container">
         <div class="newsletter-content">
           <h2>Mantente al día con nuestras ofertas</h2>
-          <p>Suscríbete a nuestro newsletter y recibe ofertas exclusivas</p>
-          <form @submit.prevent="subscribeNewsletter" class="newsletter-form">
-            <input 
-              type="email" 
-              v-model="emailSubscription"
-              placeholder="tu@email.com" 
-              required
-            >
-            <button type="submit" class="btn btn-primary">
-              Suscribirse
+          <p>Si quieres recibir ofertas exclusivas, debes crear una cuenta</p>
+          <div class="newsletter-actions">
+            <button class="btn btn-primary" @click="openRegisterModal">
+              Registrarse
             </button>
-          </form>
+          </div>
         </div>
       </div>
     </section>
@@ -82,11 +76,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { productService } from '../services/api'
 import ProductCard from '../components/ProductCard.vue'
-import { useNotifications } from '../composables/useNotifications'
 
 const router = useRouter()
-const { success } = useNotifications()
-const emailSubscription = ref('')
 
 // Referencias reactivas para productos
 const products = ref([])
@@ -170,9 +161,10 @@ const viewProduct = (productId) => {
   router.push(`/product/${productId}`)
 }
 
-const subscribeNewsletter = () => {
-  success(`¡Gracias por suscribirte con ${emailSubscription.value}!`)
-  emailSubscription.value = ''
+const openRegisterModal = (event) => {
+  event.preventDefault()
+  // Emit custom event that App.vue can listen to
+  window.dispatchEvent(new CustomEvent('open-register-modal'))
 }
 
 // Cargar productos al montar el componente
@@ -432,34 +424,10 @@ onMounted(() => {
   line-height: var(--line-height-relaxed);
 }
 
-.newsletter-form {
+.newsletter-actions {
   display: flex;
-  max-width: 400px;
-  margin: 0 auto;
-  gap: var(--spacing-lg);
-  flex-wrap: wrap;
-}
-
-.newsletter-form input {
-  flex: 1;
-  min-width: 250px;
-  padding: var(--spacing-lg);
-  border: none;
-  border-radius: var(--border-radius-md);
-  font-family: var(--font-family-primary);
-  font-size: var(--font-size-base);
-  color: var(--color-gray-700);
-  background: var(--color-white);
-  box-shadow: var(--shadow-sm);
-}
-
-.newsletter-form input:focus {
-  outline: none;
-  box-shadow: var(--shadow-md), 0 0 0 3px rgba(255, 255, 255, 0.3);
-}
-
-.newsletter-form input::placeholder {
-  color: var(--color-gray-400);
+  justify-content: center;
+  margin-top: var(--spacing-3xl);
 }
 
 .newsletter .btn-primary {
@@ -501,15 +469,6 @@ onMounted(() => {
     text-align: center;
   }
   
-  .newsletter-form {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .newsletter-form input {
-    min-width: unset;
-    width: 100%;
-  }
   
   .features-grid {
     grid-template-columns: 1fr;
