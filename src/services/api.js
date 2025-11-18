@@ -30,7 +30,7 @@ axios.interceptors.response.use(
   }
 );
 
-const formatApiError = (error) => {
+export const formatApiError = (error) => {
   const responseData = error.response?.data;
   const formattedError = (responseData && typeof responseData === 'object')
     ? { ...responseData }
