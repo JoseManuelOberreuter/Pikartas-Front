@@ -10,6 +10,7 @@ import Profile from '../views/Profile.vue'
 import Settings from '../views/Settings.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
 import AdminProducts from '../views/AdminProducts.vue'
+import Contact from '../views/Contact.vue'
 
 const routes = [
   {
@@ -126,6 +127,11 @@ const routes = [
     name: 'UserOrders',
     component: () => import('../views/UserOrders.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/contact',
+    name: 'Contact',
+    component: Contact
   }
 ]
 

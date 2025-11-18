@@ -130,6 +130,9 @@ export const useRoutesStore = defineStore('routes', () => {
     refund: '/api/payments/refund'
   });
 
+  // Ruta de contacto
+  const contactRoute = ref('/api/contact');
+
   // Computed para obtener URLs completas
   const fullUserRoutes = computed(() => {
     const routes = {};
@@ -169,6 +172,10 @@ export const useRoutesStore = defineStore('routes', () => {
       routes[key] = `${baseURL.value}${paymentRoutes.value[key]}`;
     });
     return routes;
+  });
+
+  const fullContactRoute = computed(() => {
+    return `${baseURL.value}${contactRoute.value}`;
   });
 
   // Métodos para construir URLs dinámicas
@@ -257,6 +264,7 @@ export const useRoutesStore = defineStore('routes', () => {
     orderRoutes,
     cartRoutes,
     paymentRoutes,
+    contactRoute,
     
     // Computed
     fullUserRoutes,
@@ -264,6 +272,7 @@ export const useRoutesStore = defineStore('routes', () => {
     fullOrderRoutes,
     fullCartRoutes,
     fullPaymentRoutes,
+    fullContactRoute,
     getAllRoutes,
     
     // Métodos

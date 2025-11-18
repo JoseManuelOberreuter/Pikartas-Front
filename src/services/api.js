@@ -700,4 +700,18 @@ export const adminService = {
       throw formatApiError(error);
     }
   }
+};
+
+// Contact service
+export const contactService = {
+  async submitContactForm(contactData) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(routesStore.fullContactRoute, contactData);
+      return response.data;
+    } catch (error) {
+      logger.error('Submit contact form error:', error);
+      throw formatApiError(error);
+    }
+  }
 }; 
