@@ -67,6 +67,8 @@
                 <th>Categoría</th>
                 <th>Precio</th>
                 <th>Stock</th>
+                <th>Destacado</th>
+                <th>Oferta</th>
                 <th>Estado</th>
                 <th>Acciones</th>
               </tr>
@@ -103,6 +105,27 @@
                 </td>
                 <td>
                   <span 
+                    class="featured-badge" 
+                    :class="{ 'featured-active': product.is_featured }"
+                  >
+                    <font-awesome-icon icon="star" class="badge-icon" />
+                    {{ product.is_featured ? 'Sí' : 'No' }}
+                  </span>
+                </td>
+                <td>
+                  <span 
+                    class="sale-badge" 
+                    :class="{ 'sale-active': isProductOnSale(product) }"
+                  >
+                    <font-awesome-icon icon="tag" class="badge-icon" />
+                    <span v-if="isProductOnSale(product)">
+                      {{ roundDiscount(product.discount_percentage) }}% OFF
+                    </span>
+                    <span v-else>No</span>
+                  </span>
+                </td>
+                <td>
+                  <span 
                     class="status-badge" 
                     :class="{ 
                       'status-active': product.is_active !== false && product.stock > 0, 
@@ -114,7 +137,23 @@
                 </td>
                 <td>
                   <div class="actions">
-                    <button @click="editProduct(product)" class="btn btn-sm btn-outline">
+                    <button 
+                      @click="toggleFeatured(product._id || product.id, product.is_featured)" 
+                      class="btn btn-sm"
+                      :class="product.is_featured ? 'btn-featured-active' : 'btn-featured'"
+                      :title="product.is_featured ? 'Quitar de destacados' : 'Marcar como destacado'"
+                    >
+                      <font-awesome-icon icon="star" class="action-icon" />
+                    </button>
+                    <button 
+                      @click="toggleOnSale(product._id || product.id, product)" 
+                      class="btn btn-sm"
+                      :class="isProductOnSale(product) ? 'btn-sale-active' : 'btn-sale'"
+                      :title="isProductOnSale(product) ? 'Desactivar oferta' : 'Activar oferta'"
+                    >
+                      <font-awesome-icon icon="tag" class="action-icon" />
+                    </button>
+                    <button @click="editProduct(product)" class="btn btn-sm btn-outline" title="Editar producto">
                       <font-awesome-icon icon="edit" class="action-icon" />
                     </button>
                     <button 
@@ -125,7 +164,7 @@
                     >
                       <font-awesome-icon icon="undo" class="action-icon" />
                     </button>
-                    <button @click="deleteProduct(product.id)" class="btn btn-sm btn-danger">
+                    <button @click="deleteProduct(product.id)" class="btn btn-sm btn-danger" title="Eliminar producto">
                       <font-awesome-icon icon="trash" class="action-icon" />
                     </button>
                   </div>
@@ -909,6 +948,105 @@ const reactivateProduct = async (productId) => {
   }
 };
 
+// Helper function to round discount percentage
+const roundDiscount = (percentage) => {
+  return Math.round(percentage || 0);
+};
+
+// Check if product is currently on sale (within date range)
+const isProductOnSale = (product) => {
+  if (!product.is_on_sale || !product.discount_percentage) {
+    return false;
+  }
+  
+  const now = new Date();
+  const startDate = product.sale_start_date ? new Date(product.sale_start_date) : null;
+  const endDate = product.sale_end_date ? new Date(product.sale_end_date) : null;
+  
+  if (!startDate || !endDate) {
+    return false;
+  }
+  
+  return now >= startDate && now <= endDate;
+};
+
+// Toggle featured status
+const toggleFeatured = async (productId, currentState) => {
+  const id = parseInt(productId);
+  if (!id || isNaN(id)) {
+    error('Error: ID de producto inválido');
+    return;
+  }
+  
+  const newState = !currentState;
+  const action = newState ? 'marcar como destacado' : 'quitar de destacados';
+  
+  if (!confirm(`¿Estás seguro de que quieres ${action} este producto?`)) return;
+  
+  try {
+    const formData = new FormData();
+    formData.append('isFeatured', newState);
+    
+    await adminService.updateProduct(id, formData);
+    success(newState ? 'Producto marcado como destacado' : 'Producto quitado de destacados');
+    await loadProducts();
+  } catch (err) {
+    error(err.message || 'Error al actualizar estado de destacado');
+  }
+};
+
+// Toggle on sale status
+const toggleOnSale = async (productId, product) => {
+  const id = parseInt(productId);
+  if (!id || isNaN(id)) {
+    error('Error: ID de producto inválido');
+    return;
+  }
+  
+  // Check current state - if is_on_sale is true, we're deactivating
+  const currentlyOnSale = product.is_on_sale === true;
+  const newState = !currentlyOnSale;
+  
+  // If trying to activate sale, check if product has discount and dates configured
+  if (newState) {
+    if (!product.discount_percentage || product.discount_percentage <= 0 || product.discount_percentage >= 100) {
+      error('Para activar la oferta, primero debes configurar un porcentaje de descuento válido (entre 0 y 99.99%). Por favor, edita el producto primero.');
+      return;
+    }
+    if (!product.sale_start_date || !product.sale_end_date) {
+      error('Para activar la oferta, primero debes configurar las fechas de inicio y fin. Por favor, edita el producto primero.');
+      return;
+    }
+  }
+  
+  const action = newState ? 'activar la oferta' : 'desactivar la oferta';
+  
+  if (!confirm(`¿Estás seguro de que quieres ${action} para este producto?`)) return;
+  
+  try {
+    const formData = new FormData();
+    formData.append('isOnSale', newState);
+    
+    // If deactivating, clear sale-related fields
+    if (!newState) {
+      formData.append('discountPercentage', '');
+      formData.append('saleStartDate', '');
+      formData.append('saleEndDate', '');
+    } else {
+      // If activating, ensure discount and dates are included
+      formData.append('discountPercentage', product.discount_percentage || 0);
+      formData.append('saleStartDate', product.sale_start_date || '');
+      formData.append('saleEndDate', product.sale_end_date || '');
+    }
+    
+    await adminService.updateProduct(id, formData);
+    success(newState ? 'Oferta activada exitosamente' : 'Oferta desactivada exitosamente');
+    await loadProducts();
+  } catch (err) {
+    error(err.message || 'Error al actualizar estado de oferta');
+  }
+};
+
 // Lifecycle
 onMounted(async () => {
   await loadProducts()
@@ -1105,9 +1243,122 @@ th {
   color: #721c24;
 }
 
+.featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: #e9ecef;
+  color: #6c757d;
+  transition: all 0.3s;
+}
+
+.featured-badge .badge-icon {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.featured-active {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.featured-active .badge-icon {
+  color: #ffc107;
+}
+
+.sale-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: #e9ecef;
+  color: #6c757d;
+  transition: all 0.3s;
+}
+
+.sale-badge .badge-icon {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.sale-active {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.sale-active .badge-icon {
+  color: #dc3545;
+}
+
 .actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-featured {
+  background: #e9ecef;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.btn-featured:hover {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffc107;
+}
+
+.btn-featured-active {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+.btn-featured-active:hover {
+  background: #ffc107;
+  color: #856404;
+  border-color: #ffc107;
+}
+
+.btn-featured .action-icon,
+.btn-featured-active .action-icon {
+  color: inherit;
+}
+
+.btn-sale {
+  background: #e9ecef;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.btn-sale:hover {
+  background: #f8d7da;
+  color: #721c24;
+  border-color: #dc3545;
+}
+
+.btn-sale-active {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #dc3545;
+}
+
+.btn-sale-active:hover {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.btn-sale .action-icon,
+.btn-sale-active .action-icon {
+  color: inherit;
 }
 
 .btn {
