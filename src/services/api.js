@@ -72,7 +72,7 @@ export const authService = {
     }
   },
   
-  async login(credentials) {git 
+  async login(credentials) {
     try {
       const routesStore = useRoutesStore();
       const loginUrl = routesStore.fullUserRoutes.login;

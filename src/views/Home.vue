@@ -120,6 +120,35 @@ const loadProducts = async () => {
         category: product.category,
         stock: product.stock
       }))
+    } else {
+      // Si no hay productos destacados, cargar productos regulares como fallback
+      console.warn('[Home] No featured products found, loading regular products as fallback')
+      const fallbackResponse = await productService.getAllProducts({ limit: 4, page: 1 })
+      if (fallbackResponse?.success) {
+        let fallbackArray = []
+        if (fallbackResponse.data?.products && Array.isArray(fallbackResponse.data.products)) {
+          fallbackArray = fallbackResponse.data.products
+        } else if (Array.isArray(fallbackResponse.data)) {
+          fallbackArray = fallbackResponse.data
+        }
+        if (fallbackArray.length > 0) {
+          products.value = fallbackArray.map(product => ({
+            id: product._id || product.id,
+            name: product.name,
+            price: product.price,
+            sale_price: product.sale_price,
+            discount_percentage: product.discount_percentage,
+            is_featured: product.is_featured,
+            is_on_sale: product.is_on_sale,
+            sale_start_date: product.sale_start_date,
+            sale_end_date: product.sale_end_date,
+            image: product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
+            description: product.description,
+            category: product.category,
+            stock: product.stock
+          }))
+        }
+      }
     }
   } catch (error) {
     console.error('[Home] Error loading featured products:', error);
