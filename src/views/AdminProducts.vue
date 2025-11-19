@@ -841,15 +841,15 @@ const submitProduct = async () => {
     // Agregar campos del formulario
     formData.append('name', productForm.value.name)
     formData.append('description', productForm.value.description)
-    formData.append('price', productForm.value.price)
-    formData.append('stock', productForm.value.stock)
+    formData.append('price', String(productForm.value.price))
+    formData.append('stock', String(productForm.value.stock))
     formData.append('category', productForm.value.category)
-    formData.append('isFeatured', productForm.value.isFeatured)
-    formData.append('isOnSale', productForm.value.isOnSale)
+    formData.append('isFeatured', String(productForm.value.isFeatured))
+    formData.append('isOnSale', String(productForm.value.isOnSale))
     
     // Agregar campos de oferta si está en oferta
     if (productForm.value.isOnSale) {
-      formData.append('discountPercentage', productForm.value.discountPercentage || 0)
+      formData.append('discountPercentage', String(productForm.value.discountPercentage || 0))
       formData.append('saleStartDate', productForm.value.saleStartDate)
       formData.append('saleEndDate', productForm.value.saleEndDate)
     }
@@ -985,7 +985,7 @@ const toggleFeatured = async (productId, currentState) => {
   
   try {
     const formData = new FormData();
-    formData.append('isFeatured', newState);
+    formData.append('isFeatured', String(newState));
     
     await adminService.updateProduct(id, formData);
     success(newState ? 'Producto marcado como destacado' : 'Producto quitado de destacados');
@@ -1025,7 +1025,7 @@ const toggleOnSale = async (productId, product) => {
   
   try {
     const formData = new FormData();
-    formData.append('isOnSale', newState);
+    formData.append('isOnSale', String(newState));
     
     // If deactivating, clear sale-related fields
     if (!newState) {
@@ -1034,7 +1034,7 @@ const toggleOnSale = async (productId, product) => {
       formData.append('saleEndDate', '');
     } else {
       // If activating, ensure discount and dates are included
-      formData.append('discountPercentage', product.discount_percentage || 0);
+      formData.append('discountPercentage', String(product.discount_percentage || 0));
       formData.append('saleStartDate', product.sale_start_date || '');
       formData.append('saleEndDate', product.sale_end_date || '');
     }
