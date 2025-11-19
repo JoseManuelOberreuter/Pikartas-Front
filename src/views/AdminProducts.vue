@@ -835,6 +835,30 @@ const closeModal = () => {
 const submitProduct = async () => {
   submitting.value = true
   try {
+    // Helper function to format date for API (datetime-local to ISO)
+    const formatDateForAPI = (dateValue) => {
+      if (!dateValue || dateValue === '') {
+        return ''
+      }
+      // If it's already in ISO format, return as is
+      if (typeof dateValue === 'string' && dateValue.includes('T') && (dateValue.includes('Z') || dateValue.includes('+'))) {
+        return dateValue
+      }
+      // If it's in datetime-local format (YYYY-MM-DDTHH:mm), convert to ISO
+      if (typeof dateValue === 'string' && dateValue.includes('T')) {
+        const date = new Date(dateValue)
+        if (!isNaN(date.getTime())) {
+          return date.toISOString()
+        }
+      }
+      // Try to parse as date
+      const date = new Date(dateValue)
+      if (!isNaN(date.getTime())) {
+        return date.toISOString()
+      }
+      return dateValue // Return original if can't parse
+    }
+
     // Crear FormData para enviar archivos
     const formData = new FormData()
     
@@ -849,9 +873,33 @@ const submitProduct = async () => {
     
     // Agregar campos de oferta si está en oferta
     if (productForm.value.isOnSale) {
-      formData.append('discountPercentage', String(productForm.value.discountPercentage || 0))
-      formData.append('saleStartDate', productForm.value.saleStartDate)
-      formData.append('saleEndDate', productForm.value.saleEndDate)
+      // Validate discount percentage
+      if (!productForm.value.discountPercentage || productForm.value.discountPercentage <= 0) {
+        throw new Error('El porcentaje de descuento es requerido y debe ser mayor a 0')
+      }
+      
+      // Validate dates
+      if (!productForm.value.saleStartDate || !productForm.value.saleEndDate) {
+        throw new Error('Las fechas de inicio y fin de oferta son requeridas')
+      }
+      
+      // Format dates to ISO before sending
+      const formattedStartDate = formatDateForAPI(productForm.value.saleStartDate)
+      const formattedEndDate = formatDateForAPI(productForm.value.saleEndDate)
+      
+      // Validate that dates are valid
+      const startDate = new Date(formattedStartDate)
+      const endDate = new Date(formattedEndDate)
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error('Las fechas de oferta no son válidas')
+      }
+      if (startDate >= endDate) {
+        throw new Error('La fecha de fin de oferta debe ser posterior a la fecha de inicio')
+      }
+      
+      formData.append('discountPercentage', String(productForm.value.discountPercentage))
+      formData.append('saleStartDate', formattedStartDate)
+      formData.append('saleEndDate', formattedEndDate)
     }
     
     // Agregar imagen si se seleccionó una nueva
@@ -877,7 +925,17 @@ const submitProduct = async () => {
     await loadProducts()
     closeModal()
   } catch (err) {
-    error(err.message || 'Error al guardar producto')
+    // Extract error message from API response if available
+    let errorMessage = 'Error al guardar producto'
+    if (err.response?.data?.error) {
+      errorMessage = err.response.data.error
+    } else if (err.response?.data?.message) {
+      errorMessage = err.response.data.message
+    } else if (err.message) {
+      errorMessage = err.message
+    }
+    error(errorMessage)
+    console.error('Error saving product:', err)
   } finally {
     submitting.value = false
   }
@@ -1043,7 +1101,17 @@ const toggleOnSale = async (productId, product) => {
     success(newState ? 'Oferta activada exitosamente' : 'Oferta desactivada exitosamente');
     await loadProducts();
   } catch (err) {
-    error(err.message || 'Error al actualizar estado de oferta');
+    // Extract error message from API response if available
+    let errorMessage = 'Error al actualizar estado de oferta'
+    if (err.response?.data?.error) {
+      errorMessage = err.response.data.error
+    } else if (err.response?.data?.message) {
+      errorMessage = err.response.data.message
+    } else if (err.message) {
+      errorMessage = err.message
+    }
+    error(errorMessage)
+    console.error('Error updating sale status:', err)
   }
 };
 
