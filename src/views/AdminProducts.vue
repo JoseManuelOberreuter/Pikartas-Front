@@ -66,9 +66,9 @@
                 <th>Nombre</th>
                 <th>Categoría</th>
                 <th>Precio</th>
+                <th>Oferta</th>
                 <th>Stock</th>
                 <th>Destacado</th>
-                <th>Oferta</th>
                 <th>Estado</th>
                 <th>Acciones</th>
               </tr>
@@ -93,6 +93,18 @@
                   <span class="price">${{ formatCLP(product.price) }}</span>
                 </td>
                 <td>
+                  <span 
+                    class="sale-badge" 
+                    :class="{ 'sale-active': isProductOnSale(product) }"
+                  >
+                    <font-awesome-icon icon="tag" class="badge-icon" />
+                    <span v-if="isProductOnSale(product)">
+                      {{ roundDiscount(product.discount_percentage) }}%
+                    </span>
+                    <span v-else>No</span>
+                  </span>
+                </td>
+                <td>
                   <div class="stock-control">
                     <input 
                       :value="product.stock" 
@@ -110,18 +122,6 @@
                   >
                     <font-awesome-icon icon="star" class="badge-icon" />
                     {{ product.is_featured ? 'Sí' : 'No' }}
-                  </span>
-                </td>
-                <td>
-                  <span 
-                    class="sale-badge" 
-                    :class="{ 'sale-active': isProductOnSale(product) }"
-                  >
-                    <font-awesome-icon icon="tag" class="badge-icon" />
-                    <span v-if="isProductOnSale(product)">
-                      {{ roundDiscount(product.discount_percentage) }}% OFF
-                    </span>
-                    <span v-else>No</span>
                   </span>
                 </td>
                 <td>
@@ -146,10 +146,10 @@
                       <font-awesome-icon icon="star" class="action-icon" />
                     </button>
                     <button 
-                      @click="toggleOnSale(product._id || product.id, product)" 
+                      @click="openSaleModal(product)" 
                       class="btn btn-sm"
                       :class="isProductOnSale(product) ? 'btn-sale-active' : 'btn-sale'"
-                      :title="isProductOnSale(product) ? 'Desactivar oferta' : 'Activar oferta'"
+                      :title="isProductOnSale(product) ? 'Editar oferta' : 'Configurar oferta'"
                     >
                       <font-awesome-icon icon="tag" class="action-icon" />
                     </button>
@@ -269,6 +269,83 @@
               Cerrar
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- Modal for Sale Management -->
+      <div v-if="showSaleModal" class="modal-overlay" @click="closeSaleModal">
+        <div class="modal-content sale-modal" @click.stop>
+          <div class="modal-header">
+            <h2>
+              <font-awesome-icon icon="tag" class="modal-header-icon" />
+              Gestión de Oferta
+            </h2>
+            <button @click="closeSaleModal" class="close-btn">
+              <font-awesome-icon icon="times" class="close-icon" />
+            </button>
+          </div>
+          
+          <form @submit.prevent="submitSale" class="sale-form">
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input 
+                  v-model="saleForm.isOnSale" 
+                  type="checkbox" 
+                  class="form-checkbox"
+                />
+                <span>En Oferta</span>
+              </label>
+              <small class="form-help">Marca esta opción para poner el producto en oferta</small>
+            </div>
+
+            <div v-if="saleForm.isOnSale" class="sale-fields">
+              <div class="form-group">
+                <label>Porcentaje de Descuento *</label>
+                <input 
+                  v-model.number="saleForm.discountPercentage" 
+                  type="number" 
+                  step="0.01" 
+                  min="0" 
+                  max="99.99"
+                  :required="saleForm.isOnSale"
+                  placeholder="Ej: 20 (para 20% de descuento)"
+                  class="form-input"
+                />
+                <small class="form-help">Ingresa el porcentaje de descuento (0-99.99%)</small>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Fecha de Inicio de Oferta *</label>
+                  <input 
+                    v-model="saleForm.saleStartDate" 
+                    type="datetime-local" 
+                    :required="saleForm.isOnSale"
+                    class="form-input"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Fecha de Fin de Oferta *</label>
+                  <input 
+                    v-model="saleForm.saleEndDate" 
+                    type="datetime-local" 
+                    :required="saleForm.isOnSale"
+                    class="form-input"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" @click="closeSaleModal" class="btn btn-secondary">
+                Cancelar
+              </button>
+              <button type="submit" :disabled="submittingSale" class="btn btn-primary">
+                {{ submittingSale ? 'Guardando...' : 'Guardar Oferta' }}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -504,8 +581,10 @@ const products = ref([])
 const loading = ref(false)
 const showModal = ref(false)
 const showCategoryModal = ref(false)
+const showSaleModal = ref(false)
 const isEditing = ref(false)
 const submitting = ref(false)
+const submittingSale = ref(false)
 const searchTerm = ref('')
 const selectedCategory = ref('')
 const showInactive = ref(false)
@@ -513,6 +592,7 @@ const availableCategories = ref([])
 const newCategoryName = ref('')
 const selectedImage = ref(null)
 const imagePreviewUrl = ref('')
+const currentProductId = ref(null)
 
 // Form
 const productForm = ref({
@@ -523,6 +603,14 @@ const productForm = ref({
   category: '',
   image: '',
   isFeatured: false,
+  isOnSale: false,
+  discountPercentage: null,
+  saleStartDate: '',
+  saleEndDate: ''
+})
+
+// Sale Form
+const saleForm = ref({
   isOnSale: false,
   discountPercentage: null,
   saleStartDate: '',
@@ -725,6 +813,129 @@ const openCategoryManager = () => {
 const closeCategoryModal = () => {
   showCategoryModal.value = false
   newCategoryName.value = ''
+}
+
+// Sale Modal Functions
+const openSaleModal = (product) => {
+  const productId = product._id || product.id
+  if (!productId) {
+    error('Error: Producto sin ID válido')
+    return
+  }
+  
+  currentProductId.value = productId
+  
+  // Initialize form with current product sale data
+  saleForm.value = {
+    isOnSale: product.is_on_sale || false,
+    discountPercentage: product.discount_percentage || null,
+    saleStartDate: product.sale_start_date ? new Date(product.sale_start_date).toISOString().slice(0, 16) : '',
+    saleEndDate: product.sale_end_date ? new Date(product.sale_end_date).toISOString().slice(0, 16) : ''
+  }
+  
+  showSaleModal.value = true
+}
+
+const closeSaleModal = () => {
+  showSaleModal.value = false
+  currentProductId.value = null
+  saleForm.value = {
+    isOnSale: false,
+    discountPercentage: null,
+    saleStartDate: '',
+    saleEndDate: ''
+  }
+}
+
+const submitSale = async () => {
+  // Validate form
+  if (saleForm.value.isOnSale) {
+    if (!saleForm.value.discountPercentage || saleForm.value.discountPercentage <= 0 || saleForm.value.discountPercentage >= 100) {
+      error('El porcentaje de descuento es requerido y debe estar entre 0 y 99.99%')
+      return
+    }
+    
+    if (!saleForm.value.saleStartDate || !saleForm.value.saleEndDate) {
+      error('Las fechas de inicio y fin de oferta son requeridas')
+      return
+    }
+    
+    // Validate dates
+    const startDate = new Date(saleForm.value.saleStartDate)
+    const endDate = new Date(saleForm.value.saleEndDate)
+    
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      error('Las fechas de oferta no son válidas')
+      return
+    }
+    
+    if (startDate >= endDate) {
+      error('La fecha de fin de oferta debe ser posterior a la fecha de inicio')
+      return
+    }
+  }
+  
+  submittingSale.value = true
+  try {
+    const formData = new FormData()
+    formData.append('isOnSale', String(saleForm.value.isOnSale))
+    
+    if (saleForm.value.isOnSale) {
+      // Helper function to format date for API
+      const formatDateForAPI = (dateValue) => {
+        if (!dateValue || dateValue === '') {
+          return ''
+        }
+        if (typeof dateValue === 'string' && dateValue.includes('T') && (dateValue.includes('Z') || dateValue.includes('+'))) {
+          return dateValue
+        }
+        if (typeof dateValue === 'string' && dateValue.includes('T')) {
+          const date = new Date(dateValue)
+          if (!isNaN(date.getTime())) {
+            return date.toISOString()
+          }
+        }
+        const date = new Date(dateValue)
+        if (!isNaN(date.getTime())) {
+          return date.toISOString()
+        }
+        return dateValue
+      }
+      
+      formData.append('discountPercentage', String(saleForm.value.discountPercentage))
+      formData.append('saleStartDate', formatDateForAPI(saleForm.value.saleStartDate))
+      formData.append('saleEndDate', formatDateForAPI(saleForm.value.saleEndDate))
+    } else {
+      // If deactivating, clear sale-related fields
+      formData.append('discountPercentage', '')
+      formData.append('saleStartDate', '')
+      formData.append('saleEndDate', '')
+    }
+    
+    const id = parseInt(currentProductId.value)
+    if (!id || isNaN(id)) {
+      error('Error: ID de producto inválido')
+      return
+    }
+    
+    await adminService.updateProduct(id, formData)
+    success(saleForm.value.isOnSale ? 'Oferta configurada exitosamente' : 'Oferta desactivada exitosamente')
+    await loadProducts()
+    closeSaleModal()
+  } catch (err) {
+    let errorMessage = 'Error al guardar oferta'
+    if (err.response?.data?.error) {
+      errorMessage = err.response.data.error
+    } else if (err.response?.data?.message) {
+      errorMessage = err.response.data.message
+    } else if (err.message) {
+      errorMessage = err.message
+    }
+    error(errorMessage)
+    console.error('Error saving sale:', err)
+  } finally {
+    submittingSale.value = false
+  }
 }
 
 const loadProducts = async () => {
@@ -2056,5 +2267,22 @@ th {
 .modal-header-icon {
   margin-right: 0.5rem;
   color: #007bff;
+}
+
+/* Sale Modal Styles */
+.sale-modal {
+  max-width: 600px;
+}
+
+.sale-form {
+  padding: 2rem;
+}
+
+.sale-fields {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
 }
 </style> 
