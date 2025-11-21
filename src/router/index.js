@@ -178,4 +178,17 @@ router.beforeEach(async (to, from, next) => {
   next()
 })
 
+// Scroll to top on route change
+router.afterEach((to, from) => {
+  // Scroll to top after route change
+  // Use setTimeout to ensure DOM is ready
+  setTimeout(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    })
+  }, 100)
+})
+
 export default router 
