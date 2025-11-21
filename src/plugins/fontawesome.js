@@ -66,7 +66,12 @@ import {
   faSyncAlt,
   faComments,
   faMobileAlt,
-  faTag
+  faTag,
+  faArrowUp,
+  faArrowDown,
+  faSort,
+  faSortUp,
+  faSortDown
 } from '@fortawesome/free-solid-svg-icons'
 
 import { 
@@ -153,6 +158,11 @@ library.add(
   faComments,
   faMobileAlt,
   faTag,
+  faArrowUp,
+  faArrowDown,
+  faSort,
+  faSortUp,
+  faSortDown,
   
   // Regular icons
   faHeartRegular,

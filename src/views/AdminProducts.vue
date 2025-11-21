@@ -42,6 +42,8 @@
         :getFinalPrice="getFinalPrice"
         :formatCLP="formatCLP"
         :roundDiscount="roundDiscount"
+        :sort-column="sortColumn"
+        :sort-order="sortOrder"
         @update-stock="updateStock"
         @toggle-featured="toggleFeatured"
         @open-sale="openSaleModal"
@@ -49,6 +51,7 @@
         @delete="deleteProduct"
         @reactivate="reactivateProduct"
         @create-product="openCreateModal"
+        @sort="handleSort"
       />
 
       <!-- Category Manager Modal -->
@@ -126,6 +129,8 @@ const availableCategories = ref([])
 const newCategoryName = ref('')
 const currentProductId = ref(null)
 const currentProduct = ref(null)
+const sortColumn = ref(null)
+const sortOrder = ref('asc')
 
 // Form
 const productForm = ref({
@@ -178,6 +183,48 @@ const filteredProducts = computed(() => {
 
   if (selectedCategory.value) {
     filtered = filtered.filter(p => p.category === selectedCategory.value)
+  }
+
+  // Apply sorting
+  if (sortColumn.value) {
+    filtered = [...filtered].sort((a, b) => {
+      let aValue, bValue
+
+      switch (sortColumn.value) {
+        case 'name':
+          aValue = (a.name || '').toLowerCase()
+          bValue = (b.name || '').toLowerCase()
+          break
+        case 'price':
+          aValue = getFinalPrice(a)
+          bValue = getFinalPrice(b)
+          break
+        case 'offer':
+          aValue = isProductOnSale(a) ? (a.discount_percentage || 0) : 0
+          bValue = isProductOnSale(b) ? (b.discount_percentage || 0) : 0
+          break
+        case 'stock':
+          aValue = a.stock || 0
+          bValue = b.stock || 0
+          break
+        case 'featured':
+          aValue = a.is_featured ? 1 : 0
+          bValue = b.is_featured ? 1 : 0
+          break
+        default:
+          return 0
+      }
+
+      if (typeof aValue === 'string') {
+        return sortOrder.value === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      } else {
+        return sortOrder.value === 'asc' 
+          ? aValue - bValue
+          : bValue - aValue
+      }
+    })
   }
 
   return filtered
@@ -722,6 +769,17 @@ const toggleFeatured = async (productId, currentState) => {
     await loadProducts()
   } catch (err) {
     error(err.message || 'Error al actualizar estado de destacado')
+  }
+}
+
+const handleSort = (column) => {
+  if (sortColumn.value === column) {
+    // Toggle order if same column
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    // New column, default to ascending
+    sortColumn.value = column
+    sortOrder.value = 'asc'
   }
 }
 

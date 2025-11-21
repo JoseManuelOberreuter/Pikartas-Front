@@ -5,12 +5,92 @@
         <thead>
           <tr>
             <th>Imagen</th>
-            <th>Nombre</th>
+            <th class="sortable" @click="$emit('sort', 'name')">
+              <div class="sortable-header">
+                <span>Nombre</span>
+                <div class="sort-icons">
+                  <font-awesome-icon 
+                    icon="sort-up" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'name' && sortOrder === 'asc' }"
+                  />
+                  <font-awesome-icon 
+                    icon="sort-down" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'name' && sortOrder === 'desc' }"
+                  />
+                </div>
+              </div>
+            </th>
             <th>Categoría</th>
-            <th>Precio</th>
-            <th>Oferta</th>
-            <th>Stock</th>
-            <th>Destacado</th>
+            <th class="sortable" @click="$emit('sort', 'price')">
+              <div class="sortable-header">
+                <span>Precio</span>
+                <div class="sort-icons">
+                  <font-awesome-icon 
+                    icon="sort-up" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'price' && sortOrder === 'asc' }"
+                  />
+                  <font-awesome-icon 
+                    icon="sort-down" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'price' && sortOrder === 'desc' }"
+                  />
+                </div>
+              </div>
+            </th>
+            <th class="sortable" @click="$emit('sort', 'offer')">
+              <div class="sortable-header">
+                <span>Oferta</span>
+                <div class="sort-icons">
+                  <font-awesome-icon 
+                    icon="sort-up" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'offer' && sortOrder === 'asc' }"
+                  />
+                  <font-awesome-icon 
+                    icon="sort-down" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'offer' && sortOrder === 'desc' }"
+                  />
+                </div>
+              </div>
+            </th>
+            <th class="sortable" @click="$emit('sort', 'stock')">
+              <div class="sortable-header">
+                <span>Stock</span>
+                <div class="sort-icons">
+                  <font-awesome-icon 
+                    icon="sort-up" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'stock' && sortOrder === 'asc' }"
+                  />
+                  <font-awesome-icon 
+                    icon="sort-down" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'stock' && sortOrder === 'desc' }"
+                  />
+                </div>
+              </div>
+            </th>
+            <th class="sortable" @click="$emit('sort', 'featured')">
+              <div class="sortable-header">
+                <span>Destacado</span>
+                <div class="sort-icons">
+                  <font-awesome-icon 
+                    icon="sort-up" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'featured' && sortOrder === 'asc' }"
+                  />
+                  <font-awesome-icon 
+                    icon="sort-down" 
+                    class="sort-icon"
+                    :class="{ 'sort-active': sortColumn === 'featured' && sortOrder === 'desc' }"
+                  />
+                </div>
+              </div>
+            </th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
@@ -74,10 +154,19 @@ defineProps({
   roundDiscount: {
     type: Function,
     required: true
+  },
+  sortColumn: {
+    type: String,
+    default: null
+  },
+  sortOrder: {
+    type: String,
+    default: 'asc',
+    validator: (value) => ['asc', 'desc'].includes(value)
   }
 })
 
-defineEmits(['update-stock', 'toggle-featured', 'open-sale', 'edit', 'delete', 'reactivate', 'create-product'])
+defineEmits(['update-stock', 'toggle-featured', 'open-sale', 'edit', 'delete', 'reactivate', 'create-product', 'sort'])
 </script>
 
 <style scoped>
@@ -194,6 +283,55 @@ tbody tr {
 
 tbody tr:hover {
   background-color: var(--color-gray-50);
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.sortable:hover {
+  background-color: var(--color-gray-200);
+}
+
+.sortable-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  position: relative;
+}
+
+.sort-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-left: var(--spacing-xs);
+  height: 20px;
+  justify-content: center;
+}
+
+.sort-icon {
+  font-size: 10px;
+  color: var(--color-gray-400);
+  transition: all var(--transition-fast);
+  opacity: 0.4;
+  line-height: 1;
+}
+
+.sort-icon.sort-active {
+  color: var(--color-tertiary);
+  opacity: 1;
+  font-size: 11px;
+}
+
+.sortable:hover .sort-icon {
+  opacity: 0.6;
+}
+
+.sortable:hover .sort-icon.sort-active {
+  opacity: 1;
 }
 
 .no-products {
