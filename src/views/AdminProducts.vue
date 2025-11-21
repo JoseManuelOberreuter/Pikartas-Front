@@ -306,6 +306,22 @@
             </div>
 
             <div v-if="saleForm.isOnSale" class="sale-fields">
+              <!-- Price Preview Section -->
+              <div v-if="currentProduct" class="price-preview-section">
+                <div class="price-preview-item">
+                  <span class="price-label">Precio Original:</span>
+                  <span class="price-original">${{ formatCLP(currentProduct.price) }}</span>
+                </div>
+                <div class="price-preview-item" v-if="saleForm.discountPercentage && saleForm.discountPercentage > 0">
+                  <span class="price-label">Descuento:</span>
+                  <span class="price-discount">-{{ saleForm.discountPercentage }}%</span>
+                </div>
+                <div class="price-preview-item">
+                  <span class="price-label">Precio Final:</span>
+                  <span class="price-final">${{ formatCLP(calculateSalePrice(currentProduct.price, saleForm.discountPercentage)) }}</span>
+                </div>
+              </div>
+
               <div class="form-group">
                 <label>Porcentaje de Descuento *</label>
                 <input 
@@ -600,6 +616,7 @@ const newCategoryName = ref('')
 const selectedImage = ref(null)
 const imagePreviewUrl = ref('')
 const currentProductId = ref(null)
+const currentProduct = ref(null)
 
 // Form
 const productForm = ref({
@@ -831,6 +848,7 @@ const openSaleModal = (product) => {
   }
   
   currentProductId.value = productId
+  currentProduct.value = product
   
   // Initialize form with current product sale data
   saleForm.value = {
@@ -846,6 +864,7 @@ const openSaleModal = (product) => {
 const closeSaleModal = () => {
   showSaleModal.value = false
   currentProductId.value = null
+  currentProduct.value = null
   saleForm.value = {
     isOnSale: false,
     discountPercentage: null,
@@ -1253,6 +1272,15 @@ const getFinalPrice = (product) => {
     return product.price * (1 - discount);
   }
   return product.price;
+};
+
+// Calculate sale price for preview in modal
+const calculateSalePrice = (originalPrice, discountPercentage) => {
+  if (!discountPercentage || discountPercentage <= 0) {
+    return originalPrice;
+  }
+  const discount = discountPercentage / 100;
+  return originalPrice * (1 - discount);
 };
 
 // Toggle featured status
@@ -2304,5 +2332,57 @@ th {
   background: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #e9ecef;
+}
+
+.price-preview-section {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.price-preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.price-preview-item:last-child {
+  border-bottom: none;
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
+  border-top: 2px solid #e9ecef;
+  font-weight: 600;
+}
+
+.price-label {
+  font-weight: 500;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.price-original {
+  font-weight: 500;
+  color: #6c757d;
+  text-decoration: line-through;
+  font-size: 0.95rem;
+}
+
+.price-discount {
+  font-weight: 600;
+  color: #dc3545;
+  font-size: 0.95rem;
+}
+
+.price-final {
+  font-weight: 700;
+  color: #28a745;
+  font-size: 1.1rem;
 }
 </style> 
