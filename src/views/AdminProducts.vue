@@ -39,14 +39,11 @@
           </select>
         </div>
         <div class="filter-group">
-          <label class="filter-checkbox-label">
-            <input 
-              v-model="showInactive" 
-              type="checkbox" 
-              class="filter-checkbox"
-            />
-            <span>Mostrar productos inactivos</span>
-          </label>
+          <label>Estado:</label>
+          <select v-model="productStatusFilter" class="filter-select">
+            <option value="active">Productos activos</option>
+            <option value="inactive">Productos inactivos</option>
+          </select>
         </div>
       </div>
 
@@ -137,36 +134,41 @@
                 </td>
                 <td>
                   <div class="actions">
-                    <button 
-                      @click="toggleFeatured(product._id || product.id, product.is_featured)" 
-                      class="btn btn-sm"
-                      :class="product.is_featured ? 'btn-featured-active' : 'btn-featured'"
-                      :title="product.is_featured ? 'Quitar de destacados' : 'Marcar como destacado'"
-                    >
-                      <font-awesome-icon icon="star" class="action-icon" />
-                    </button>
-                    <button 
-                      @click="openSaleModal(product)" 
-                      class="btn btn-sm"
-                      :class="isProductOnSale(product) ? 'btn-sale-active' : 'btn-sale'"
-                      :title="isProductOnSale(product) ? 'Editar oferta' : 'Configurar oferta'"
-                    >
-                      <font-awesome-icon icon="tag" class="action-icon" />
-                    </button>
-                    <button @click="editProduct(product)" class="btn btn-sm btn-outline" title="Editar producto">
-                      <font-awesome-icon icon="edit" class="action-icon" />
-                    </button>
-                    <button 
-                      v-if="product.is_active === false" 
-                      @click="reactivateProduct(product.id)" 
-                      class="btn btn-sm btn-success"
-                      title="Reactivar producto"
-                    >
-                      <font-awesome-icon icon="undo" class="action-icon" />
-                    </button>
-                    <button @click="deleteProduct(product.id)" class="btn btn-sm btn-danger" title="Eliminar producto">
-                      <font-awesome-icon icon="trash" class="action-icon" />
-                    </button>
+                    <!-- Para productos inactivos, solo mostrar opción de reactivar -->
+                    <template v-if="product.is_active === false">
+                      <button 
+                        @click="reactivateProduct(product.id)" 
+                        class="btn btn-sm btn-success"
+                        title="Reactivar producto"
+                      >
+                        <font-awesome-icon icon="undo" class="action-icon" />
+                      </button>
+                    </template>
+                    <!-- Para productos activos, mostrar todas las opciones -->
+                    <template v-else>
+                      <button 
+                        @click="toggleFeatured(product._id || product.id, product.is_featured)" 
+                        class="btn btn-sm"
+                        :class="product.is_featured ? 'btn-featured-active' : 'btn-featured'"
+                        :title="product.is_featured ? 'Quitar de destacados' : 'Marcar como destacado'"
+                      >
+                        <font-awesome-icon icon="star" class="action-icon" />
+                      </button>
+                      <button 
+                        @click="openSaleModal(product)" 
+                        class="btn btn-sm"
+                        :class="isProductOnSale(product) ? 'btn-sale-active' : 'btn-sale'"
+                        :title="isProductOnSale(product) ? 'Editar oferta' : 'Configurar oferta'"
+                      >
+                        <font-awesome-icon icon="tag" class="action-icon" />
+                      </button>
+                      <button @click="editProduct(product)" class="btn btn-sm btn-outline" title="Editar producto">
+                        <font-awesome-icon icon="edit" class="action-icon" />
+                      </button>
+                      <button @click="deleteProduct(product.id)" class="btn btn-sm btn-danger" title="Eliminar producto">
+                        <font-awesome-icon icon="trash" class="action-icon" />
+                      </button>
+                    </template>
                   </div>
                 </td>
               </tr>
@@ -587,7 +589,7 @@ const submitting = ref(false)
 const submittingSale = ref(false)
 const searchTerm = ref('')
 const selectedCategory = ref('')
-const showInactive = ref(false)
+const productStatusFilter = ref('active')
 const availableCategories = ref([])
 const newCategoryName = ref('')
 const selectedImage = ref(null)
@@ -626,14 +628,14 @@ const categories = computed(() => {
 })
 
 const filteredProducts = computed(() => {
-  // Filtrar productos según si se muestran inactivos o no
+  // Filtrar productos según el estado seleccionado
   // Supabase devuelve is_active (snake_case)
   let filtered = products.value.filter(p => {
-    if (showInactive.value) {
-      // Si showInactive está activo, mostrar todos los productos
-      return true;
+    if (productStatusFilter.value === 'inactive') {
+      // Si se selecciona inactivos, mostrar solo productos inactivos
+      return p.is_active === false;
     } else {
-      // Si showInactive está desactivado, mostrar solo activos
+      // Si se selecciona activos, mostrar solo productos activos
       const isActive = p.is_active !== false && p.is_active !== null;
       return isActive;
     }
