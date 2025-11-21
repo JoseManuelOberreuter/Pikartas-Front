@@ -87,7 +87,12 @@
                   <span class="category-badge">{{ product.category }}</span>
                 </td>
                 <td>
-                  <span class="price">${{ formatCLP(product.price) }}</span>
+                  <span 
+                    class="price" 
+                    :class="{ 'price-on-sale': isProductOnSale(product) }"
+                  >
+                    ${{ formatCLP(getFinalPrice(product)) }}
+                  </span>
                 </td>
                 <td>
                   <span 
@@ -1241,6 +1246,15 @@ const isProductOnSale = (product) => {
   return now >= startDate && now <= endDate;
 };
 
+// Calculate final price with discount applied
+const getFinalPrice = (product) => {
+  if (isProductOnSale(product) && product.discount_percentage) {
+    const discount = product.discount_percentage / 100;
+    return product.price * (1 - discount);
+  }
+  return product.price;
+};
+
 // Toggle featured status
 const toggleFeatured = async (productId, currentState) => {
   const id = parseInt(productId);
@@ -1498,6 +1512,10 @@ th {
 .price {
   font-weight: 600;
   color: #28a745;
+}
+
+.price-on-sale {
+  color: #dc3545;
 }
 
 .stock-input {
