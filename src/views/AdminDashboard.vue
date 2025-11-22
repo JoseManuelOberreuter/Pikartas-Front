@@ -3,7 +3,21 @@
 <!-- TODO: los colores de los botones y de los iconos -->
 
   <div class="admin-dashboard">
-    <div class="container">
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-container">
+      <div class="loading-content">
+        <div class="loading-spinner">
+          <font-awesome-icon icon="spinner" class="spinning" />
+        </div>
+        <h2>Cargando datos del dashboard...</h2>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div v-else class="container">
       <div class="dashboard-header">
         <h1>
           <font-awesome-icon icon="tools" class="header-icon" />
@@ -230,6 +244,9 @@ const loading = ref(false)
 
 const loadDashboardData = async () => {
   loading.value = true
+  const startTime = Date.now()
+  const minLoadTime = 1000 // Minimum 1 second loading time
+  
   try {
     // Cargar estadísticas de órdenes y usuarios
     const [ordersStats, allProducts, orders, usersData] = await Promise.all([
@@ -299,8 +316,22 @@ const loadDashboardData = async () => {
     // Generate payment alerts
     generatePaymentAlerts(allOrders)
 
+    // Ensure minimum loading time of 1 second for smooth UX
+    const elapsedTime = Date.now() - startTime
+    const remainingTime = minLoadTime - elapsedTime
+    
+    if (remainingTime > 0) {
+      await new Promise(resolve => setTimeout(resolve, remainingTime))
+    }
+
   } catch (err) {
     error('Error al cargar datos del dashboard')
+    // Even on error, ensure minimum loading time
+    const elapsedTime = Date.now() - startTime
+    const remainingTime = minLoadTime - elapsedTime
+    if (remainingTime > 0) {
+      await new Promise(resolve => setTimeout(resolve, remainingTime))
+    }
   } finally {
     loading.value = false
   }
@@ -431,6 +462,74 @@ onMounted(() => {
   padding-bottom: 80px;
   min-height: 100vh;
   background: #f8f9fa;
+}
+
+/* Loading State Styles */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 2rem;
+}
+
+.loading-content {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.loading-spinner {
+  font-size: 4rem;
+  color: var(--color-primary, #4CAF50);
+  margin-bottom: 2rem;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-content h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary, #4CAF50), #66BB6A);
+  border-radius: 4px;
+  animation: progress 1.5s ease-in-out infinite;
+  width: 70%;
+  position: relative;
+}
+
+@keyframes progress {
+  0% {
+    left: -70%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .dashboard-header {

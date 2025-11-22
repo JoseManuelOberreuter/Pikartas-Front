@@ -183,6 +183,15 @@ export async function prefetchAdminData(routeName) {
     const { adminService } = await import('../services/api');
     
     switch (routeName) {
+      case 'AdminDashboard':
+        // Prefetch all data needed for dashboard
+        await Promise.all([
+          adminService.getOrderStats(),
+          adminService.getAllProducts(),
+          adminService.getAllOrders(),
+          adminService.getAllUsers()
+        ]);
+        break;
       case 'AdminProducts':
         await adminService.getAllProducts();
         break;

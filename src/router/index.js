@@ -158,8 +158,8 @@ const router = createRouter({
 // Navigation guard para rutas que requieren autenticación
 router.beforeEach(async (to, from, next) => {
   // Intelligent prefetch based on destination route
-  // This runs in parallel and doesn't block navigation
   const prefetchPromises = []
+  const criticalRoutes = ['AdminDashboard', 'Checkout'] // Routes that should wait for prefetch
   
   switch (to.name) {
     case 'Shop':
@@ -179,6 +179,7 @@ router.beforeEach(async (to, from, next) => {
     case 'Offers':
       prefetchPromises.push(prefetchOnSaleProducts())
       break
+    case 'AdminDashboard':
     case 'AdminProducts':
     case 'AdminOrders':
     case 'AdminUsers':
@@ -187,11 +188,22 @@ router.beforeEach(async (to, from, next) => {
       break
   }
   
-  // Execute prefetch in background (don't wait for it)
+  // For critical routes, wait for prefetch to complete before navigation
+  // For other routes, execute prefetch in background
   if (prefetchPromises.length > 0) {
-    Promise.all(prefetchPromises).catch(() => {
-      // Silently fail - prefetch errors shouldn't block navigation
-    })
+    if (criticalRoutes.includes(to.name)) {
+      try {
+        await Promise.all(prefetchPromises)
+      } catch (error) {
+        // Silently fail - prefetch errors shouldn't block navigation
+        console.warn('Prefetch failed for critical route:', error)
+      }
+    } else {
+      // Execute prefetch in background (don't wait for it)
+      Promise.all(prefetchPromises).catch(() => {
+        // Silently fail - prefetch errors shouldn't block navigation
+      })
+    }
   }
   
   // Authentication and authorization checks
