@@ -159,61 +159,6 @@
         </label>
         <small class="form-help">Los productos destacados aparecerán en la página de inicio</small>
       </div>
-
-      <div class="form-group">
-        <label class="checkbox-label">
-          <input 
-            :checked="productForm.isOnSale" 
-            @change="updateField('isOnSale', $event.target.checked)"
-            type="checkbox" 
-            class="form-checkbox"
-          />
-          <span>En Oferta</span>
-        </label>
-        <small class="form-help">Marca esta opción para poner el producto en oferta</small>
-      </div>
-
-      <div v-if="productForm.isOnSale" class="sale-fields">
-        <div class="form-group">
-          <label class="form-label">Porcentaje de Descuento *</label>
-          <input 
-            :value="productForm.discountPercentage" 
-            @input="updateField('discountPercentage', parseFloat($event.target.value) || null)"
-            type="number" 
-            step="0.01" 
-            min="0" 
-            max="99.99"
-            :required="productForm.isOnSale"
-            placeholder="Ej: 20 (para 20% de descuento)"
-            class="form-input"
-          />
-          <small class="form-help">Ingresa el porcentaje de descuento (0-99.99%)</small>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Fecha de Inicio de Oferta *</label>
-            <input 
-              :value="productForm.saleStartDate" 
-              @input="updateField('saleStartDate', $event.target.value)"
-              type="datetime-local" 
-              :required="productForm.isOnSale"
-              class="form-input"
-            />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Fecha de Fin de Oferta *</label>
-            <input 
-              :value="productForm.saleEndDate" 
-              @input="updateField('saleEndDate', $event.target.value)"
-              type="datetime-local" 
-              :required="productForm.isOnSale"
-              class="form-input"
-            />
-          </div>
-        </div>
-      </div>
     </form>
 
     <template #footer>
@@ -371,14 +316,6 @@ watch(() => props.show, (newVal) => {
 .form-textarea {
   resize: vertical;
   min-height: 100px;
-}
-
-.sale-fields {
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  background: var(--color-gray-100);
-  border-radius: var(--border-radius-lg);
-  border: var(--border-width-thin) solid var(--color-gray-200);
 }
 
 .category-selector {

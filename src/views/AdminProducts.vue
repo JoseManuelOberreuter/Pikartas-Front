@@ -140,11 +140,7 @@ const productForm = ref({
   stock: 0,
   category: '',
   image: '',
-  isFeatured: false,
-  isOnSale: false,
-  discountPercentage: null,
-  saleStartDate: '',
-  saleEndDate: ''
+  isFeatured: false
 })
 
 // Sale Form
@@ -522,11 +518,7 @@ const openCreateModal = () => {
     stock: 0,
     category: '',
     image: '',
-    isFeatured: false,
-    isOnSale: false,
-    discountPercentage: null,
-    saleStartDate: '',
-    saleEndDate: ''
+    isFeatured: false
   }
   newCategoryName.value = ''
   showModal.value = true
@@ -549,11 +541,7 @@ const editProduct = (product) => {
     stock: product.stock,
     category: product.category,
     image: product.image,
-    isFeatured: product.is_featured || false,
-    isOnSale: product.is_on_sale || false,
-    discountPercentage: product.discount_percentage || null,
-    saleStartDate: product.sale_start_date ? new Date(product.sale_start_date).toISOString().slice(0, 16) : '',
-    saleEndDate: product.sale_end_date ? new Date(product.sale_end_date).toISOString().slice(0, 16) : ''
+    isFeatured: product.is_featured || false
   }
   
   newCategoryName.value = ''
@@ -569,24 +557,6 @@ const closeModal = () => {
 const submitProduct = async (formData) => {
   submitting.value = true
   try {
-    const formatDateForAPI = (dateValue) => {
-      if (!dateValue || dateValue === '') return ''
-      if (typeof dateValue === 'string' && dateValue.includes('T') && (dateValue.includes('Z') || dateValue.includes('+'))) {
-        return dateValue
-      }
-      if (typeof dateValue === 'string' && dateValue.includes('T')) {
-        const date = new Date(dateValue)
-        if (!isNaN(date.getTime())) {
-          return date.toISOString()
-        }
-      }
-      const date = new Date(dateValue)
-      if (!isNaN(date.getTime())) {
-        return date.toISOString()
-      }
-      return dateValue
-    }
-
     const formDataToSend = new FormData()
     
     formDataToSend.append('name', formData.name)
@@ -595,33 +565,6 @@ const submitProduct = async (formData) => {
     formDataToSend.append('stock', String(formData.stock))
     formDataToSend.append('category', formData.category)
     formDataToSend.append('isFeatured', String(formData.isFeatured))
-    formDataToSend.append('isOnSale', String(formData.isOnSale))
-    
-    if (formData.isOnSale) {
-      if (!formData.discountPercentage || formData.discountPercentage <= 0) {
-        throw new Error('El porcentaje de descuento es requerido y debe ser mayor a 0')
-      }
-      
-      if (!formData.saleStartDate || !formData.saleEndDate) {
-        throw new Error('Las fechas de inicio y fin de oferta son requeridas')
-      }
-      
-      const formattedStartDate = formatDateForAPI(formData.saleStartDate)
-      const formattedEndDate = formatDateForAPI(formData.saleEndDate)
-      
-      const startDate = new Date(formattedStartDate)
-      const endDate = new Date(formattedEndDate)
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        throw new Error('Las fechas de oferta no son válidas')
-      }
-      if (startDate >= endDate) {
-        throw new Error('La fecha de fin de oferta debe ser posterior a la fecha de inicio')
-      }
-      
-      formDataToSend.append('discountPercentage', String(formData.discountPercentage))
-      formDataToSend.append('saleStartDate', formattedStartDate)
-      formDataToSend.append('saleEndDate', formattedEndDate)
-    }
     
     if (formData.selectedImage) {
       formDataToSend.append('image', formData.selectedImage)

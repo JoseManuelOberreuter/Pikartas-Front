@@ -105,7 +105,7 @@
             :formatCLP="formatCLP"
             :roundDiscount="roundDiscount"
             @update-stock="$emit('update-stock', $event)"
-            @toggle-featured="$emit('toggle-featured', $event)"
+            @toggle-featured="(productId, currentState) => $emit('toggle-featured', productId, currentState)"
             @open-sale="$emit('open-sale', $event)"
             @edit="$emit('edit', $event)"
             @delete="$emit('delete', $event)"
