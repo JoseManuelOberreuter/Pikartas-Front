@@ -12,6 +12,15 @@ import Settings from '../views/Settings.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
 import AdminProducts from '../views/AdminProducts.vue'
 import Contact from '../views/Contact.vue'
+// Preloader for intelligent prefetching
+import {
+  prefetchShopProducts,
+  prefetchProduct,
+  prefetchCart,
+  prefetchCheckoutData,
+  prefetchOnSaleProducts,
+  prefetchAdminData
+} from '../utils/preloader'
 
 const routes = [
   {
@@ -148,6 +157,44 @@ const router = createRouter({
 
 // Navigation guard para rutas que requieren autenticación
 router.beforeEach(async (to, from, next) => {
+  // Intelligent prefetch based on destination route
+  // This runs in parallel and doesn't block navigation
+  const prefetchPromises = []
+  
+  switch (to.name) {
+    case 'Shop':
+      prefetchPromises.push(prefetchShopProducts())
+      break
+    case 'ProductDetail':
+      if (to.params.id) {
+        prefetchPromises.push(prefetchProduct(to.params.id))
+      }
+      break
+    case 'Cart':
+      prefetchPromises.push(prefetchCart())
+      break
+    case 'Checkout':
+      prefetchPromises.push(prefetchCheckoutData())
+      break
+    case 'Offers':
+      prefetchPromises.push(prefetchOnSaleProducts())
+      break
+    case 'AdminProducts':
+    case 'AdminOrders':
+    case 'AdminUsers':
+    case 'AdminAnalytics':
+      prefetchPromises.push(prefetchAdminData(to.name))
+      break
+  }
+  
+  // Execute prefetch in background (don't wait for it)
+  if (prefetchPromises.length > 0) {
+    Promise.all(prefetchPromises).catch(() => {
+      // Silently fail - prefetch errors shouldn't block navigation
+    })
+  }
+  
+  // Authentication and authorization checks
   if (to.meta.requiresAuth) {
     const token = localStorage.getItem('token')
     if (!token) {

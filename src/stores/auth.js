@@ -7,66 +7,78 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref(null);
   const loading = ref(false);
   const isAuthenticated = ref(false);
+  const isInitializing = ref(false);
 
   // Verificar si hay un token al iniciar
   const initializeAuth = async () => {
+    // Prevent multiple simultaneous initializations
+    if (isInitializing.value) {
+      return;
+    }
+    
     const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        // Intentar obtener el email del token JWT para hacer la consulta
-        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-        const identifier = tokenPayload.email || tokenPayload.id;
+    if (!token) {
+      return;
+    }
+    
+    isInitializing.value = true;
+    
+    try {
+      // Intentar obtener el email del token JWT para hacer la consulta
+      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      const identifier = tokenPayload.email || tokenPayload.id;
+      
+      if (identifier) {
+        const userProfile = await authService.getUserProfile(identifier);
+        // El backend devuelve { success: true, data: { ...user } }
+        // Intentar acceder a data primero, luego user, luego directamente
+        const userData = userProfile?.data || userProfile?.user || userProfile;
         
-        if (identifier) {
-          const userProfile = await authService.getUserProfile(identifier);
-          // El backend devuelve { success: true, data: { ...user } }
-          // Intentar acceder a data primero, luego user, luego directamente
-          const userData = userProfile?.data || userProfile?.user || userProfile;
+        if (userData) {
+          // Asegurar que el objeto usuario tenga todas las propiedades necesarias
+          user.value = {
+            _id: userData.id || userData._id || null,
+            id: userData.id || userData._id || null,
+            name: userData.name || 'Usuario',
+            email: userData.email || 'usuario@ejemplo.com',
+            telefono: userData.telefono || userData.phone || '',
+            fechaNacimiento: userData.fecha_nacimiento || userData.fechaNacimiento || userData.birthDate || '',
+            direccion: userData.direccion || userData.address || '',
+            avatar: userData.avatar || '',
+            role: userData.role || 'user',
+            isVerified: userData.is_verified !== undefined ? userData.is_verified : (userData.isVerified !== undefined ? userData.isVerified : false),
+            ...userData
+          };
+          isAuthenticated.value = true;
           
-          if (userData) {
-            // Asegurar que el objeto usuario tenga todas las propiedades necesarias
-            user.value = {
-              _id: userData.id || userData._id || null,
-              id: userData.id || userData._id || null,
-              name: userData.name || 'Usuario',
-              email: userData.email || 'usuario@ejemplo.com',
-              telefono: userData.telefono || userData.phone || '',
-              fechaNacimiento: userData.fecha_nacimiento || userData.fechaNacimiento || userData.birthDate || '',
-              direccion: userData.direccion || userData.address || '',
-              avatar: userData.avatar || '',
-              role: userData.role || 'user',
-              isVerified: userData.is_verified !== undefined ? userData.is_verified : (userData.isVerified !== undefined ? userData.isVerified : false),
-              ...userData
-            };
-            isAuthenticated.value = true;
-            
-            // Inicializar carrito después de autenticación
-            try {
-              const { useCartStore } = await import('./cart');
-              const cartStore = useCartStore();
-              await cartStore.initializeCart();
-            } catch (cartError) {
-              // Error initializing cart - silently fail
-            }
-          } else {
-            // Si no hay datos del usuario, limpiar autenticación
-            localStorage.removeItem('token');
-            user.value = null;
-            isAuthenticated.value = false;
+          // Inicializar carrito después de autenticación
+          try {
+            const { useCartStore } = await import('./cart');
+            const cartStore = useCartStore();
+            await cartStore.initializeCart();
+          } catch (cartError) {
+            // Error initializing cart - silently fail
           }
         } else {
-          // Si no hay identificador en el token, limpiar autenticación
+          // Si no hay datos del usuario, limpiar autenticación
           localStorage.removeItem('token');
           user.value = null;
           isAuthenticated.value = false;
         }
-        } catch (error) {
-        // Error initializing auth - silently fail and clear auth
-        // Si falla la verificación, limpiar autenticación
+      } else {
+        // Si no hay identificador en el token, limpiar autenticación
         localStorage.removeItem('token');
         user.value = null;
         isAuthenticated.value = false;
       }
+    } catch (error) {
+      // Error initializing auth - silently fail and clear auth
+      // Si falla la verificación, limpiar autenticación
+      localStorage.removeItem('token');
+      user.value = null;
+      isAuthenticated.value = false;
+    } finally {
+      isInitializing.value = false;
     }
   };
   

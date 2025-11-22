@@ -10,6 +10,7 @@ export const useCartStore = defineStore('cart', () => {
   const isOpen = ref(false);
   const loading = ref(false);
   const error = ref(null);
+  const isInitializing = ref(false);
 
   // Composables
   const { success, error: errorNotification } = useNotifications();
@@ -76,6 +77,11 @@ export const useCartStore = defineStore('cart', () => {
     // Solo cargar si está autenticado
     if (!authStore.isAuthenticated) {
       items.value = [];
+      return;
+    }
+
+    // Prevent multiple simultaneous loads
+    if (loading.value || isInitializing.value) {
       return;
     }
 
@@ -410,7 +416,17 @@ export const useCartStore = defineStore('cart', () => {
 
   // Inicializar carrito cuando se autentica
   const initializeCart = async () => {
-    await loadCart();
+    // Prevent multiple simultaneous initializations
+    if (isInitializing.value) {
+      return;
+    }
+    
+    isInitializing.value = true;
+    try {
+      await loadCart();
+    } finally {
+      isInitializing.value = false;
+    }
   };
 
   return {
