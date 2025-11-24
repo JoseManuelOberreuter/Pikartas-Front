@@ -26,6 +26,12 @@
         <p>Gestiona tu tienda online</p>
       </div>
 
+      <!-- Error Message -->
+      <div v-if="hasError" class="error-alert">
+        <font-awesome-icon icon="exclamation-triangle" class="error-icon" />
+        <p>{{ errorMessage }}</p>
+      </div>
+
       <div class="dashboard-stats" v-if="stats">
         <div class="stat-card">
           <div class="stat-icon">
@@ -241,22 +247,62 @@ const stats = ref(null)
 const recentOrders = ref([])
 const paymentAlerts = ref([])
 const loading = ref(false)
+const hasError = ref(false)
+const errorMessage = ref('')
 
 const loadDashboardData = async () => {
   loading.value = true
+  hasError.value = false
+  errorMessage.value = ''
   const startTime = Date.now()
   const minLoadTime = 1000 // Minimum 1 second loading time
   
   try {
     // Cargar estadísticas de órdenes y usuarios
-    const [ordersStats, allProducts, orders, usersData] = await Promise.all([
-      adminService.getOrderStats().catch(() => ({ data: {} })),
-      adminService.getAllProducts().catch(() => ({ data: [] })),
-      adminService.getAllOrders().catch(() => ({ data: [] })),
-      adminService.getAllUsers().catch(() => {
-        return { data: [], total: 0 }
-      })
-    ])
+    // Manejar errores de manera explícita para no ocultarlos
+    let ordersStats = null
+    let allProducts = null
+    let orders = null
+    let usersData = null
+    const errors = []
+    
+    try {
+      ordersStats = await adminService.getOrderStats()
+    } catch (err) {
+      console.error('[AdminDashboard] Error loading order stats:', err)
+      errors.push('estadísticas de órdenes')
+      ordersStats = { success: false, data: {} }
+    }
+    
+    try {
+      allProducts = await adminService.getAllProducts()
+    } catch (err) {
+      console.error('[AdminDashboard] Error loading products:', err)
+      errors.push('productos')
+      allProducts = { success: false, data: [] }
+    }
+    
+    try {
+      orders = await adminService.getAllOrders()
+    } catch (err) {
+      console.error('[AdminDashboard] Error loading orders:', err)
+      errors.push('órdenes')
+      orders = { success: false, data: [] }
+    }
+    
+    try {
+      usersData = await adminService.getAllUsers()
+    } catch (err) {
+      console.error('[AdminDashboard] Error loading users:', err)
+      errors.push('usuarios')
+      usersData = { success: false, data: [], total: 0 }
+    }
+    
+    // Si hay errores, mostrar mensaje al usuario
+    if (errors.length > 0) {
+      hasError.value = true
+      errorMessage.value = `Error al cargar: ${errors.join(', ')}. Algunos datos pueden estar incompletos.`
+    }
 
     // Handle new response format: { success: true, data: { products: [...], pagination: {...} } }
     // allProducts is already the response.data from axios, so it's: { success: true, data: { products: [...] } }
@@ -285,35 +331,39 @@ const loadDashboardData = async () => {
       }
     }
     
-    // Calculate payment statistics
-    const allOrders = ordersArray
+    // Calculate payment statistics from real data only
+    const allOrders = Array.isArray(ordersArray) ? ordersArray : []
     const paidOrders = allOrders.filter(order => order.paymentStatus === 'paid').length
     const pendingPayments = allOrders.filter(order => order.paymentStatus === 'pending').length
     const refundedOrders = allOrders.filter(order => order.paymentStatus === 'refunded').length
     const conversionRate = allOrders.length > 0 ? Math.round((paidOrders / allOrders.length) * 100) : 0
 
+    // Calculate stats from real data only - no hardcoded defaults
     stats.value = {
       totalProducts: activeProducts.length,
-      totalOrders: ordersStats.data?.totalOrders || 0,
-      totalRevenue: ordersStats.data?.totalRevenue || 0,
+      totalOrders: ordersStats?.success && ordersStats.data?.totalOrders ? ordersStats.data.totalOrders : allOrders.length,
+      totalRevenue: ordersStats?.success && ordersStats.data?.totalRevenue ? ordersStats.data.totalRevenue : 0,
       // Handle new response format: { success: true, data: { users: [...], total: ... } }
       // usersData is already the response.data from axios, so it's: { success: true, data: { users: [...], total: ... } }
-      totalUsers: usersData?.data?.total || usersData?.total || (Array.isArray(usersData?.data?.users) ? usersData.data.users.length : 0) || 0,
+      totalUsers: usersData?.success 
+        ? (usersData.data?.total || (Array.isArray(usersData.data?.users) ? usersData.data.users.length : 0))
+        : 0,
       paidOrders,
       pendingPayments,
       refundedOrders,
       conversionRate
     }
 
-    // Obtener órdenes recientes (últimas 5)
-    // orders is already the response.data from axios, so it's: { success: true, data: { orders: [...] } }
+    // Obtener órdenes recientes (últimas 5) solo si hay datos reales
     if (Array.isArray(ordersArray) && ordersArray.length > 0) {
       recentOrders.value = ordersArray
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 5)
+    } else {
+      recentOrders.value = []
     }
 
-    // Generate payment alerts
+    // Generate payment alerts from real data only
     generatePaymentAlerts(allOrders)
 
     // Ensure minimum loading time of 1 second for smooth UX
@@ -325,6 +375,9 @@ const loadDashboardData = async () => {
     }
 
   } catch (err) {
+    console.error('[AdminDashboard] Error loading dashboard data:', err)
+    hasError.value = true
+    errorMessage.value = 'Error al cargar los datos del dashboard. Por favor, intenta recargar la página.'
     error('Error al cargar datos del dashboard')
     // Even on error, ensure minimum loading time
     const elapsedTime = Date.now() - startTime
@@ -964,6 +1017,31 @@ onMounted(() => {
 .btn-outline:hover {
   background: #6c757d;
   color: white;
+}
+
+/* Error Alert */
+.error-alert {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #721c24;
+}
+
+.error-icon {
+  font-size: 1.25rem;
+  color: #dc3545;
+  flex-shrink: 0;
+}
+
+.error-alert p {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 /* Responsive */

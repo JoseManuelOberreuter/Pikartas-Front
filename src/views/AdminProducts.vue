@@ -257,10 +257,14 @@ const loadCategoriesFromProducts = async () => {
       const categories = [...new Set(productsArray.map(p => p.category).filter(Boolean))]
       availableCategories.value = categories.sort()
     } else {
-      availableCategories.value = ['Electrónicos', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes', 'Belleza', 'Automóviles', 'Otros', 'Plantas']
+      // No hay productos, lista de categorías vacía
+      availableCategories.value = []
     }
   } catch (err) {
-    availableCategories.value = ['Electrónicos', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes', 'Belleza', 'Automóviles', 'Otros', 'Plantas']
+    console.error('[AdminProducts] Error loading categories from products:', err)
+    // En caso de error, retornar lista vacía en lugar de datos hardcodeados
+    availableCategories.value = []
+    error('Error al cargar categorías. Puedes continuar creando productos sin categorías.')
   }
 }
 
