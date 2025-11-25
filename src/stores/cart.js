@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { cartService, productService } from '../services/api';
+import { cartService } from '../services/api';
 import { useAuthStore } from './auth';
 import { useNotifications } from '../composables/useNotifications';
 
@@ -24,51 +24,32 @@ export const useCartStore = defineStore('cart', () => {
     return err?.message || err?.error || fallbackMessage;
   };
 
-  // Función para obtener información completa de productos
-  async function getProductDetails(productIds) {
-    const productDetails = {};
-    
-    try {
-      // Obtener detalles de cada producto
-      const promises = productIds.map(async (productId) => {
-        try {
-          const product = await productService.getProductById(productId);
-          if (product.success && product.data) {
-            productDetails[productId] = product.data;
-          } else if (product.product) {
-            productDetails[productId] = product.product;
-          } else {
-            productDetails[productId] = product;
-          }
-        } catch (error) {
-          // Handle 404 errors specifically - product doesn't exist or is disabled
-          if (error?.status === 404 || error?.response?.status === 404) {
-            console.warn(`[Cart Store] Product ${productId} not found (404), will be filtered out`);
-            // Don't add to productDetails - product will be filtered out in mapItemsToCartFormat
-            // The backend should have already removed inactive products, but if a product
-            // was completely deleted, this will handle it gracefully
-            return; // Skip this product
-          }
-          // For other errors, use default data as fallback
-          console.error(`[Cart Store] Error obteniendo detalles del producto ${productId}:`, error);
-          productDetails[productId] = {
-            id: productId,
-            name: `Producto ${productId}`,
-            image: '/placeholder-product.svg',
-            category: 'General',
-            rating: 5,
-            description: '',
-            stock: 0
-          };
-        }
-      });
-      
-      await Promise.all(promises);
-      return productDetails;
-    } catch (error) {
-      console.error('[Cart Store] Error getting product details:', error);
-      return {};
+  // Helper function to map backend cart items to frontend format
+  // Uses data directly from backend without additional API calls
+  function mapItemsToCartFormat(itemsArray) {
+    if (!itemsArray || !Array.isArray(itemsArray) || itemsArray.length === 0) {
+      return [];
     }
+    
+    return itemsArray
+      .filter(item => item.productId) // Filter out items without productId
+      .map(item => ({
+        id: item.productId,
+        _id: item.productId,
+        name: item.productName || `Producto ${item.productId}`,
+        price: item.price, // Recalculated price from backend
+        image: item.image || '/placeholder-product.svg',
+        stock: item.stock ?? 999,
+        quantity: item.quantity,
+        category: item.category || 'General',
+        rating: 5, // Default rating (not provided by backend)
+        description: item.description || '',
+        subtotal: item.subtotal || (item.price * item.quantity),
+        // Include sale information from backend
+        isOnSale: item.isOnSale || false,
+        discountPercentage: item.discountPercentage || null,
+        originalPrice: item.originalPrice || item.price
+      }));
   }
 
   // Computed properties - Pinia maneja la reactividad automáticamente
@@ -104,60 +85,8 @@ export const useCartStore = defineStore('cart', () => {
     error.value = null;
     
     try {
-      // Intentar obtener el carrito completo primero
+      // Get cart from backend
       const response = await cartService.getCart();
-      
-      // Helper function to map items
-      const mapItemsToCartFormat = async (itemsArray) => {
-        if (!itemsArray || !Array.isArray(itemsArray) || itemsArray.length === 0) {
-          return Promise.resolve([]);
-        }
-        
-        const productIds = [...new Set(itemsArray.map(item => item.productId).filter(Boolean))];
-        
-        if (productIds.length === 0) {
-          return Promise.resolve([]);
-        }
-        
-        const productDetails = await getProductDetails(productIds);
-        
-        const mapped = itemsArray.map(item => {
-          if (!item.productId) {
-            return null;
-          }
-          
-          // If product details are not available (404 or other error), filter it out
-          // The backend should have already removed inactive products, but this is a safety net
-          if (!productDetails[item.productId]) {
-            console.warn(`[Cart Store] Product ${item.productId} details not available, filtering out`);
-            return null;
-          }
-          
-          const productDetail = productDetails[item.productId];
-          return {
-            id: item.productId,
-            _id: item.productId,
-            name: item.productName || productDetail.name || `Producto ${item.productId}`,
-            price: item.price, // This is now the recalculated price from backend
-            // Use placeholder if product not found or image missing
-            image: productDetail.image || '/placeholder-product.svg',
-            stock: productDetail.stock || 999,
-            quantity: item.quantity,
-            category: productDetail.category || 'General',
-            rating: productDetail.rating || 5,
-            description: productDetail.description || '',
-            subtotal: item.subtotal || (item.price * item.quantity),
-            // Include sale information from backend if available
-            isOnSale: item.isOnSale || false,
-            discountPercentage: item.discountPercentage || null,
-            originalPrice: item.originalPrice || item.price
-          };
-        }).filter(Boolean); // Remove null items
-        
-        return mapped;
-      };
-      
-      let mappedItems = [];
       
       // Check for removed products notification
       let removedProductsInfo = null;
@@ -165,19 +94,21 @@ export const useCartStore = defineStore('cart', () => {
         removedProductsInfo = response.data.removedProducts;
       }
       
-      // Check response structure and extract items
+      let mappedItems = [];
+      
+      // Extract items from response (backend already includes all product details)
       if (response.success && response.data) {
         // Case 1: response.data.items (standard format from formatCart)
         if (response.data.items && Array.isArray(response.data.items)) {
-          mappedItems = await mapItemsToCartFormat(response.data.items);
+          mappedItems = mapItemsToCartFormat(response.data.items);
         }
         // Case 2: response.data is an array directly
         else if (Array.isArray(response.data)) {
-          mappedItems = await mapItemsToCartFormat(response.data);
+          mappedItems = mapItemsToCartFormat(response.data);
         }
         // Case 3: response.data.cartItems
         else if (response.data.cartItems && Array.isArray(response.data.cartItems)) {
-          mappedItems = await mapItemsToCartFormat(response.data.cartItems);
+          mappedItems = mapItemsToCartFormat(response.data.cartItems);
         }
         // Case 4: Try summary endpoint as fallback
         else {
@@ -190,15 +121,15 @@ export const useCartStore = defineStore('cart', () => {
           
           if (summaryResponse.success && summaryResponse.data) {
             if (summaryResponse.data.items && Array.isArray(summaryResponse.data.items)) {
-              mappedItems = await mapItemsToCartFormat(summaryResponse.data.items);
+              mappedItems = mapItemsToCartFormat(summaryResponse.data.items);
             } else if (Array.isArray(summaryResponse.data)) {
-              mappedItems = await mapItemsToCartFormat(summaryResponse.data);
+              mappedItems = mapItemsToCartFormat(summaryResponse.data);
             }
           }
         }
       } else if (response.data && Array.isArray(response.data)) {
         // Direct array response
-        mappedItems = await mapItemsToCartFormat(response.data);
+        mappedItems = mapItemsToCartFormat(response.data);
       } else {
         // Try summary as fallback
         const summaryResponse = await cartService.getCartSummary();
@@ -210,9 +141,9 @@ export const useCartStore = defineStore('cart', () => {
         
         if (summaryResponse.success && summaryResponse.data) {
           if (summaryResponse.data.items && Array.isArray(summaryResponse.data.items)) {
-            mappedItems = await mapItemsToCartFormat(summaryResponse.data.items);
+            mappedItems = mapItemsToCartFormat(summaryResponse.data.items);
           } else if (Array.isArray(summaryResponse.data)) {
-            mappedItems = await mapItemsToCartFormat(summaryResponse.data);
+            mappedItems = mapItemsToCartFormat(summaryResponse.data);
           }
         }
       }
@@ -222,13 +153,8 @@ export const useCartStore = defineStore('cart', () => {
         errorNotification('Un artículo ya no existe o no queda stock');
       }
       
-      // Actualizar items - Pinia maneja la reactividad automáticamente
-      // Al asignar items.value, los computed (cartItemCount, cartTotal, cartItems) se actualizan automáticamente
-      if (mappedItems.length > 0) {
-        items.value = mappedItems;
-      } else {
-        items.value = [];
-      }
+      // Update items - Pinia handles reactivity automatically
+      items.value = mappedItems;
       
     } catch (err) {
       console.error('[Cart Store] Error loading cart:', err);
@@ -257,6 +183,32 @@ export const useCartStore = defineStore('cart', () => {
       return;
     }
 
+    // Optimistic update: add item immediately to UI
+    const existingItem = items.value.find(item => item.id === product.id);
+    if (existingItem) {
+      existingItem.quantity += 1;
+      existingItem.subtotal = existingItem.price * existingItem.quantity;
+    } else {
+      // Create temporary item with product data
+      const tempItem = {
+        id: product.id,
+        _id: product.id,
+        name: product.name,
+        price: product.price || 0,
+        image: product.image || '/placeholder-product.svg',
+        stock: product.stock ?? 999,
+        quantity: 1,
+        category: product.category || 'General',
+        rating: product.rating || 5,
+        description: product.description || '',
+        subtotal: (product.price || 0) * 1,
+        isOnSale: product.isOnSale || false,
+        discountPercentage: product.discountPercentage || null,
+        originalPrice: product.originalPrice || product.price || 0
+      };
+      items.value.push(tempItem);
+    }
+
     loading.value = true;
     error.value = null;
     
@@ -266,13 +218,28 @@ export const useCartStore = defineStore('cart', () => {
         quantity: 1
       };
       
-      await cartService.addToCart(productData);
-      await loadCart(); // Recargar carrito después de agregar
+      // Backend returns the updated cart with all items
+      const response = await cartService.addToCart(productData);
+      
+      // Use backend response directly instead of reloading
+      if (response.success && response.data) {
+        let backendItems = [];
+        if (response.data.items && Array.isArray(response.data.items)) {
+          backendItems = mapItemsToCartFormat(response.data.items);
+        } else if (Array.isArray(response.data)) {
+          backendItems = mapItemsToCartFormat(response.data);
+        }
+        
+        // Update with backend data (this ensures consistency)
+        if (backendItems.length > 0) {
+          items.value = backendItems;
+        }
+      }
       
       success(`${product.name} agregado al carrito`);
       
     } catch (err) {
-      // Siempre recargar el carrito, incluso si falla, para mostrar items existentes
+      // Revert optimistic update on error
       await loadCart();
       
       if (err?.verificationRequired) {
@@ -304,16 +271,37 @@ export const useCartStore = defineStore('cart', () => {
       return;
     }
 
+    // Optimistic update: remove item immediately from UI
+    const itemToRemove = items.value.find(item => item.id === productId);
+    const previousItems = [...items.value];
+    items.value = items.value.filter(item => item.id !== productId);
+
     loading.value = true;
     error.value = null;
     
     try {
-      await cartService.removeFromCart(productId);
-      await loadCart(); // Recargar carrito después de eliminar
+      // Backend returns the updated cart with all items
+      const response = await cartService.removeFromCart(productId);
+      
+      // Use backend response directly instead of reloading
+      if (response.success && response.data) {
+        let backendItems = [];
+        if (response.data.items && Array.isArray(response.data.items)) {
+          backendItems = mapItemsToCartFormat(response.data.items);
+        } else if (Array.isArray(response.data)) {
+          backendItems = mapItemsToCartFormat(response.data);
+        }
+        
+        // Update with backend data (this ensures consistency)
+        items.value = backendItems;
+      }
       
       success('Producto eliminado del carrito');
       
     } catch (err) {
+      // Revert optimistic update on error
+      items.value = previousItems;
+      
       if (err?.verificationRequired) {
         const message = resolveCartErrorMessage(err, verificationRequiredMessage);
         error.value = message;
@@ -345,6 +333,16 @@ export const useCartStore = defineStore('cart', () => {
       return;
     }
 
+    // Optimistic update: update quantity immediately in UI
+    const itemToUpdate = items.value.find(item => item.id === productId);
+    const previousQuantity = itemToUpdate?.quantity;
+    const previousSubtotal = itemToUpdate?.subtotal;
+    
+    if (itemToUpdate) {
+      itemToUpdate.quantity = quantity;
+      itemToUpdate.subtotal = itemToUpdate.price * quantity;
+    }
+
     loading.value = true;
     error.value = null;
     
@@ -354,10 +352,31 @@ export const useCartStore = defineStore('cart', () => {
         quantity: quantity
       };
       
-      await cartService.updateCartItem(itemData);
-      await loadCart(); // Recargar carrito después de actualizar
+      // Backend returns the updated cart with all items
+      const response = await cartService.updateCartItem(itemData);
+      
+      // Use backend response directly instead of reloading
+      if (response.success && response.data) {
+        let backendItems = [];
+        if (response.data.items && Array.isArray(response.data.items)) {
+          backendItems = mapItemsToCartFormat(response.data.items);
+        } else if (Array.isArray(response.data)) {
+          backendItems = mapItemsToCartFormat(response.data);
+        }
+        
+        // Update with backend data (this ensures consistency)
+        if (backendItems.length > 0) {
+          items.value = backendItems;
+        }
+      }
       
     } catch (err) {
+      // Revert optimistic update on error
+      if (itemToUpdate) {
+        itemToUpdate.quantity = previousQuantity;
+        itemToUpdate.subtotal = previousSubtotal;
+      }
+      
       if (err?.verificationRequired) {
         const message = resolveCartErrorMessage(err, verificationRequiredMessage);
         error.value = message;

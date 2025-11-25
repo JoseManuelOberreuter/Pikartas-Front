@@ -131,10 +131,27 @@ const { isAuthenticated } = storeToRefs(authStore)
 // Emits
 const emit = defineEmits(['open-login-modal'])
 
+// Cache timestamp to avoid unnecessary reloads
+let lastCartLoadTime = 0
+const CART_CACHE_DURATION = 5000 // 5 seconds
+
+// Watch for cart updates to update cache timestamp
+watch([cartItems, loading], () => {
+  if (!loading.value && cartItems.value.length > 0) {
+    lastCartLoadTime = Date.now()
+  }
+})
+
 // Recargar carrito cuando se abre el sidebar (si está autenticado)
+// Only reload if cart hasn't been loaded recently
 watch(isCartOpen, async (isOpen) => {
   if (isOpen && isAuthenticated.value && !loading.value) {
-    await cartStore.loadCart()
+    const now = Date.now()
+    // Only reload if cache has expired or cart is empty
+    if (now - lastCartLoadTime > CART_CACHE_DURATION || cartItems.value.length === 0) {
+      await cartStore.loadCart()
+      lastCartLoadTime = Date.now()
+    }
   }
 })
 
