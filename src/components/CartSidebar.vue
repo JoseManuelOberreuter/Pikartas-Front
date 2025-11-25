@@ -50,7 +50,17 @@
             
             <div class="item-details">
               <h4 class="item-name">{{ item.name }}</h4>
-              <div class="item-price">${{ formatCLP(item.price) }}</div>
+              <div class="item-price-container">
+                <span v-if="item.isOnSale && item.originalPrice" class="item-price-original">
+                  ${{ formatCLP(item.originalPrice) }}
+                </span>
+                <span :class="{ 'item-price-sale': item.isOnSale, 'item-price': !item.isOnSale }">
+                  ${{ formatCLP(item.price) }}
+                </span>
+                <span v-if="item.isOnSale && item.discountPercentage" class="discount-badge-small">
+                  -{{ item.discountPercentage }}%
+                </span>
+              </div>
               
               <div class="quantity-controls">
                 <button class="qty-btn decrease" @click="decreaseQuantity(item.id)" :disabled="item.quantity <= 1">
@@ -62,8 +72,13 @@
                 </button>
               </div>
               
-              <div class="item-total">
-                Total: ${{ formatCLP(item.price * item.quantity) }}
+              <div class="item-total-container">
+                <span v-if="item.isOnSale && item.originalPrice" class="item-total-original">
+                  Total: ${{ formatCLP(item.originalPrice * item.quantity) }}
+                </span>
+                <span :class="{ 'item-total-sale': item.isOnSale, 'item-total': !item.isOnSale }">
+                  Total: ${{ formatCLP(item.price * item.quantity) }}
+                </span>
               </div>
             </div>
             
@@ -384,10 +399,40 @@ const openLoginModal = () => {
   overflow: hidden;
 }
 
+.item-price-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
 .item-price {
   color: #28a745;
   font-weight: 600;
-  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.item-price-sale {
+  color: #dc3545;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.item-price-original {
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 0.8rem;
+  text-decoration: line-through;
+}
+
+.discount-badge-small {
+  background: #dc3545;
+  color: white;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
 .quantity-controls {
@@ -474,10 +519,30 @@ const openLoginModal = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.item-total-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .item-total {
   font-size: 0.875rem;
   color: #666;
   font-weight: 500;
+}
+
+.item-total-sale {
+  font-size: 0.875rem;
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.item-total-original {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-decoration: line-through;
 }
 
 .remove-btn {

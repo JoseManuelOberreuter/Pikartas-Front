@@ -73,7 +73,14 @@
               
               <div class="item-subtotal">
                 <span class="subtotal-label">Subtotal:</span>
-                <span class="subtotal">${{ formatCLP(item.price * item.quantity) }}</span>
+                <div class="subtotal-container">
+                  <span v-if="item.isOnSale && item.originalPrice" class="subtotal-original">
+                    ${{ formatCLP(item.originalPrice * item.quantity) }}
+                  </span>
+                  <span :class="{ 'subtotal-sale': item.isOnSale, 'subtotal': !item.isOnSale }">
+                    ${{ formatCLP(item.price * item.quantity) }}
+                  </span>
+                </div>
               </div>
               
               <button class="remove-btn" @click="removeFromCart(item.id)">
@@ -499,10 +506,30 @@ const updateItemQuantity = async (productId, newQuantity) => {
   color: #666;
 }
 
+.subtotal-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .subtotal {
   font-size: 1.25rem;
   font-weight: 700;
   color: #333;
+}
+
+.subtotal-sale {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #dc3545;
+}
+
+.subtotal-original {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6c757d;
+  text-decoration: line-through;
 }
 
 .remove-btn {

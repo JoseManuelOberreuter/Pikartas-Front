@@ -130,7 +130,13 @@ const loadProducts = async () => {
         image: product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: product.description,
         category: product.category,
-        stock: product.stock
+        stock: product.stock,
+        // Include sale information for ProductCard to display offers
+        is_on_sale: product.is_on_sale || false,
+        discount_percentage: product.discount_percentage || null,
+        sale_start_date: product.sale_start_date || null,
+        sale_end_date: product.sale_end_date || null,
+        sale_price: product.sale_price || null
       }))
     } else {
       products.value = []
@@ -172,6 +178,26 @@ const loadCategoriesFromProducts = () => {
   }
 }
 
+// Helper function to get final price (considering offers)
+const getFinalPrice = (product) => {
+  if (!product) return 0
+  
+  // Check if product is currently on sale
+  if (product.is_on_sale && product.discount_percentage) {
+    const now = new Date()
+    const startDate = product.sale_start_date ? new Date(product.sale_start_date) : null
+    const endDate = product.sale_end_date ? new Date(product.sale_end_date) : null
+    
+    if (startDate && endDate && now >= startDate && now <= endDate) {
+      // Product is currently on sale
+      return product.price * (1 - product.discount_percentage / 100)
+    }
+  }
+  
+  // Return regular price
+  return product.price
+}
+
 // Computed properties
 const filteredProducts = computed(() => {
   let result = [...products.value]
@@ -191,13 +217,13 @@ const filteredProducts = computed(() => {
     )
   }
   
-  // Sort products
+  // Sort products (using final price for price sorting)
   switch (sortBy.value) {
     case 'price-low':
-      result.sort((a, b) => a.price - b.price)
+      result.sort((a, b) => getFinalPrice(a) - getFinalPrice(b))
       break
     case 'price-high':
-      result.sort((a, b) => b.price - a.price)
+      result.sort((a, b) => getFinalPrice(b) - getFinalPrice(a))
       break
     case 'name':
     default:
