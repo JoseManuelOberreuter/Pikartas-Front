@@ -168,7 +168,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart.js'
 import { storeToRefs } from 'pinia'
@@ -177,7 +177,29 @@ import { useAuthStore } from '../stores/auth.js'
 const router = useRouter()
 const authStore = useAuthStore()
 const cartStore = useCartStore()
+
+// Usar storeToRefs para obtener referencias reactivas a los valores del store
+// Esto asegura que los cambios se reflejen automáticamente en el template
 const { cartItemCount } = storeToRefs(cartStore)
+
+// Watch para cargar el carrito cuando el usuario se autentica
+watch(() => authStore.isAuthenticated, async (isAuthenticated, wasAuthenticated) => {
+  if (isAuthenticated && !wasAuthenticated) {
+    // Usuario acaba de autenticarse, cargar el carrito
+    if (cartItemCount.value === 0 && !cartStore.loading) {
+      await cartStore.loadCart();
+    }
+  }
+}, { immediate: true })
+
+// Watch para forzar actualización cuando el carrito se carga
+// Esto asegura que el badge se actualice incluso si el Header se renderizó antes de que el carrito se cargara
+watch(cartItemCount, async (newCount, oldCount) => {
+  if (newCount !== oldCount) {
+    // Forzar actualización del componente
+    await nextTick();
+  }
+}, { immediate: true })
 
 const emit = defineEmits(['open-login', 'open-register'])
 const mobileMenuOpen = ref(false)
@@ -276,8 +298,14 @@ const handleClickOutside = (event) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('click', handleClickOutside)
+  
+  // Cargar carrito si el usuario está autenticado y el carrito está vacío
+  // Esto asegura que el badge se muestre correctamente al recargar la página
+  if (authStore.isAuthenticated && cartItemCount.value === 0 && !cartStore.loading) {
+    await cartStore.loadCart();
+  }
 })
 
 onUnmounted(() => {

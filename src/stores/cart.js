@@ -41,14 +41,24 @@ export const useCartStore = defineStore('cart', () => {
             productDetails[productId] = product;
           }
         } catch (error) {
-          // Usar datos por defecto si falla
+          // Handle 404 errors specifically - product doesn't exist or is disabled
+          if (error?.status === 404 || error?.response?.status === 404) {
+            console.warn(`[Cart Store] Product ${productId} not found (404), will be filtered out`);
+            // Don't add to productDetails - product will be filtered out in mapItemsToCartFormat
+            // The backend should have already removed inactive products, but if a product
+            // was completely deleted, this will handle it gracefully
+            return; // Skip this product
+          }
+          // For other errors, use default data as fallback
+          console.error(`[Cart Store] Error obteniendo detalles del producto ${productId}:`, error);
           productDetails[productId] = {
             id: productId,
             name: `Producto ${productId}`,
             image: '/placeholder-product.svg',
             category: 'General',
             rating: 5,
-            description: ''
+            description: '',
+            stock: 0
           };
         }
       });
@@ -56,18 +66,23 @@ export const useCartStore = defineStore('cart', () => {
       await Promise.all(promises);
       return productDetails;
     } catch (error) {
+      console.error('[Cart Store] Error getting product details:', error);
       return {};
     }
   }
 
-  // Computed (mantenemos la misma API que antes)
+  // Computed properties - Pinia maneja la reactividad automáticamente
+  // Estos computed se actualizan automáticamente cuando items.value cambia
   const cartItems = computed(() => items.value);
+  
   const cartTotal = computed(() => 
     items.value.reduce((total, item) => total + (item.price * item.quantity), 0)
   );
+  
   const cartItemCount = computed(() => 
-    items.value.reduce((total, item) => total + item.quantity, 0)
+    items.value.reduce((total, item) => total + (item.quantity || 0), 0)
   );
+  
   const isCartOpen = computed(() => isOpen.value);
 
   // Acciones
@@ -81,10 +96,10 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     // Prevent multiple simultaneous loads
-    if (loading.value || isInitializing.value) {
+    // No verificar isInitializing aquí porque initializeCart lo usa para prevenir múltiples inicializaciones
+    if (loading.value) {
       return;
     }
-
     loading.value = true;
     error.value = null;
     
@@ -92,145 +107,127 @@ export const useCartStore = defineStore('cart', () => {
       // Intentar obtener el carrito completo primero
       const response = await cartService.getCart();
       
-              // Si no hay items en la respuesta principal, intentar con el summary
-        if (!response.data || (!response.data.items && !Array.isArray(response.data))) {
-          const summaryResponse = await cartService.getCartSummary();
-        
-        if (summaryResponse.success && summaryResponse.data && summaryResponse.data.items) {
-                // Obtener IDs únicos de productos
-      const productIds = [...new Set(summaryResponse.data.items.map(item => item.productId))];
-      
-      // Obtener detalles de productos
-      const productDetails = await getProductDetails(productIds);
-      
-      items.value = summaryResponse.data.items.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-              quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-        } else if (summaryResponse.data && Array.isArray(summaryResponse.data)) {
-          // Obtener IDs únicos de productos
-          const productIds = [...new Set(summaryResponse.data.map(item => item.productId))];
-          
-          // Obtener detalles de productos
-          const productDetails = await getProductDetails(productIds);
-          
-          items.value = summaryResponse.data.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-              quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-        } else {
-          items.value = [];
+      // Helper function to map items
+      const mapItemsToCartFormat = async (itemsArray) => {
+        if (!itemsArray || !Array.isArray(itemsArray) || itemsArray.length === 0) {
+          return Promise.resolve([]);
         }
+        
+        const productIds = [...new Set(itemsArray.map(item => item.productId).filter(Boolean))];
+        
+        if (productIds.length === 0) {
+          return Promise.resolve([]);
+        }
+        
+        const productDetails = await getProductDetails(productIds);
+        
+        const mapped = itemsArray.map(item => {
+          if (!item.productId) {
+            return null;
+          }
+          
+          // If product details are not available (404 or other error), filter it out
+          // The backend should have already removed inactive products, but this is a safety net
+          if (!productDetails[item.productId]) {
+            console.warn(`[Cart Store] Product ${item.productId} details not available, filtering out`);
+            return null;
+          }
+          
+          const productDetail = productDetails[item.productId];
+          return {
+            id: item.productId,
+            _id: item.productId,
+            name: item.productName || productDetail.name || `Producto ${item.productId}`,
+            price: item.price,
+            // Use placeholder if product not found or image missing
+            image: productDetail.image || '/placeholder-product.svg',
+            stock: productDetail.stock || 999,
+            quantity: item.quantity,
+            category: productDetail.category || 'General',
+            rating: productDetail.rating || 5,
+            description: productDetail.description || '',
+            subtotal: item.subtotal || (item.price * item.quantity)
+          };
+        }).filter(Boolean); // Remove null items
+        
+        return mapped;
+      };
+      
+      let mappedItems = [];
+      
+      // Check for removed products notification
+      let removedProductsInfo = null;
+      if (response.success && response.data && response.data.removedProducts) {
+        removedProductsInfo = response.data.removedProducts;
+      }
+      
+      // Check response structure and extract items
+      if (response.success && response.data) {
+        // Case 1: response.data.items (standard format from formatCart)
+        if (response.data.items && Array.isArray(response.data.items)) {
+          mappedItems = await mapItemsToCartFormat(response.data.items);
+        }
+        // Case 2: response.data is an array directly
+        else if (Array.isArray(response.data)) {
+          mappedItems = await mapItemsToCartFormat(response.data);
+        }
+        // Case 3: response.data.cartItems
+        else if (response.data.cartItems && Array.isArray(response.data.cartItems)) {
+          mappedItems = await mapItemsToCartFormat(response.data.cartItems);
+        }
+        // Case 4: Try summary endpoint as fallback
+        else {
+          const summaryResponse = await cartService.getCartSummary();
+          
+          // Check for removed products in summary response too
+          if (summaryResponse.success && summaryResponse.data && summaryResponse.data.removedProducts) {
+            removedProductsInfo = summaryResponse.data.removedProducts;
+          }
+          
+          if (summaryResponse.success && summaryResponse.data) {
+            if (summaryResponse.data.items && Array.isArray(summaryResponse.data.items)) {
+              mappedItems = await mapItemsToCartFormat(summaryResponse.data.items);
+            } else if (Array.isArray(summaryResponse.data)) {
+              mappedItems = await mapItemsToCartFormat(summaryResponse.data);
+            }
+          }
+        }
+      } else if (response.data && Array.isArray(response.data)) {
+        // Direct array response
+        mappedItems = await mapItemsToCartFormat(response.data);
       } else {
-      // Mapear la respuesta del backend al formato esperado por el frontend
-      if (response.success && response.data && response.data.items) {
-          // Obtener IDs únicos de productos
-          const productIds = [...new Set(response.data.items.map(item => item.productId))];
-          
-          // Obtener detalles de productos
-          const productDetails = await getProductDetails(productIds);
-          
-          items.value = response.data.items.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-              quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-        } else if (response.data && Array.isArray(response.data)) {
-          // Obtener IDs únicos de productos
-          const productIds = [...new Set(response.data.map(item => item.productId))];
-          
-          // Obtener detalles de productos
-          const productDetails = await getProductDetails(productIds);
-          
-          items.value = response.data.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-              quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-        } else if (response.success && response.data && response.data.cartItems) {
-          // Obtener IDs únicos de productos
-          const productIds = [...new Set(response.data.cartItems.map(item => item.productId))];
-          
-          // Obtener detalles de productos
-          const productDetails = await getProductDetails(productIds);
-          
-          items.value = response.data.cartItems.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-          quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-      } else {
-        items.value = [];
+        // Try summary as fallback
+        const summaryResponse = await cartService.getCartSummary();
+        
+        // Check for removed products in summary response too
+        if (summaryResponse.success && summaryResponse.data && summaryResponse.data.removedProducts) {
+          removedProductsInfo = summaryResponse.data.removedProducts;
+        }
+        
+        if (summaryResponse.success && summaryResponse.data) {
+          if (summaryResponse.data.items && Array.isArray(summaryResponse.data.items)) {
+            mappedItems = await mapItemsToCartFormat(summaryResponse.data.items);
+          } else if (Array.isArray(summaryResponse.data)) {
+            mappedItems = await mapItemsToCartFormat(summaryResponse.data);
+          }
         }
       }
+      
+      // Show notification if products were removed
+      if (removedProductsInfo && removedProductsInfo.count > 0) {
+        errorNotification('Un artículo ya no existe o no queda stock');
+      }
+      
+      // Actualizar items - Pinia maneja la reactividad automáticamente
+      // Al asignar items.value, los computed (cartItemCount, cartTotal, cartItems) se actualizan automáticamente
+      if (mappedItems.length > 0) {
+        items.value = mappedItems;
+      } else {
+        items.value = [];
+      }
+      
     } catch (err) {
+      console.error('[Cart Store] Error loading cart:', err);
       // Manejar errores específicos de autenticación
       if (err?.verificationRequired) {
         error.value = resolveCartErrorMessage(err, verificationRequiredMessage);
@@ -271,6 +268,9 @@ export const useCartStore = defineStore('cart', () => {
       success(`${product.name} agregado al carrito`);
       
     } catch (err) {
+      // Siempre recargar el carrito, incluso si falla, para mostrar items existentes
+      await loadCart();
+      
       if (err?.verificationRequired) {
         const message = resolveCartErrorMessage(err, verificationRequiredMessage);
         error.value = message;
@@ -279,7 +279,11 @@ export const useCartStore = defineStore('cart', () => {
         error.value = 'Debes iniciar sesión para agregar productos al carrito';
         errorNotification(error.value);
       } else {
-        const message = resolveCartErrorMessage(err, 'Error al agregar producto al carrito');
+        // Extraer mensaje de error del response si está disponible
+        const errorMessage = err?.response?.data?.error || 
+                            err?.message || 
+                            'Error al agregar producto al carrito';
+        const message = resolveCartErrorMessage(err, errorMessage);
         error.value = message;
         errorNotification(message);
       }
@@ -421,9 +425,25 @@ export const useCartStore = defineStore('cart', () => {
       return;
     }
     
+    // Si ya está cargando, simplemente esperar a que termine
+    if (loading.value) {
+      // Esperar hasta 5 segundos máximo
+      let attempts = 0;
+      while (loading.value && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      if (!loading.value) {
+        return;
+      }
+    }
+    
     isInitializing.value = true;
     try {
       await loadCart();
+    } catch (error) {
+      console.error('[Cart Store] Error inicializando carrito:', error);
+      // Don't throw - allow app to continue even if cart init fails
     } finally {
       isInitializing.value = false;
     }

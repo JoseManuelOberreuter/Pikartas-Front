@@ -57,7 +57,8 @@ export const useAuthStore = defineStore('auth', () => {
             const cartStore = useCartStore();
             await cartStore.initializeCart();
           } catch (cartError) {
-            // Error initializing cart - silently fail
+            // Error initializing cart - silently fail, cart will load when needed
+            console.error('[Auth] Error inicializando carrito:', cartError);
           }
         } else {
           // Si no hay datos del usuario, limpiar autenticación
@@ -173,7 +174,8 @@ export const useAuthStore = defineStore('auth', () => {
           const cartStore = useCartStore();
           await cartStore.initializeCart();
         } catch (cartError) {
-          // Error initializing cart - silently fail
+          // Error initializing cart - silently fail, cart will load when needed
+          console.error('[Auth] Error inicializando carrito después de login:', cartError);
         }
       } else {
         throw new Error('Login response does not contain token');
@@ -207,7 +209,8 @@ export const useAuthStore = defineStore('auth', () => {
           const cartStore = useCartStore();
           await cartStore.initializeCart();
         } catch (cartError) {
-          // Error initializing cart - silently fail
+          // Error initializing cart - silently fail, cart will load when needed
+          console.error('[Auth] Error inicializando carrito después de verificación:', cartError);
         }
       }
       

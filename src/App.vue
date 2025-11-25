@@ -52,11 +52,14 @@ const showRegisterModal = ref(false)
 const showForgotPasswordModal = ref(false)
 
 // Inicializar carrito cuando el usuario esté autenticado
-watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
-  if (isAuthenticated) {
-    await cartStore.initializeCart()
+// Solo se ejecuta cuando isAuthenticated cambia a true (no en el valor inicial)
+watch(() => authStore.isAuthenticated, async (isAuthenticated, wasAuthenticated) => {
+  // Solo inicializar si cambió a true (no si ya era true desde el inicio)
+  // Esto evita duplicar la inicialización que ya se hace en auth.js
+  if (isAuthenticated && !wasAuthenticated) {
+    await cartStore.initializeCart();
   }
-}, { immediate: true })
+})
 
 // Listen for custom event from Home.vue to open register modal
 onMounted(() => {

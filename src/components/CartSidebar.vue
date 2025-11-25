@@ -35,19 +35,11 @@
               <font-awesome-icon icon="store" class="btn-icon" />
               <span class="btn-text">Ir a la tienda</span>
             </router-link>
-                      <button v-else class="action-btn login-btn" @click="openLoginModal">
-            <font-awesome-icon icon="lock" class="btn-icon" />
-            <span class="btn-text">Iniciar Sesión</span>
-          </button>
+            <button v-else class="action-btn login-btn" @click="openLoginModal">
+              <font-awesome-icon icon="lock" class="btn-icon" />
+              <span class="btn-text">Iniciar Sesión</span>
+            </button>
           </div>
-        </div>
-
-        <div v-else-if="cartItems.length === 0" class="empty-cart">
-          <font-awesome-icon icon="shopping-cart" class="empty-cart-icon" />
-          <p>Tu carrito está vacío</p>
-          <router-link to="/shop" class="btn btn-primary" @click="closeCart">
-            Ir a la tienda
-          </router-link>
         </div>
         
         <div v-else class="cart-items">
@@ -110,6 +102,7 @@
 </template>
 
 <script setup>
+import { watch } from 'vue'
 import { useCartStore } from '../stores/cart.js'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth.js'
@@ -122,6 +115,13 @@ const { isAuthenticated } = storeToRefs(authStore)
 
 // Emits
 const emit = defineEmits(['open-login-modal'])
+
+// Recargar carrito cuando se abre el sidebar (si está autenticado)
+watch(isCartOpen, async (isOpen) => {
+  if (isOpen && isAuthenticated.value && !loading.value) {
+    await cartStore.loadCart()
+  }
+})
 
 const removeFromCart = async (productId) => {
   await cartStore.removeFromCart(productId)
