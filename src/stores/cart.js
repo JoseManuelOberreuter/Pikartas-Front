@@ -138,7 +138,7 @@ export const useCartStore = defineStore('cart', () => {
             id: item.productId,
             _id: item.productId,
             name: item.productName || productDetail.name || `Producto ${item.productId}`,
-            price: item.price,
+            price: item.price, // This is now the recalculated price from backend
             // Use placeholder if product not found or image missing
             image: productDetail.image || '/placeholder-product.svg',
             stock: productDetail.stock || 999,
@@ -146,7 +146,11 @@ export const useCartStore = defineStore('cart', () => {
             category: productDetail.category || 'General',
             rating: productDetail.rating || 5,
             description: productDetail.description || '',
-            subtotal: item.subtotal || (item.price * item.quantity)
+            subtotal: item.subtotal || (item.price * item.quantity),
+            // Include sale information from backend if available
+            isOnSale: item.isOnSale || false,
+            discountPercentage: item.discountPercentage || null,
+            originalPrice: item.originalPrice || item.price
           };
         }).filter(Boolean); // Remove null items
         

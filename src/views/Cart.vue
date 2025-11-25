@@ -37,7 +37,15 @@
             <div class="item-controls">
               <div class="item-price">
                 <span class="price-label">Precio unitario:</span>
-                <span class="price">${{ formatCLP(item.price) }}</span>
+                <div class="price-container">
+                  <span v-if="item.isOnSale && item.originalPrice" class="price-original">${{ formatCLP(item.originalPrice) }}</span>
+                  <span :class="{ 'price-sale': item.isOnSale, 'price': !item.isOnSale }">
+                    ${{ formatCLP(item.price) }}
+                  </span>
+                  <span v-if="item.isOnSale && item.discountPercentage" class="discount-badge">
+                    -{{ item.discountPercentage }}%
+                  </span>
+                </div>
               </div>
               
               <div class="quantity-controls">
@@ -338,10 +346,39 @@ const updateItemQuantity = async (productId, newQuantity) => {
   color: #666;
 }
 
+.price-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .price {
   font-size: 1.1rem;
   font-weight: 600;
   color: #28a745;
+}
+
+.price-sale {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #dc3545;
+}
+
+.price-original {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6c757d;
+  text-decoration: line-through;
+}
+
+.discount-badge {
+  background: #dc3545;
+  color: white;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .quantity-controls {

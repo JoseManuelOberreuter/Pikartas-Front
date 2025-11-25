@@ -21,7 +21,13 @@
       <div v-else class="product-content">
         <div class="product-gallery">
           <div class="main-image">
-                <img :src="product.image" :alt="product.name" />
+            <img :src="product.image" :alt="product.name" />
+            <div class="product-badges" v-if="isOnSale">
+              <span class="badge badge-sale">
+                <font-awesome-icon icon="tag" class="badge-icon" />
+                {{ discountPercentage }}% OFF
+              </span>
+            </div>
           </div>
         </div>
 
@@ -35,7 +41,10 @@
           <h1 class="product-title">{{ product.name }}</h1>
           
           <div class="product-price">
-            <span class="price">${{ formatCLP(product.price) }}</span>
+            <span v-if="isOnSale" class="price-original">${{ formatCLP(product.price) }}</span>
+            <span :class="{ 'price-sale': isOnSale, 'price-normal': !isOnSale }">
+              ${{ formatCLP(displayPrice) }}
+            </span>
           </div>
 
           <div class="product-description">
@@ -136,6 +145,39 @@ const product = ref(null)
 const loading = ref(false)
 const allProducts = ref([])
 
+// Check if product is currently on sale (within date range)
+const isOnSale = computed(() => {
+  if (!product.value || !product.value.is_on_sale || !product.value.discount_percentage) {
+    return false
+  }
+  
+  const now = new Date()
+  const startDate = product.value.sale_start_date ? new Date(product.value.sale_start_date) : null
+  const endDate = product.value.sale_end_date ? new Date(product.value.sale_end_date) : null
+  
+  if (!startDate || !endDate) {
+    return false
+  }
+  
+  return now >= startDate && now <= endDate
+})
+
+// Calculate discount percentage
+const discountPercentage = computed(() => {
+  if (!isOnSale.value || !product.value.discount_percentage) {
+    return 0
+  }
+  return Math.round(product.value.discount_percentage)
+})
+
+// Calculate display price (sale price if on sale, otherwise regular price)
+const displayPrice = computed(() => {
+  if (isOnSale.value && product.value.discount_percentage) {
+    return product.value.price * (1 - product.value.discount_percentage / 100)
+  }
+  return product.value.price
+})
+
 // Cargar producto específico por ID
 const loadProduct = async (productId) => {
   loading.value = true
@@ -153,7 +195,11 @@ const loadProduct = async (productId) => {
         image: response.data.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: response.data.description,
         category: response.data.category,
-        stock: response.data.stock
+        stock: response.data.stock,
+        is_on_sale: response.data.is_on_sale || false,
+        discount_percentage: response.data.discount_percentage || null,
+        sale_start_date: response.data.sale_start_date || null,
+        sale_end_date: response.data.sale_end_date || null
       }
     } else {
       product.value = null
@@ -325,10 +371,44 @@ onMounted(async () => {
 }
 
 .main-image {
+  position: relative;
   width: 100%;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.product-badges {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+}
+
+.badge-sale {
+  color: white;
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.95) 0%, rgba(255, 0, 0, 0.95) 100%);
+}
+
+.badge-icon {
+  font-size: 0.75rem;
 }
 
 .main-image img {
@@ -365,12 +445,29 @@ onMounted(async () => {
 
 .product-price {
   margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.price {
+.price-normal {
   font-size: 2.5rem;
   font-weight: 700;
   color: #28a745;
+}
+
+.price-sale {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #dc3545;
+}
+
+.price-original {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #6c757d;
+  text-decoration: line-through;
 }
 
 .product-description {
