@@ -613,11 +613,17 @@ const updateStock = async (productId, newStock) => {
       return
     }
     
-    // Validate and parse stock value
-    const stockValue = parseInt(newStock)
+    // Handle empty string or invalid values
+    if (newStock === '' || newStock === null || newStock === undefined) {
+      error('El stock no puede estar vacío')
+      return
+    }
+    
+    // Convert to number, handling both string and number inputs
+    const stockValue = typeof newStock === 'string' ? parseInt(newStock.trim(), 10) : Number(newStock)
+    
     if (isNaN(stockValue) || stockValue < 0) {
       error('El stock debe ser un número válido mayor o igual a 0')
-      await loadProducts() // Reload to reset the input value
       return
     }
     
@@ -626,9 +632,7 @@ const updateStock = async (productId, newStock) => {
     success('Stock actualizado')
     await loadProducts()
   } catch (err) {
-    const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Error al actualizar stock'
-    error(errorMessage)
-    await loadProducts() // Reload to reset the input value on error
+    error('Error al actualizar stock')
   }
 }
 
