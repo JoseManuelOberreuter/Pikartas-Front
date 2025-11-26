@@ -209,6 +209,24 @@ router.beforeEach(async (to, from, next) => {
   // Authentication and authorization checks
   if (to.meta.requiresAuth) {
     const token = localStorage.getItem('token')
+    
+    // Special handling for PaymentReturn route: allow access if token_ws query parameter exists
+    // This is secure because token_ws is a unique, single-use token from Transbank
+    if (to.name === 'PaymentReturn' && to.query.token_ws) {
+      // Allow access to payment return callback even without auth token
+      // The backend validates the token_ws, providing security
+      next()
+      return
+    }
+    
+    // Special handling for PaymentError route: allow access if message query parameter exists
+    // This prevents redirect loops when showing payment errors
+    if (to.name === 'PaymentError' && to.query.message) {
+      // Allow access to payment error page when coming from payment flow
+      next()
+      return
+    }
+    
     if (!token) {
       // Redirigir al home si no está autenticado
       next('/')

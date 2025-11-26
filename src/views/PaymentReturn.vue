@@ -72,13 +72,30 @@ const cartStore = useCartStore()
 const currentStep = ref(1)
 const error = ref('')
 const isProcessing = ref(false)
+const redirectAttempted = ref(false)
 
 // Get token from URL
 const transbankToken = ref(route.query.token_ws)
 
+// Helper function to mask token for logging
+const maskToken = (token) => {
+  if (!token || token.length < 10) return '***'
+  return `${token.substring(0, 6)}...${token.substring(token.length - 4)}`
+}
+
 onMounted(async () => {
+  // Log payment return attempt
+  console.log('[PaymentReturn] Component mounted', {
+    hasToken: !!transbankToken.value,
+    tokenMasked: transbankToken.value ? maskToken(transbankToken.value) : 'none',
+    hasAuthToken: !!localStorage.getItem('token')
+  })
+  
   if (!transbankToken.value) {
-    error.value = 'Token de pago no encontrado'
+    const errorMsg = 'Token de pago no encontrado en la URL'
+    console.error('[PaymentReturn] Missing token_ws parameter')
+    error.value = errorMsg
+    showError(errorMsg)
     return
   }
   
@@ -88,49 +105,120 @@ onMounted(async () => {
 const confirmPayment = async () => {
   try {
     isProcessing.value = true
+    error.value = ''
     currentStep.value = 2
     
+    console.log('[PaymentReturn] Starting payment confirmation', {
+      tokenMasked: maskToken(transbankToken.value),
+      step: currentStep.value
+    })
+    
     const data = await transbankService.confirmPayment(transbankToken.value)
+    
+    console.log('[PaymentReturn] Payment confirmed successfully', {
+      orderId: data.data?.orderId,
+      orderNumber: data.data?.orderNumber,
+      status: data.data?.status
+    })
     
     currentStep.value = 3
     
     // Clear cart on successful payment
-    await cartStore.clearCart()
+    try {
+      await cartStore.clearCart()
+      console.log('[PaymentReturn] Cart cleared successfully')
+    } catch (cartError) {
+      console.warn('[PaymentReturn] Error clearing cart:', cartError)
+      // Don't fail the payment if cart clearing fails
+    }
     
     // Clear stored payment data
-    transbankService.clearStoredPaymentData()
+    try {
+      transbankService.clearStoredPaymentData()
+    } catch (storageError) {
+      console.warn('[PaymentReturn] Error clearing stored payment data:', storageError)
+    }
     
     // Redirect to success page
-    router.push({
-      name: 'PaymentSuccess',
-      query: {
-        orderId: data.data.orderId,
-        orderNumber: data.data.orderNumber,
-        amount: data.data.amount,
-        authorizationCode: data.data.authorizationCode
-      }
-    })
+    try {
+      redirectAttempted.value = true
+      await router.push({
+        name: 'PaymentSuccess',
+        query: {
+          orderId: data.data.orderId,
+          orderNumber: data.data.orderNumber,
+          amount: data.data.amount,
+          authorizationCode: data.data.authorizationCode
+        }
+      })
+    } catch (redirectError) {
+      console.error('[PaymentReturn] Error redirecting to success page:', redirectError)
+      // Fallback: show success message in current component
+      error.value = 'Pago confirmado exitosamente. Por favor, revisa tus órdenes.'
+    }
     
   } catch (err) {
-    error.value = err.message || 'Error al confirmar el pago'
-    showError(error.value)
-    
-    // Redirect to error page
-    router.push({
-      name: 'PaymentError',
-      query: {
-        message: error.value
-      }
+    // Enhanced error handling
+    console.error('[PaymentReturn] Error confirming payment:', {
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status,
+      tokenMasked: maskToken(transbankToken.value)
     })
+    
+    // Determine specific error message
+    let errorMessage = 'Error al confirmar el pago'
+    
+    if (err.response) {
+      // Network/API error
+      if (err.response.status === 400) {
+        errorMessage = err.response.data?.message || 'La transacción no es válida o fue cancelada'
+      } else if (err.response.status === 404) {
+        errorMessage = 'No se encontró la orden asociada a este pago'
+      } else if (err.response.status === 500) {
+        errorMessage = 'Error en el servidor. Por favor, intenta nuevamente más tarde'
+      } else {
+        errorMessage = err.response.data?.message || err.message || errorMessage
+      }
+    } else if (err.message) {
+      // Other errors (network, timeout, etc.)
+      if (err.message.includes('Network Error') || err.message.includes('fetch')) {
+        errorMessage = 'Error de conexión. Por favor, verifica tu conexión a internet e intenta nuevamente'
+      } else if (err.message.includes('timeout')) {
+        errorMessage = 'La solicitud tardó demasiado. Por favor, intenta nuevamente'
+      } else {
+        errorMessage = err.message
+      }
+    }
+    
+    error.value = errorMessage
+    showError(errorMessage)
+    
+    // Try to redirect to error page, but show error in component if redirect fails
+    try {
+      redirectAttempted.value = true
+      await router.push({
+        name: 'PaymentError',
+        query: {
+          message: errorMessage
+        }
+      })
+    } catch (redirectError) {
+      console.error('[PaymentReturn] Error redirecting to error page:', redirectError)
+      // Error is already displayed in the component, so user can see it
+      // The component will show the error message and retry button
+    }
   } finally {
     isProcessing.value = false
   }
 }
 
 const retryConfirmation = () => {
+  console.log('[PaymentReturn] Retrying payment confirmation')
   error.value = ''
   currentStep.value = 1
   isProcessing.value = false
+  redirectAttempted.value = false
   confirmPayment()
 }
 </script>

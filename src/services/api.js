@@ -613,10 +613,24 @@ export const adminService = {
   },
 
   // Gestión de órdenes
-  async getAllOrders() {
+  async getAllOrders(params = {}) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.get(routesStore.fullOrderRoutes.getAllAdmin);
+      // Build query parameters
+      const queryParams = new URLSearchParams();
+      
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.paymentStatus) queryParams.append('paymentStatus', params.paymentStatus);
+      if (params.userId) queryParams.append('userId', params.userId);
+      if (params.search) queryParams.append('search', params.search);
+      
+      const url = queryParams.toString() 
+        ? `${routesStore.fullOrderRoutes.getAllAdmin}?${queryParams.toString()}`
+        : routesStore.fullOrderRoutes.getAllAdmin;
+      
+      const response = await axios.get(url);
       return response.data;
     } catch (error) {
       logger.error('Get all orders error:', error);
