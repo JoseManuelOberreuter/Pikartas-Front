@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: './', // Ajusta esto según tu ruta base de despliegue
+  base: '/', // Use absolute paths for Vercel deployment
   plugins: [
     vue(),
   ],
@@ -13,5 +13,9 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
   },
 })
