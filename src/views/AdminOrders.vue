@@ -248,6 +248,12 @@ const handleItemsPerPageChange = (newItemsPerPage) => {
 }
 
 const updateOrderStatus = async (orderId, newStatus) => {
+  if (!orderId) {
+    error('Error: ID de orden inválido')
+    console.error('updateOrderStatus called with invalid orderId:', orderId)
+    return
+  }
+  
   try {
     await adminService.updateOrderStatus(orderId, newStatus)
     success('Estado de orden actualizado')
@@ -266,16 +272,23 @@ const viewOrderDetails = (order) => {
 }
 
 const refundOrder = async (order) => {
-  if (!confirm(`¿Estás seguro de que quieres reembolsar la orden #${(order.id || order._id)?.toString().slice(-8)}?`)) {
+  const orderId = order?.id || order?._id
+  if (!orderId) {
+    error('Error: ID de orden inválido')
+    console.error('refundOrder called with invalid order:', order)
     return
   }
 
-  refundingOrder.value = order.id || order._id
+  if (!confirm(`¿Estás seguro de que quieres reembolsar la orden #${orderId.toString().slice(-8)}?`)) {
+    return
+  }
+
+  refundingOrder.value = orderId
   try {
-    await adminService.refundPayment(order.id || order._id)
+    await adminService.refundPayment(orderId)
     success('Reembolso procesado exitosamente')
     await loadOrders()
-    if (selectedOrder.value && (selectedOrder.value.id === order.id || selectedOrder.value._id === order._id)) {
+    if (selectedOrder.value && (selectedOrder.value.id === orderId || selectedOrder.value._id === orderId)) {
       selectedOrder.value.paymentStatus = 'refunded'
       selectedOrder.value.payment_status = 'refunded'
     }
@@ -287,9 +300,16 @@ const refundOrder = async (order) => {
 }
 
 const checkPaymentStatus = async (order) => {
-  checkingPayment.value = order.id || order._id
+  const orderId = order?.id || order?._id
+  if (!orderId) {
+    error('Error: ID de orden inválido')
+    console.error('checkPaymentStatus called with invalid order:', order)
+    return
+  }
+
+  checkingPayment.value = orderId
   try {
-    await adminService.getPaymentStatus(order.id || order._id)
+    await adminService.getPaymentStatus(orderId)
     success('Estado de pago actualizado')
     await loadOrders()
   } catch (err) {

@@ -18,7 +18,7 @@
     <td>
       <select 
         :value="order.status" 
-        @change="$emit('update-status', order.id || order._id, $event.target.value)"
+        @change="handleStatusChange($event.target.value)"
         class="status-select"
         :class="`status-${order.status}`"
       >
@@ -52,7 +52,7 @@
         </button>
         <button 
           v-if="(order.paymentStatus || order.payment_status) === 'paid' && order.status !== 'cancelled'"
-          @click="$emit('refund', order)" 
+          @click="handleRefund"
           class="btn btn-sm btn-warning"
           :disabled="refundingOrder === (order.id || order._id)"
         >
@@ -64,7 +64,7 @@
           Reembolsar
         </button>
         <button 
-          @click="$emit('check-payment', order)" 
+          @click="handleCheckPayment"
           class="btn btn-sm btn-info"
           :disabled="checkingPayment === (order.id || order._id)"
         >
@@ -98,7 +98,47 @@ const props = defineProps({
   }
 })
 
-defineEmits(['update-status', 'view', 'refund', 'check-payment'])
+const emit = defineEmits(['update-status', 'view', 'refund', 'check-payment'])
+
+// Helper function to get order ID safely
+const getOrderId = () => {
+  const id = props.order?.id || props.order?._id
+  if (!id) {
+    console.error('Order ID is missing:', props.order)
+    return null
+  }
+  return id
+}
+
+// Handle status change with validation
+const handleStatusChange = (newStatus) => {
+  const orderId = getOrderId()
+  if (!orderId) {
+    console.error('Cannot update status: Order ID is missing')
+    return
+  }
+  emit('update-status', orderId, newStatus)
+}
+
+// Handle refund with validation
+const handleRefund = () => {
+  const orderId = getOrderId()
+  if (!orderId) {
+    console.error('Cannot refund: Order ID is missing')
+    return
+  }
+  emit('refund', props.order)
+}
+
+// Handle check payment with validation
+const handleCheckPayment = () => {
+  const orderId = getOrderId()
+  if (!orderId) {
+    console.error('Cannot check payment: Order ID is missing')
+    return
+  }
+  emit('check-payment', props.order)
+}
 
 const formatDate = (dateString) => {
   if (!dateString) return 'Fecha no disponible'
