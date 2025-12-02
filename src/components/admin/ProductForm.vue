@@ -115,13 +115,14 @@
         <label class="form-label">Imagen del Producto *</label>
         <div class="image-upload-container">
           <input 
+            ref="fileInputRef"
             type="file" 
             @change="handleImageUpload" 
             accept="image/*"
             class="file-input"
-            :id="uniqueId.value"
+            :id="uniqueId"
           />
-          <label :for="uniqueId.value" class="file-input-label">
+          <label :for="uniqueId" @click="handleLabelClick" class="file-input-label">
             <font-awesome-icon icon="camera" class="upload-icon" />
             <span class="upload-text">
               {{ selectedImage ? selectedImage.name : 'Seleccionar imagen' }}
@@ -176,7 +177,8 @@
 import { ref, watch } from 'vue'
 import Modal from '../Modal.vue'
 
-const uniqueId = ref(`product-image-${Math.random().toString(36).substr(2, 9)}`)
+const uniqueId = `product-image-${Math.random().toString(36).substr(2, 9)}`
+const fileInputRef = ref(null)
 
 const props = defineProps({
   show: {
@@ -221,6 +223,13 @@ const updateField = (field, value) => {
   })
 }
 
+const handleLabelClick = (event) => {
+  event.preventDefault()
+  if (fileInputRef.value) {
+    fileInputRef.value.click()
+  }
+}
+
 const handleImageUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
@@ -233,8 +242,9 @@ const handleImageUpload = (event) => {
 const removeImage = () => {
   selectedImage.value = null
   imagePreviewUrl.value = ''
-  const fileInput = document.getElementById(uniqueId.value)
-  if (fileInput) fileInput.value = ''
+  if (fileInputRef.value) {
+    fileInputRef.value.value = ''
+  }
 }
 
 const handleAddCategory = () => {
