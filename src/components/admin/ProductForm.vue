@@ -177,8 +177,7 @@
 import { ref, watch } from 'vue'
 import Modal from '../Modal.vue'
 
-const uniqueId = `product-image-${Math.random().toString(36).substr(2, 9)}`
-const fileInputRef = ref(null)
+const uniqueId = ref(`product-image-${Math.random().toString(36).substr(2, 9)}`)
 
 const props = defineProps({
   show: {

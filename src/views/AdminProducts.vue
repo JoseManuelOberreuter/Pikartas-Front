@@ -90,11 +90,119 @@
         :submitting="submitting"
         @update:show="showModal = $event"
         @close="closeModal"
-        @submit="submitProduct"
+        @submit="handleProductSubmit"
         @add-category="handleAddCategory"
         @delete-category="handleDeleteCategoryFromForm"
         @update:newCategoryName="newCategoryName = $event"
         @update:productForm="productForm = $event"
+      />
+
+      <!-- Confirmation Modals -->
+      <!-- Delete Product Confirmation -->
+      <ConfirmationModal
+        :show="showDeleteProductModal"
+        title="Eliminar Producto"
+        message="¿Estás seguro de que quieres eliminar este producto?"
+        confirm-text="Eliminar"
+        cancel-text="Cancelar"
+        type="danger"
+        icon="trash"
+        @update:show="showDeleteProductModal = $event"
+        @confirm="confirmDeleteProduct"
+        @cancel="cancelDeleteProduct"
+      />
+
+      <!-- Reactivate Product Confirmation -->
+      <ConfirmationModal
+        :show="showReactivateProductModal"
+        title="Reactivar Producto"
+        message="¿Estás seguro de que quieres reactivar este producto?"
+        confirm-text="Reactivar"
+        cancel-text="Cancelar"
+        type="success"
+        icon="undo"
+        @update:show="showReactivateProductModal = $event"
+        @confirm="confirmReactivateProduct"
+        @cancel="cancelReactivateProduct"
+      />
+
+      <!-- Toggle Featured Confirmation -->
+      <ConfirmationModal
+        :show="showToggleFeaturedModal"
+        :title="toggleFeaturedTitle"
+        :message="toggleFeaturedMessage"
+        confirm-text="Aceptar"
+        cancel-text="Cancelar"
+        type="info"
+        icon="star"
+        @update:show="showToggleFeaturedModal = $event"
+        @confirm="confirmToggleFeatured"
+        @cancel="cancelToggleFeatured"
+      />
+
+      <!-- Delete Category Confirmation -->
+      <ConfirmationModal
+        :show="showDeleteCategoryModal"
+        title="Eliminar Categoría"
+        :message="deleteCategoryMessage"
+        confirm-text="Eliminar"
+        cancel-text="Cancelar"
+        type="danger"
+        icon="trash"
+        @update:show="showDeleteCategoryModal = $event"
+        @confirm="confirmDeleteCategory"
+        @cancel="cancelDeleteCategory"
+      />
+
+      <!-- Save Offer Confirmation -->
+      <ConfirmationModal
+        :show="showSaveOfferModal"
+        title="Guardar Oferta"
+        :message="saveOfferMessage"
+        confirm-text="Guardar"
+        cancel-text="Cancelar"
+        type="success"
+        icon="tag"
+        @update:show="showSaveOfferModal = $event"
+        @confirm="confirmSaveOffer"
+        @cancel="cancelSaveOffer"
+      >
+        <template #content>
+          <div v-if="pendingSaleForm.isOnSale" class="offer-details">
+            <p><strong>Descuento:</strong> {{ pendingSaleForm.discountPercentage }}%</p>
+            <p><strong>Fecha de inicio:</strong> {{ formatDate(pendingSaleForm.saleStartDate) }}</p>
+            <p><strong>Fecha de fin:</strong> {{ formatDate(pendingSaleForm.saleEndDate) }}</p>
+          </div>
+          <p v-else>Se desactivará la oferta para este producto.</p>
+        </template>
+      </ConfirmationModal>
+
+      <!-- Update Product Confirmation -->
+      <ConfirmationModal
+        :show="showUpdateProductModal"
+        :title="isEditing ? 'Actualizar Producto' : 'Crear Producto'"
+        :message="isEditing ? '¿Estás seguro de que quieres actualizar este producto?' : '¿Estás seguro de que quieres crear este producto?'"
+        confirm-text="Confirmar"
+        cancel-text="Cancelar"
+        type="info"
+        icon="save"
+        @update:show="showUpdateProductModal = $event"
+        @confirm="confirmUpdateProduct"
+        @cancel="cancelUpdateProduct"
+      />
+
+      <!-- Update Stock Confirmation -->
+      <ConfirmationModal
+        :show="showUpdateStockModal"
+        title="Actualizar Stock"
+        :message="updateStockMessage"
+        confirm-text="Actualizar"
+        cancel-text="Cancelar"
+        type="info"
+        icon="box"
+        @update:show="showUpdateStockModal = $event"
+        @confirm="confirmUpdateStock"
+        @cancel="cancelUpdateStock"
       />
     </div>
   </div>
@@ -110,6 +218,7 @@ import ProductTable from '../components/admin/ProductTable.vue'
 import CategoryManager from '../components/admin/CategoryManager.vue'
 import SaleForm from '../components/admin/SaleForm.vue'
 import ProductForm from '../components/admin/ProductForm.vue'
+import ConfirmationModal from '../components/ConfirmationModal.vue'
 
 const { success, error } = useNotifications()
 
@@ -131,6 +240,25 @@ const currentProductId = ref(null)
 const currentProduct = ref(null)
 const sortColumn = ref(null)
 const sortOrder = ref('asc')
+
+// Confirmation Modal States
+const showDeleteProductModal = ref(false)
+const showReactivateProductModal = ref(false)
+const showToggleFeaturedModal = ref(false)
+const showDeleteCategoryModal = ref(false)
+const showSaveOfferModal = ref(false)
+const showUpdateProductModal = ref(false)
+const showUpdateStockModal = ref(false)
+
+// Pending actions data
+const pendingProductId = ref(null)
+const pendingCategoryName = ref('')
+const categoryToDelete = ref('')
+const pendingFeaturedState = ref(null)
+const pendingSaleForm = ref({})
+const pendingProductForm = ref(null)
+const pendingStockValue = ref(null)
+const pendingStockProductId = ref(null)
 
 // Form
 const productForm = ref({
@@ -322,20 +450,27 @@ const handleDeleteCategory = (categoryName) => {
     return
   }
   
-  if (!confirm(`¿Estás seguro de que quieres eliminar la categoría "${categoryName}"?`)) {
-    return
-  }
-  
+  categoryToDelete.value = categoryName
+  showDeleteCategoryModal.value = true
+}
+
+const confirmDeleteCategory = () => {
   try {
-    availableCategories.value = availableCategories.value.filter(cat => cat !== categoryName)
-    success(`Categoría "${categoryName}" eliminada correctamente`)
+    availableCategories.value = availableCategories.value.filter(cat => cat !== categoryToDelete.value)
+    success(`Categoría "${categoryToDelete.value}" eliminada correctamente`)
     
-    if (productForm.value.category === categoryName) {
+    if (productForm.value.category === categoryToDelete.value) {
       productForm.value.category = ''
     }
   } catch (err) {
     error('Error al eliminar la categoría')
+  } finally {
+    categoryToDelete.value = ''
   }
+}
+
+const cancelDeleteCategory = () => {
+  categoryToDelete.value = ''
 }
 
 const handleDeleteCategoryFromForm = (categoryName) => {
@@ -345,21 +480,8 @@ const handleDeleteCategoryFromForm = (categoryName) => {
     return
   }
   
-  if (!confirm(`¿Estás seguro de que quieres eliminar la categoría "${categoryName}"?`)) {
-    return
-  }
-  
-  try {
-    availableCategories.value = availableCategories.value.filter(cat => cat !== categoryName)
-    
-    if (productForm.value.category === categoryName) {
-      productForm.value.category = ''
-    }
-    
-    success(`Categoría "${categoryName}" eliminada correctamente`)
-  } catch (err) {
-    error('Error al eliminar la categoría')
-  }
+  categoryToDelete.value = categoryName
+  showDeleteCategoryModal.value = true
 }
 
 const openCategoryManager = () => {
@@ -431,8 +553,15 @@ const submitSale = async (formData) => {
     }
   }
   
+  // Show confirmation modal before saving
+  pendingSaleForm.value = { ...formData }
+  showSaveOfferModal.value = true
+}
+
+const confirmSaveOffer = async () => {
   submittingSale.value = true
   try {
+    const formData = pendingSaleForm.value
     const formDataToSend = new FormData()
     formDataToSend.append('isOnSale', String(formData.isOnSale))
     
@@ -487,7 +616,31 @@ const submitSale = async (formData) => {
     console.error('Error saving sale:', err)
   } finally {
     submittingSale.value = false
+    pendingSaleForm.value = {}
   }
+}
+
+const cancelSaveOffer = () => {
+  pendingSaleForm.value = {}
+}
+
+const saveOfferMessage = computed(() => {
+  if (pendingSaleForm.value.isOnSale) {
+    return '¿Estás seguro de que quieres guardar esta oferta?'
+  }
+  return '¿Estás seguro de que quieres desactivar la oferta para este producto?'
+})
+
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleString('es-CL', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 const loadProducts = async () => {
@@ -558,6 +711,12 @@ const closeModal = () => {
   newCategoryName.value = ''
 }
 
+const handleProductSubmit = (formData) => {
+  // Show confirmation modal before submitting
+  pendingProductForm.value = formData
+  showUpdateProductModal.value = true
+}
+
 const submitProduct = async (formData) => {
   submitting.value = true
   try {
@@ -603,7 +762,18 @@ const submitProduct = async (formData) => {
     console.error('Error saving product:', err)
   } finally {
     submitting.value = false
+    pendingProductForm.value = null
   }
+}
+
+const confirmUpdateProduct = () => {
+  if (pendingProductForm.value) {
+    submitProduct(pendingProductForm.value)
+  }
+}
+
+const cancelUpdateProduct = () => {
+  pendingProductForm.value = null
 }
 
 const updateStock = async (productId, newStock) => {
@@ -627,13 +797,31 @@ const updateStock = async (productId, newStock) => {
       return
     }
     
-    await adminService.updateProductStock(productId, stockValue)
-    
+    // Show confirmation modal before updating
+    pendingStockProductId.value = productId
+    pendingStockValue.value = stockValue
+    showUpdateStockModal.value = true
+  } catch (err) {
+    error('Error al validar stock')
+  }
+}
+
+const confirmUpdateStock = async () => {
+  try {
+    await adminService.updateProductStock(pendingStockProductId.value, pendingStockValue.value)
     success('Stock actualizado')
     await loadProducts()
   } catch (err) {
     error('Error al actualizar stock')
+  } finally {
+    pendingStockProductId.value = null
+    pendingStockValue.value = null
   }
+}
+
+const cancelUpdateStock = () => {
+  pendingStockProductId.value = null
+  pendingStockValue.value = null
 }
 
 const deleteProduct = async (productId) => {
@@ -643,15 +831,24 @@ const deleteProduct = async (productId) => {
     return
   }
   
-  if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return
-  
+  pendingProductId.value = id
+  showDeleteProductModal.value = true
+}
+
+const confirmDeleteProduct = async () => {
   try {
-    await adminService.deleteProduct(id)
+    await adminService.deleteProduct(pendingProductId.value)
     success('Producto eliminado')
     await loadProducts()
   } catch (err) {
     error(err.message || 'Error al eliminar producto')
+  } finally {
+    pendingProductId.value = null
   }
+}
+
+const cancelDeleteProduct = () => {
+  pendingProductId.value = null
 }
 
 const reactivateProduct = async (productId) => {
@@ -661,18 +858,27 @@ const reactivateProduct = async (productId) => {
     return
   }
   
-  if (!confirm('¿Estás seguro de que quieres reactivar este producto?')) return
-  
+  pendingProductId.value = id
+  showReactivateProductModal.value = true
+}
+
+const confirmReactivateProduct = async () => {
   try {
     const formData = new FormData()
     formData.append('is_active', 'true')
     
-    await adminService.updateProduct(id, formData)
+    await adminService.updateProduct(pendingProductId.value, formData)
     success('Producto reactivado exitosamente')
     await loadProducts()
   } catch (err) {
     error(err.message || 'Error al reactivar producto')
+  } finally {
+    pendingProductId.value = null
   }
+}
+
+const cancelReactivateProduct = () => {
+  pendingProductId.value = null
 }
 
 // Helper functions
@@ -712,21 +918,50 @@ const toggleFeatured = async (productId, currentState) => {
   }
   
   const newState = !currentState
-  const action = newState ? 'marcar como destacado' : 'quitar de destacados'
-  
-  if (!confirm(`¿Estás seguro de que quieres ${action} este producto?`)) return
-  
+  pendingProductId.value = id
+  pendingFeaturedState.value = newState
+  showToggleFeaturedModal.value = true
+}
+
+const confirmToggleFeatured = async () => {
   try {
     const formData = new FormData()
-    formData.append('isFeatured', String(newState))
+    formData.append('isFeatured', String(pendingFeaturedState.value))
     
-    await adminService.updateProduct(id, formData)
-    success(newState ? 'Producto marcado como destacado' : 'Producto quitado de destacados')
+    await adminService.updateProduct(pendingProductId.value, formData)
+    success(pendingFeaturedState.value ? 'Producto marcado como destacado' : 'Producto quitado de destacados')
     await loadProducts()
   } catch (err) {
     error(err.message || 'Error al actualizar estado de destacado')
+  } finally {
+    pendingProductId.value = null
+    pendingFeaturedState.value = null
   }
 }
+
+const cancelToggleFeatured = () => {
+  pendingProductId.value = null
+  pendingFeaturedState.value = null
+}
+
+const toggleFeaturedTitle = computed(() => {
+  if (pendingFeaturedState.value === null) return 'Confirmar acción'
+  return pendingFeaturedState.value ? 'Marcar como Destacado' : 'Quitar de Destacados'
+})
+
+const toggleFeaturedMessage = computed(() => {
+  if (pendingFeaturedState.value === null) return ''
+  const action = pendingFeaturedState.value ? 'marcar como destacado' : 'quitar de destacados'
+  return `¿Estás seguro de que quieres ${action} este producto?`
+})
+
+const deleteCategoryMessage = computed(() => {
+  return `¿Estás seguro de que quieres eliminar la categoría "${categoryToDelete.value}"?`
+})
+
+const updateStockMessage = computed(() => {
+  return `¿Estás seguro de que quieres actualizar el stock a ${pendingStockValue.value} unidades?`
+})
 
 const handleSort = (column) => {
   if (sortColumn.value === column) {
@@ -803,6 +1038,23 @@ onMounted(async () => {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.offer-details {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--color-gray-100);
+  border-radius: var(--border-radius-lg);
+  border: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+.offer-details p {
+  margin: var(--spacing-sm) 0;
+  color: var(--color-gray-700);
+}
+
+.offer-details p:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 768px) {
