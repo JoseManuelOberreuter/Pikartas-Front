@@ -113,12 +113,12 @@
         <h3>Productos</h3>
         <div class="items-list">
           <div v-for="item in orderItems" :key="item.id || item._id" class="order-item">
-            <div class="item-image-placeholder" v-if="!item.image">
+            <div class="item-image-placeholder" v-if="!getItemImage(item)">
               <font-awesome-icon icon="image" />
             </div>
-            <img v-else :src="item.image" :alt="item.name || item.product_name" class="item-image" />
+            <img v-else :src="getItemImage(item)" :alt="getItemName(item)" class="item-image" />
             <div class="item-details">
-              <h4>{{ item.name || item.product_name }}</h4>
+              <h4>{{ getItemName(item) }}</h4>
               <p>Cantidad: {{ item.quantity }}</p>
               <p>Precio unitario: ${{ formatCLP(item.price) }}</p>
             </div>
@@ -170,6 +170,15 @@ const orderItems = computed(() => {
   if (!props.order) return []
   return props.order.items || props.order.order_items || []
 })
+
+// Helper functions to access item properties (supporting both old and new structure)
+const getItemImage = (item) => {
+  return item.product?.image || item.image || null
+}
+
+const getItemName = (item) => {
+  return item.product?.name || item.name || item.productName || item.product_name || 'Producto sin nombre'
+}
 
 const formatDate = (dateString) => {
   if (!dateString) return 'Fecha no disponible'

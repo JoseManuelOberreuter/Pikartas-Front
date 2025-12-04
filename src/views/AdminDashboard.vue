@@ -163,18 +163,6 @@
               Gestionar Usuarios
             </div>
           </div>
-
-          <div class="action-card" @click="navigateTo('/admin/orders')">
-            <div class="action-icon">
-              <font-awesome-icon icon="credit-card" class="action-icon-svg" />
-            </div>
-            <h3>Gestionar Pagos</h3>
-            <p>Reembolsos y estado de pagos</p>
-            <div class="action-button">
-              <font-awesome-icon icon="arrow-right" class="action-btn-icon" />
-              Gestionar Pagos
-            </div>
-          </div>
         </div>
       </div>
 
