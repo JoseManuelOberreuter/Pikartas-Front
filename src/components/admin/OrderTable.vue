@@ -20,7 +20,7 @@
             :order="order"
             :refunding-order="refundingOrder"
             :checking-payment="checkingPayment"
-            @update-status="$emit('update-status', $event[0], $event[1])"
+            @update-status="handleUpdateStatus"
             @view="$emit('view', $event)"
             @refund="$emit('refund', $event)"
             @check-payment="$emit('check-payment', $event)"
@@ -59,7 +59,12 @@ defineProps({
   }
 })
 
-defineEmits(['update-status', 'view', 'refund', 'check-payment'])
+const emit = defineEmits(['update-status', 'view', 'refund', 'check-payment'])
+
+// Handler method to properly receive both arguments from the event
+const handleUpdateStatus = (orderId, newStatus) => {
+  emit('update-status', orderId, newStatus)
+}
 </script>
 
 <style scoped>
