@@ -44,47 +44,50 @@
         
         <div v-else class="cart-items">
           <div v-for="item in cartItems" :key="item.id" class="cart-item">
-            <div class="item-image">
-              <img :src="item.image" :alt="item.name" />
-            </div>
+            <img :src="item.image" :alt="item.name" class="item-image" />
             
-            <div class="item-details">
-              <h4 class="item-name">{{ item.name }}</h4>
-              <div class="item-price-container">
-                <span v-if="item.isOnSale && item.originalPrice" class="item-price-original">
+            <div class="item-info">
+              <div class="item-header">
+                <h4 class="item-name">{{ item.name }}</h4>
+                <button class="remove-btn" @click="removeFromCart(item.id)" title="Eliminar">
+                  <font-awesome-icon icon="trash" />
+                </button>
+              </div>
+              
+              <div class="item-price-row">
+                <span v-if="item.isOnSale && item.originalPrice" class="price-original">
                   ${{ formatCLP(item.originalPrice) }}
                 </span>
-                <span :class="{ 'item-price-sale': item.isOnSale, 'item-price': !item.isOnSale }">
+                <span :class="{ 'price-sale': item.isOnSale }" class="price">
                   ${{ formatCLP(item.price) }}
                 </span>
-                <span v-if="item.isOnSale && item.discountPercentage" class="discount-badge-small">
+                <span v-if="item.isOnSale && item.discountPercentage" class="discount-badge">
                   -{{ item.discountPercentage }}%
                 </span>
               </div>
               
-              <div class="quantity-controls">
-                <button class="qty-btn decrease" @click="decreaseQuantity(item.id)" :disabled="item.quantity <= 1">
-                  <font-awesome-icon icon="minus" class="qty-icon" />
-                </button>
-                <span class="quantity">{{ item.quantity }}</span>
-                <button class="qty-btn increase" @click="increaseQuantity(item.id)">
-                  <font-awesome-icon icon="plus" class="qty-icon" />
-                </button>
-              </div>
-              
-              <div class="item-total-container">
-                <span v-if="item.isOnSale && item.originalPrice" class="item-total-original">
-                  Total: ${{ formatCLP(item.originalPrice * item.quantity) }}
-                </span>
-                <span :class="{ 'item-total-sale': item.isOnSale, 'item-total': !item.isOnSale }">
-                  Total: ${{ formatCLP(item.price * item.quantity) }}
-                </span>
+              <div class="item-actions">
+                <div class="quantity-controls">
+                  <button class="qty-btn" @click="decreaseQuantity(item.id)" :disabled="item.quantity <= 1">
+                    <font-awesome-icon icon="minus" />
+                  </button>
+                  <input 
+                    type="number" 
+                    :value="item.quantity" 
+                    @change="updateItemQuantity(item.id, $event.target.value)"
+                    min="1"
+                    class="qty-input"
+                  >
+                  <button class="qty-btn" @click="increaseQuantity(item.id)">
+                    <font-awesome-icon icon="plus" />
+                  </button>
+                </div>
+                
+                <div class="item-total">
+                  ${{ formatCLP(item.price * item.quantity) }}
+                </div>
               </div>
             </div>
-            
-            <button class="remove-btn" @click="removeFromCart(item.id)" title="Eliminar producto">
-              <font-awesome-icon icon="trash" class="remove-icon" />
-            </button>
           </div>
         </div>
       </div>
@@ -96,20 +99,15 @@
         </div>
         
         <div class="cart-actions">
-          <div class="action-buttons">
-            <button class="action-btn clear-btn" @click="clearCart">
-              <font-awesome-icon icon="trash" class="btn-icon" />
-              <span class="btn-text">Limpiar</span>
+          <button class="btn btn-clear" @click="clearCart">
+            Limpiar
           </button>
-            <router-link to="/cart" class="action-btn view-btn" @click="closeCart">
-              <font-awesome-icon icon="eye" class="btn-icon" />
-              <span class="btn-text">Ver Carrito</span>
+          <router-link to="/cart" class="btn btn-view" @click="closeCart">
+            Ver Carrito
           </router-link>
-            <router-link to="/checkout" class="action-btn checkout-btn" @click="closeCart">
-              <font-awesome-icon icon="credit-card" class="btn-icon" />
-              <span class="btn-text">Comprar</span>
+          <router-link to="/checkout" class="btn btn-checkout" @click="closeCart">
+            Comprar
           </router-link>
-          </div>
         </div>
       </div>
     </div>
@@ -173,6 +171,13 @@ const decreaseQuantity = async (productId) => {
   }
 }
 
+const updateItemQuantity = async (productId, newQuantity) => {
+  const quantity = parseInt(newQuantity)
+  if (quantity > 0) {
+    await cartStore.updateQuantity(productId, quantity)
+  }
+}
+
 const clearCart = async () => {
   if (confirm('¿Estás seguro de que quieres limpiar el carrito?')) {
     await cartStore.clearCart()
@@ -208,9 +213,7 @@ const openLoginModal = () => {
 }
 
 @keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
+  to { opacity: 1; }
 }
 
 .cart-sidebar {
@@ -235,61 +238,28 @@ const openLoginModal = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
+  padding: 1rem;
   border-bottom: 1px solid #eee;
-  background: #f8f9fa;
 }
 
 .cart-header h2 {
   margin: 0;
-  color: #333;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.cart-title-icon {
-  color: var(--icon-cart);
-  font-size: 1.1rem;
-  transition: color var(--transition-normal);
-}
-
-.cart-header:hover .cart-title-icon {
-  color: var(--icon-cart-hover);
-}
-
 .close-btn {
-  background: rgba(0, 0, 0, 0.05);
+  background: transparent;
   border: none;
   cursor: pointer;
+  padding: 0.5rem;
   color: #666;
-  line-height: 1;
-  padding: 0;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
 }
 
 .close-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  transform: scale(1.1);
   color: #333;
-}
-
-.close-icon {
-  font-size: 1.2rem;
-  color: var(--icon-close);
-  transition: color var(--transition-normal);
-}
-
-.close-btn:hover .close-icon {
-  color: var(--icon-close-hover);
 }
 
 .cart-content {
@@ -304,7 +274,6 @@ const openLoginModal = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
   padding: 2rem;
   text-align: center;
   gap: 1rem;
@@ -312,8 +281,7 @@ const openLoginModal = () => {
 
 .loading-spinner {
   font-size: 2rem;
-  margin-bottom: 1rem;
-  color: var(--icon-loading);
+  color: #666;
   animation: spin 2s linear infinite;
 }
 
@@ -322,52 +290,26 @@ const openLoginModal = () => {
   100% { transform: rotate(360deg); }
 }
 
-.loading-state p {
-  margin: 0;
-  color: #666;
-  font-size: 0.95rem;
-}
-
 .empty-cart-icon {
-  font-size: 3.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--icon-cart);
-  opacity: 0.5;
-  transition: color var(--transition-normal);
-}
-
-.empty-cart:hover .empty-cart-icon {
-  color: var(--icon-cart-hover);
-  opacity: 0.7;
+  font-size: 3rem;
+  opacity: 0.3;
 }
 
 .empty-cart p {
   margin: 0;
   color: #666;
-  font-size: 1rem;
-  line-height: 1.4;
-}
-
-.empty-cart-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 0.5rem;
 }
 
 .error-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  color: var(--icon-warning);
+  font-size: 3rem;
+  color: #dc3545;
   opacity: 0.7;
 }
 
 .error-state p {
-  margin: 0 0 1.5rem 0;
+  margin: 0;
   color: #dc3545;
-  font-size: 1.1rem;
 }
-
-
 
 .cart-items {
   padding: 1rem;
@@ -375,10 +317,9 @@ const openLoginModal = () => {
 
 .cart-item {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   padding: 1rem 0;
   border-bottom: 1px solid #eee;
-  position: relative;
 }
 
 .cart-item:last-child {
@@ -386,218 +327,149 @@ const openLoginModal = () => {
 }
 
 .item-image {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  overflow: hidden;
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  object-fit: cover;
   flex-shrink: 0;
 }
 
-.item-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.item-details {
+.item-info {
   flex: 1;
   min-width: 0;
 }
 
-.item-name {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #333;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.item-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
-.item-price-container {
+.item-name {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.remove-btn {
+  background: transparent;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.remove-btn:hover {
+  opacity: 0.7;
+}
+
+.item-price-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-.item-price {
+.price {
+  font-weight: 600;
   color: #28a745;
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
-.item-price-sale {
+.price-sale {
   color: #dc3545;
-  font-weight: 600;
-  font-size: 0.95rem;
 }
 
-.item-price-original {
-  color: #6c757d;
-  font-weight: 500;
-  font-size: 0.8rem;
+.price-original {
+  font-size: 0.75rem;
+  color: #999;
   text-decoration: line-through;
 }
 
-.discount-badge-small {
+.discount-badge {
   background: #dc3545;
   color: white;
   padding: 0.125rem 0.375rem;
-  border-radius: 4px;
+  border-radius: 3px;
   font-size: 0.7rem;
   font-weight: 600;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .quantity-controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  background: #f8f9fa;
-  border-radius: 20px;
-  padding: 0.25rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 .qty-btn {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border: none;
-  background: white;
-  border-radius: 50%;
+  background: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #666;
+  font-size: 0.75rem;
 }
 
 .qty-btn:hover:not(:disabled) {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.qty-btn:active:not(:disabled) {
-  transform: scale(0.95);
+  background: #f0f0f0;
+  color: #333;
 }
 
 .qty-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
-  transform: none;
 }
 
-.qty-btn.decrease:hover:not(:disabled) {
-  background: #ff6b6b;
-  color: white;
-}
-
-.qty-btn.increase:hover:not(:disabled) {
-  background: #4ecdc4;
-  color: white;
-}
-
-.qty-icon {
-  font-size: 0.9rem;
-  color: var(--icon-plus);
-  transition: color var(--transition-normal);
-}
-
-.qty-btn.decrease .qty-icon {
-  color: var(--icon-minus);
-}
-
-.qty-btn.increase .qty-icon {
-  color: var(--icon-plus);
-}
-
-.qty-btn.decrease:hover:not(:disabled) .qty-icon {
-  color: var(--icon-minus-hover);
-}
-
-.qty-btn.increase:hover:not(:disabled) .qty-icon {
-  color: var(--icon-plus-hover);
-}
-
-.quantity {
-  min-width: 40px;
+.qty-input {
+  width: 40px;
   text-align: center;
-  font-weight: 700;
-  font-size: 1rem;
-  color: #333;
-  background: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: none;
+  padding: 0.25rem;
+  font-size: 0.875rem;
+  background: transparent;
+  appearance: textfield;
+  -moz-appearance: textfield;
 }
 
-.item-total-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .item-total {
-  font-size: 0.875rem;
-  color: #666;
-  font-weight: 500;
-}
-
-.item-total-sale {
-  font-size: 0.875rem;
-  color: #dc3545;
   font-weight: 600;
-}
-
-.item-total-original {
-  font-size: 0.75rem;
-  color: #6c757d;
-  font-weight: 500;
-  text-decoration: line-through;
-}
-
-.remove-btn {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.5rem;
-  background: rgba(220, 53, 69, 0.1);
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-}
-
-.remove-btn:hover {
-  background: rgba(220, 53, 69, 0.2);
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-}
-
-.remove-icon {
-  font-size: 0.9rem;
-  color: var(--icon-trash);
-  transition: color var(--transition-normal);
-}
-
-.remove-btn:hover .remove-icon {
-  color: var(--icon-trash-hover);
+  font-size: 0.875rem;
+  color: #333;
 }
 
 .cart-footer {
   border-top: 1px solid #eee;
-  padding: 1.5rem;
-  background: #f8f9fa;
+  padding: 1rem;
 }
 
 .cart-total {
@@ -611,7 +483,7 @@ const openLoginModal = () => {
 }
 
 .total-price {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: #333;
 }
@@ -619,187 +491,46 @@ const openLoginModal = () => {
 .cart-actions {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.action-buttons {
-  display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
-.action-btn {
-  flex: 1;
-  min-width: 0;
-  padding: 0.625rem 1.25rem;
+.btn {
+  padding: 0.75rem;
   border: none;
-  border-radius: 12px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   text-align: center;
   text-decoration: none;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  transition: background 0.2s;
   font-size: 0.875rem;
-  position: relative;
-  overflow: hidden;
-  min-height: 44px;
-  max-width: 200px;
 }
 
-.action-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.action-btn:hover::before {
-  left: 100%;
-}
-
-.btn-icon {
-  font-size: 0.9rem;
-  line-height: 1;
-  transition: color var(--transition-normal);
-}
-
-/* Colores específicos para cada tipo de botón */
-.clear-btn .btn-icon {
-  color: var(--icon-trash);
-}
-
-.clear-btn:hover .btn-icon {
-  color: var(--icon-trash-hover);
-}
-
-.view-btn .btn-icon {
-  color: var(--icon-view);
-}
-
-.view-btn:hover .btn-icon {
-  color: var(--icon-view-hover);
-}
-
-.checkout-btn .btn-icon {
-  color: var(--icon-checkout);
-}
-
-.checkout-btn:hover .btn-icon {
-  color: var(--icon-checkout-hover);
-}
-
-.shop-btn .btn-icon {
-  color: var(--icon-shop);
-}
-
-.shop-btn:hover .btn-icon {
-  color: var(--icon-shop-hover);
-}
-
-.login-btn .btn-icon {
-  color: var(--icon-login);
-}
-
-.login-btn:hover .btn-icon {
-  color: var(--icon-login-hover);
-}
-
-.retry-btn .btn-icon {
-  color: var(--icon-retry);
-}
-
-.retry-btn:hover .btn-icon {
-  color: var(--icon-retry-hover);
-}
-
-.btn-text {
-  font-weight: 600;
-}
-
-/* Botón Limpiar */
-.clear-btn {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+.btn-clear {
+  background: #dc3545;
   color: white;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
 }
 
-.clear-btn:hover {
-  background: linear-gradient(135deg, #ff5252, #d32f2f);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+.btn-clear:hover {
+  background: #c82333;
 }
 
-/* Botón Ver Carrito */
-.view-btn {
-  background: linear-gradient(135deg, #4ecdc4, #44a08d);
+.btn-view {
+  background: #17a2b8;
   color: white;
-  box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
 }
 
-.view-btn:hover {
-  background: linear-gradient(135deg, #26a69a, #00897b);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+.btn-view:hover {
+  background: #138496;
 }
 
-/* Botón Comprar */
-.checkout-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+.btn-checkout {
+  background: #667eea;
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.checkout-btn:hover {
-  background: linear-gradient(135deg, #5a6fd8, #6a4c93);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* Botón Ir a la tienda */
-.shop-btn {
-  background: linear-gradient(135deg, #f093fb, #f5576c);
-  color: white;
-  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
-}
-
-.shop-btn:hover {
-  background: linear-gradient(135deg, #e91e63, #c2185b);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
-}
-
-/* Botón Iniciar Sesión */
-.login-btn {
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
-  color: white;
-  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-}
-
-.login-btn:hover {
-  background: linear-gradient(135deg, #2196f3, #00bcd4);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
-}
-
-/* Botón Reintentar */
-.retry-btn {
-  background: linear-gradient(135deg, #ffecd2, #fcb69f);
-  color: #333;
-  box-shadow: 0 4px 15px rgba(255, 236, 210, 0.3);
-}
-
-.retry-btn:hover {
-  background: linear-gradient(135deg, #ffd89b, #19547b);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 236, 210, 0.4);
+.btn-checkout:hover {
+  background: #5568d3;
 }
 
 @media (max-width: 480px) {
