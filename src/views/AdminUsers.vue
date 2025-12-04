@@ -290,88 +290,84 @@
       </div>
 
       <!-- User Edit Modal -->
-      <div v-if="showEditModal" class="modal-overlay" @click="closeEditModal">
-        <div class="modal-content" @click.stop>
-          <div class="modal-header">
-            <h2>Editar Usuario</h2>
-            <button @click="closeEditModal" class="close-btn">
-              <font-awesome-icon icon="times" class="close-icon" />
-            </button>
+      <Modal
+        v-model:show="showEditModal"
+        title="Editar Usuario"
+        icon="edit"
+        max-width="lg"
+        @close="closeEditModal"
+      >
+        <form @submit.prevent="submitUserEdit" class="user-form">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input 
+              v-model="userForm.name" 
+              type="text" 
+              required 
+              placeholder="Nombre completo"
+              class="form-input"
+            />
           </div>
-          
-          <form @submit.prevent="submitUserEdit" class="user-form">
-            <div class="form-group">
-              <label>Nombre *</label>
-              <input 
-                v-model="userForm.name" 
-                type="text" 
-                required 
-                placeholder="Nombre completo"
-                class="form-input"
+
+          <div class="form-group">
+            <label>Email *</label>
+            <input 
+              v-model="userForm.email" 
+              type="email" 
+              required 
+              placeholder="email@ejemplo.com"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input 
+              v-model="userForm.telefono" 
+              type="text" 
+              placeholder="+56 9 1234 5678"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Dirección</label>
+            <textarea 
+              v-model="userForm.direccion" 
+              placeholder="Dirección completa"
+              class="form-textarea"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Rol *</label>
+            <select v-model="userForm.role" required class="form-select">
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <div class="verification-display">
+              <font-awesome-icon 
+                :icon="userForm.is_verified ? 'check-circle' : 'times-circle'" 
+                :class="userForm.is_verified ? 'verified' : 'unverified'"
               />
+              <span>{{ userForm.is_verified ? 'Usuario Verificado' : 'Usuario No Verificado' }}</span>
             </div>
+          </div>
+        </form>
 
-            <div class="form-group">
-              <label>Email *</label>
-              <input 
-                v-model="userForm.email" 
-                type="email" 
-                required 
-                placeholder="email@ejemplo.com"
-                class="form-input"
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Teléfono</label>
-              <input 
-                v-model="userForm.telefono" 
-                type="text" 
-                placeholder="+56 9 1234 5678"
-                class="form-input"
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Dirección</label>
-              <textarea 
-                v-model="userForm.direccion" 
-                placeholder="Dirección completa"
-                class="form-textarea"
-                rows="3"
-              ></textarea>
-            </div>
-
-            <div class="form-group">
-              <label>Rol *</label>
-              <select v-model="userForm.role" required class="form-select">
-                <option value="user">Usuario</option>
-                <option value="admin">Administrador</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-checkbox-label">
-                <input 
-                  v-model="userForm.is_verified" 
-                  type="checkbox" 
-                  class="form-checkbox"
-                />
-                <span>Usuario verificado</span>
-              </label>
-            </div>
-
-            <div class="form-actions">
-              <button type="button" @click="closeEditModal" class="btn btn-secondary">
-                Cancelar
-              </button>
-              <button type="submit" :disabled="submitting" class="btn btn-primary">
-                {{ submitting ? 'Guardando...' : 'Guardar Cambios' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+        <template #footer>
+          <button type="button" @click="closeEditModal" class="btn btn-secondary">
+            Cancelar
+          </button>
+          <button type="button" @click="submitUserEdit" :disabled="submitting" class="btn btn-primary">
+            {{ submitting ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </template>
+      </Modal>
     </div>
   </div>
 </template>
@@ -380,6 +376,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { adminService } from '../services/api'
 import { useNotifications } from '../composables/useNotifications'
+import Modal from '../components/Modal.vue'
 
 const { success, error } = useNotifications()
 
@@ -660,14 +657,38 @@ const submitUserEdit = async () => {
       return
     }
 
-    await adminService.updateUser(userForm.value.id, {
-      name: userForm.value.name,
-      email: userForm.value.email,
-      telefono: userForm.value.telefono,
-      direccion: userForm.value.direccion,
-      role: userForm.value.role,
-      is_verified: userForm.value.is_verified
-    })
+    // Prepare update data, ensuring no undefined values are sent
+    const updateData = {}
+    
+    // Always include required fields
+    if (userForm.value.name !== undefined && userForm.value.name !== null) {
+      updateData.name = userForm.value.name
+    }
+    if (userForm.value.email !== undefined && userForm.value.email !== null) {
+      updateData.email = userForm.value.email
+    }
+    if (userForm.value.role !== undefined && userForm.value.role !== null) {
+      updateData.role = userForm.value.role
+    }
+    if (userForm.value.is_verified !== undefined && userForm.value.is_verified !== null) {
+      updateData.is_verified = Boolean(userForm.value.is_verified)
+    }
+
+    // Handle telefono - send null if empty, otherwise send the value
+    if (userForm.value.telefono !== undefined) {
+      updateData.telefono = (userForm.value.telefono && userForm.value.telefono.trim() !== '') 
+        ? userForm.value.telefono.trim() 
+        : null
+    }
+
+    // Handle direccion - send null if empty, otherwise send the value
+    if (userForm.value.direccion !== undefined) {
+      updateData.direccion = (userForm.value.direccion && userForm.value.direccion.trim() !== '') 
+        ? userForm.value.direccion.trim() 
+        : null
+    }
+
+    await adminService.updateUser(userForm.value.id, updateData)
 
     success('Usuario actualizado correctamente')
     await loadUsers()
@@ -1375,6 +1396,21 @@ td:nth-child(7) {
   height: 18px;
   cursor: pointer;
   accent-color: #007bff;
+}
+
+.verification-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+.verification-display .verified {
+  color: #28a745;
+}
+
+.verification-display .unverified {
+  color: #dc3545;
 }
 
 .form-actions {

@@ -52,6 +52,11 @@ const props = defineProps({
   closeOnOverlay: {
     type: Boolean,
     default: true
+  },
+  priority: {
+    type: String,
+    default: 'normal',
+    validator: (value) => ['normal', 'alert'].includes(value)
   }
 })
 

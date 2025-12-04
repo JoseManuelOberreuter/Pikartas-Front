@@ -71,7 +71,8 @@ import {
   faArrowDown,
   faSort,
   faSortUp,
-  faSortDown
+  faSortDown,
+  faTicketAlt
 } from '@fortawesome/free-solid-svg-icons'
 
 import { 
@@ -163,6 +164,7 @@ library.add(
   faSort,
   faSortUp,
   faSortDown,
+  faTicketAlt,
   
   // Regular icons
   faHeartRegular,
