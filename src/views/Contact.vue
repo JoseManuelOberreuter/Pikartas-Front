@@ -82,7 +82,7 @@
               />
               <font-awesome-icon 
                 v-else 
-                icon="paper-plane" 
+                icon="envelope" 
                 class="btn-icon" 
               />
               {{ loading ? 'Enviando...' : 'Enviar Mensaje' }}
@@ -369,42 +369,89 @@ const handleSubmit = async () => {
   font-size: 1em;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .contact-hero {
-    padding: var(--spacing-5xl) 0 var(--spacing-4xl);
+    padding: var(--spacing-4xl) 0 var(--spacing-3xl);
   }
-
   .hero-content h1 {
     font-size: var(--font-size-3xl);
   }
-
   .hero-content p {
     font-size: var(--font-size-lg);
   }
-
   .contact-form-section {
-    padding: var(--spacing-5xl) 0;
+    padding: var(--spacing-4xl) 0;
   }
-
+  .container {
+    padding: 0 var(--spacing-lg);
+  }
   .form-container {
     padding: var(--spacing-3xl);
   }
-
   .contact-form {
     gap: var(--spacing-lg);
   }
 }
 
 @media (max-width: 480px) {
-  .hero-content h1 {
-    font-size: var(--font-size-2xl);
-    flex-direction: column;
-    gap: var(--spacing-sm);
+  .contact {
+    margin-top: var(--header-height);
   }
-
+  .contact-hero {
+    padding: var(--spacing-3xl) 0 var(--spacing-2xl);
+  }
+  .hero-content h1 {
+    font-size: var(--font-size-xl);
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  .hero-icon {
+    font-size: 1em;
+  }
+  .hero-content p {
+    font-size: var(--font-size-base);
+    padding: 0 var(--spacing-md);
+  }
+  .contact-form-section {
+    padding: var(--spacing-2xl) 0;
+  }
+  .container {
+    padding: 0 var(--spacing-md);
+  }
   .form-container {
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+  }
+  .contact-form {
+    gap: var(--spacing-md);
+  }
+  .form-group {
+    gap: var(--spacing-xs);
+  }
+  .form-group label {
+    font-size: var(--font-size-sm);
+  }
+  .form-group input,
+  .form-group textarea {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+  .form-group textarea {
+    min-height: 120px;
+    rows: 5;
+  }
+  .error-message {
+    font-size: var(--font-size-xs);
+  }
+  .char-count {
+    font-size: var(--font-size-xs);
+  }
+  .btn-submit {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-base);
+    width: 100%;
+    min-height: 44px;
   }
 }
 </style>
