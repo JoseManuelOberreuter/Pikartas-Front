@@ -545,7 +545,6 @@ onMounted(async () => {
   transform: translateY(-2px);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .shop {
     padding-top: 100px;
@@ -582,16 +581,93 @@ onMounted(async () => {
 }
 
 @media (max-width: 480px) {
+  .shop {
+    padding-top: 90px;
+    padding-bottom: 60px;
+  }
+  
+  .container {
+    padding: 0 var(--spacing-md, 1rem);
+  }
+  
+  .shop-header {
+    margin-bottom: 2rem;
+  }
+  
+  .shop-header h1 {
+    font-size: 1.5rem;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .shop-header p {
+    font-size: 0.9rem;
+  }
+  
+  .shop-controls {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
   .filters {
     flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
   }
   
   .filter-group {
     flex: none;
+    width: 100%;
+  }
+  
+  .filter-group label {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .filter-group select {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    min-width: auto;
+    border-radius: 6px;
+  }
+  
+  .reset-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  .search-box {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .search-input {
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .search-icon {
+    right: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .results-info {
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .results-info p {
+    font-size: 0.875rem;
   }
   
   .products-grid {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 }
 </style> 

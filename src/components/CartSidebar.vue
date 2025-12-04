@@ -31,12 +31,11 @@
           <p v-if="isAuthenticated">No tienes nada en el carrito. ¡Agrega algo!</p>
           <p v-else>Debes tener sesión iniciada para usar el carrito</p>
           <div class="empty-cart-actions">
-            <router-link v-if="isAuthenticated" to="/shop" class="action-btn shop-btn" @click="closeCart">
+            <router-link v-if="isAuthenticated" to="/shop" class="btn btn-outline" @click="closeCart">
               <font-awesome-icon icon="store" class="btn-icon" />
-              <span class="btn-text">Ir a la tienda</span>
+              <span>Ir a la tienda</span>
             </router-link>
-            <button v-else class="action-btn login-btn" @click="openLoginModal">
-              <font-awesome-icon icon="lock" class="btn-icon" />
+            <button v-else class="btn btn-outline" @click="openLoginModal">
               <span class="btn-text">Iniciar Sesión</span>
             </button>
           </div>
@@ -298,6 +297,19 @@ const openLoginModal = () => {
 .empty-cart p {
   margin: 0;
   color: #666;
+}
+
+.empty-cart-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 0.5rem);
+  width: 100%;
+  max-width: 300px;
+}
+
+.empty-cart-actions .btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .error-icon {

@@ -428,6 +428,12 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
+  // Función para resetear el carrito localmente (sin llamadas al servidor)
+  function resetCart() {
+    items.value = [];
+    error.value = null;
+  }
+
   // Funciones de UI (mantener compatibilidad)
   function toggleCart() {
     isOpen.value = !isOpen.value;
@@ -491,6 +497,7 @@ export const useCartStore = defineStore('cart', () => {
     removeFromCart,
     updateQuantity,
     clearCart,
+    resetCart,
     toggleCart,
     openCart,
     closeCart,
