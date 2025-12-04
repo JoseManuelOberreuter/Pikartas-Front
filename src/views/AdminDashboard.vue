@@ -989,35 +989,7 @@ onMounted(() => {
   font-family: monospace;
 }
 
-/* Button Styles */
-.btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  text-align: center;
-  text-decoration: none;
-  transition: all 0.3s;
-  font-size: 0.875rem;
-  display: inline-block;
-}
-
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-}
-
-.btn-outline {
-  background: transparent;
-  color: #6c757d;
-  border-color: #6c757d;
-}
-
-.btn-outline:hover {
-  background: #6c757d;
-  color: white;
-}
+/* Reutilizar estilos globales de botones - solo ajustes específicos si es necesario */
 
 /* Error Alert */
 .error-alert {
@@ -1044,39 +1016,167 @@ onMounted(() => {
   font-weight: 500;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
+  .admin-dashboard {
+    padding-top: 100px;
+    padding-bottom: 60px;
+  }
+  .container {
+    padding: 0 var(--spacing-md, 1rem);
+  }
+  .dashboard-header {
+    margin-bottom: 2rem;
+  }
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
   .dashboard-stats {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
   }
-  
   .action-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
-  
   .stat-card {
     padding: 1.5rem;
+    gap: 1rem;
   }
-  
+  .stat-icon {
+    font-size: 2.5rem;
+  }
+  .stat-info h3 {
+    font-size: 1.75rem;
+  }
   .action-card {
     padding: 1.5rem;
   }
-  
+  .action-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
   .alert-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
   }
-  
   .alert-actions {
     width: 100%;
     justify-content: flex-end;
   }
-  
   .payment-info {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
+  }
+  .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .activity-status {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-dashboard {
+    padding-top: 90px;
+    padding-bottom: 40px;
+  }
+  .container {
+    padding: 0 var(--spacing-sm, 0.75rem);
+  }
+  .dashboard-header h1 {
+    font-size: 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .dashboard-header p {
+    font-size: 0.9rem;
+  }
+  .dashboard-stats {
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    padding: 1rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  .stat-icon {
+    font-size: 2rem;
+  }
+  .stat-info h3 {
+    font-size: 1.5rem;
+  }
+  .stat-info p {
+    font-size: 0.8rem;
+  }
+  .action-grid {
+    gap: 0.75rem;
+  }
+  .action-card {
+    padding: 1rem;
+  }
+  .action-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  .action-card h3 {
+    font-size: 1.1rem;
+  }
+  .action-card p {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  .action-button {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    width: 100%;
+  }
+  .payment-alerts,
+  .recent-activity {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .payment-alerts h2,
+  .recent-activity h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .alert-item {
+    padding: 0.75rem;
+  }
+  .alert-content h4 {
+    font-size: 0.9rem;
+  }
+  .alert-content p {
+    font-size: 0.8rem;
+  }
+  .activity-item {
+    padding: 0.75rem;
+  }
+  .activity-info h4 {
+    font-size: 0.9rem;
+  }
+  .activity-info p {
+    font-size: 0.8rem;
+  }
+  .activity-status {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+  .error-alert {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .error-alert p {
+    font-size: 0.85rem;
   }
 }
 </style> 
