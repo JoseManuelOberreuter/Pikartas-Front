@@ -20,10 +20,8 @@
     <div v-else class="container">
       <div class="dashboard-header">
         <h1>
-          <font-awesome-icon icon="tools" class="header-icon" />
           Panel de Administración
         </h1>
-        <p>Gestiona tu tienda online</p>
       </div>
 
       <!-- Error Message -->
@@ -701,7 +699,7 @@ onMounted(() => {
 /* Primera fila */
 .stat-card:nth-child(1) .stat-icon-svg { color: #10b981; } /* Productos Activos - Green */
 .stat-card:nth-child(2) .stat-icon-svg { color: #f59e0b; } /* Productos en Oferta - Orange */
-.stat-card:nth-child(3) .stat-icon-svg { color: var(--icon-admin-users); } /* Total Usuarios */
+.stat-card:nth-child(3) .stat-icon-svg { color: #3b82f6; } /* Total Usuarios - Blue */
 .stat-card:nth-child(4) .stat-icon-svg { color: var(--icon-admin-revenue); } /* Ingresos Totales */
 /* Segunda fila */
 .stat-card:nth-child(5) .stat-icon-svg { color: var(--icon-admin-pending); } /* Órdenes Pendientes */
