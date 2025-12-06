@@ -101,12 +101,6 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
-    path: '/admin/analytics',
-    name: 'AdminAnalytics',
-    component: () => import('../views/AdminAnalytics.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-  {
     path: '/admin/users',
     name: 'AdminUsers',
     component: () => import('../views/AdminUsers.vue'),
@@ -183,9 +177,6 @@ router.beforeEach(async (to, from, next) => {
     case 'AdminProducts':
     case 'AdminOrders':
     case 'AdminUsers':
-    case 'AdminAnalytics':
-      prefetchPromises.push(prefetchAdminData(to.name))
-      break
   }
   
   // For critical routes, wait for prefetch to complete before navigation

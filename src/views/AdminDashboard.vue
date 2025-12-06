@@ -140,18 +140,6 @@
             </div>
           </div>
 
-          <div class="action-card" @click="navigateTo('/admin/analytics')">
-            <div class="action-icon">
-              <font-awesome-icon icon="chart-bar" class="action-icon-svg" />
-            </div>
-            <h3>Estadísticas</h3>
-            <p>Ver reportes y analíticas</p>
-            <div class="action-button">
-              <font-awesome-icon icon="arrow-right" class="action-btn-icon" />
-              Ver Estadísticas
-            </div>
-          </div>
-
           <div class="action-card" @click="navigateTo('/admin/users')">
             <div class="action-icon">
               <font-awesome-icon icon="users" class="action-icon-svg" />
@@ -472,8 +460,8 @@ const generatePaymentAlerts = (orders) => {
       icon: '📉',
       title: 'Alta Tasa de Reembolsos',
       message: `Tasa de reembolsos del ${refundRate.toFixed(1)}% - Revisar calidad del servicio`,
-      actionText: 'Analizar',
-      action: () => navigateTo('/admin/analytics')
+      actionText: 'Ver Órdenes',
+      action: () => navigateTo('/admin/orders')
     })
   }
   

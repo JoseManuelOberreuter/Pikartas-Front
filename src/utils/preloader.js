@@ -203,10 +203,6 @@ export async function prefetchAdminData(routeName) {
         await adminService.getAllUsers();
         await adminService.getUserStats();
         break;
-      case 'AdminAnalytics':
-        await adminService.getOrderStats();
-        await adminService.getUserStats();
-        break;
     }
   } catch (error) {
     logger.error('Prefetch admin data error:', error);
