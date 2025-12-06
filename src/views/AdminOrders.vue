@@ -123,6 +123,20 @@
       @close="selectedOrder = null"
       @refund="refundOrder"
     />
+
+    <!-- Status Change Confirmation Modal -->
+    <ConfirmationModal
+      :show="showStatusChangeModal"
+      title="Confirmar cambio de estado"
+      :message="`¿Estás seguro de que quieres cambiar el estado de la orden ${pendingStatusChange.orderNumber} a '${getStatusLabel(pendingStatusChange.newStatus)}'? ${getEmailNotificationMessage(pendingStatusChange.newStatus)}`"
+      confirm-text="Confirmar y enviar correo"
+      cancel-text="Cancelar"
+      type="info"
+      icon="envelope"
+      @update:show="showStatusChangeModal = $event"
+      @confirm="confirmStatusChange"
+      @cancel="cancelStatusChange"
+    />
   </div>
 </template>
 
@@ -135,6 +149,7 @@ import OrderFilters from '../components/admin/OrderFilters.vue'
 import OrderTable from '../components/admin/OrderTable.vue'
 import OrderDetailsModal from '../components/admin/OrderDetailsModal.vue'
 import Pagination from '../components/admin/Pagination.vue'
+import ConfirmationModal from '../components/ConfirmationModal.vue'
 
 const { success, error } = useNotifications()
 
@@ -148,6 +163,8 @@ const searchTerm = ref('')
 const selectedOrder = ref(null)
 const refundingOrder = ref(null)
 const checkingPayment = ref(null)
+const showStatusChangeModal = ref(false)
+const pendingStatusChange = ref({ orderId: null, newStatus: null, orderNumber: null })
 
 // Pagination state
 const currentPage = ref(1)
@@ -247,12 +264,53 @@ const handleItemsPerPageChange = (newItemsPerPage) => {
   loadOrders()
 }
 
-const updateOrderStatus = async (orderId, newStatus) => {
+// Get status label in Spanish
+const getStatusLabel = (status) => {
+  const labels = {
+    pending: 'Pendiente',
+    processing: 'Procesando',
+    shipped: 'Enviado',
+    delivered: 'Entregado',
+    cancelled: 'Cancelado'
+  }
+  return labels[status] || status
+}
+
+// Get email notification message based on status
+const getEmailNotificationMessage = (status) => {
+  const messages = {
+    processing: 'Se enviará un correo al cliente informándole que su pedido está siendo procesado y preparado para envío.',
+    shipped: 'Se enviará un correo al cliente notificándole que su pedido ha sido enviado y está en camino.',
+    delivered: 'Se enviará un correo al cliente confirmando la entrega y agradeciéndole por su compra.',
+    cancelled: 'Se enviará un correo al cliente informándole sobre la cancelación de su pedido.'
+  }
+  return messages[status] || 'Se enviará un correo electrónico al cliente notificándole sobre este cambio.'
+}
+
+// Handle status change request - show confirmation modal
+const updateOrderStatus = (orderId, newStatus) => {
   if (!orderId) {
     error('Error: ID de orden inválido')
     console.error('updateOrderStatus called with invalid orderId:', orderId)
     return
   }
+
+  // Find the order to get its number
+  const order = orders.value.find(o => (o.id === orderId || o._id === orderId))
+  const orderNumber = order?.orderNumber || order?.order_number || `#${orderId.toString().slice(-8)}`
+
+  // Store pending change and show modal
+  pendingStatusChange.value = {
+    orderId,
+    newStatus,
+    orderNumber
+  }
+  showStatusChangeModal.value = true
+}
+
+// Confirm and execute status change
+const confirmStatusChange = async () => {
+  const { orderId, newStatus } = pendingStatusChange.value
   
   try {
     await adminService.updateOrderStatus(orderId, newStatus)
@@ -264,7 +322,16 @@ const updateOrderStatus = async (orderId, newStatus) => {
     }
   } catch (err) {
     error('Error al actualizar estado de orden: ' + (err.message || 'Error desconocido'))
+  } finally {
+    showStatusChangeModal.value = false
+    pendingStatusChange.value = { orderId: null, newStatus: null, orderNumber: null }
   }
+}
+
+// Cancel status change
+const cancelStatusChange = () => {
+  showStatusChangeModal.value = false
+  pendingStatusChange.value = { orderId: null, newStatus: null, orderNumber: null }
 }
 
 const viewOrderDetails = (order) => {
