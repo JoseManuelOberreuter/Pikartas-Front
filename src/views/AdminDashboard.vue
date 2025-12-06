@@ -33,33 +33,24 @@
       </div>
 
       <div class="dashboard-stats" v-if="stats">
+        <!-- Primera fila: Productos y Usuarios -->
         <div class="stat-card">
           <div class="stat-icon">
-            <font-awesome-icon icon="box" class="stat-icon-svg" />
+            <font-awesome-icon icon="check-circle" class="stat-icon-svg" />
           </div>
           <div class="stat-info">
-            <h3>{{ stats.totalProducts || 0 }}</h3>
-            <p>Total Productos</p>
+            <h3>{{ stats.activeProducts || 0 }}</h3>
+            <p>Productos Activos</p>
           </div>
         </div>
         
         <div class="stat-card">
           <div class="stat-icon">
-            <font-awesome-icon icon="shopping-cart" class="stat-icon-svg" />
+            <font-awesome-icon icon="tag" class="stat-icon-svg" />
           </div>
           <div class="stat-info">
-            <h3>{{ stats.totalOrders || 0 }}</h3> 
-            <p>Total Órdenes</p>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">
-            <font-awesome-icon icon="dollar-sign" class="stat-icon-svg" />
-          </div>
-          <div class="stat-info">
-            <h3>${{ stats.totalRevenue || 0 }}</h3>
-            <p>Ingresos Totales</p>
+            <h3>{{ stats.productsOnSale || 0 }}</h3>
+            <p>Productos en Oferta</p>
           </div>
         </div>
         
@@ -75,41 +66,52 @@
         
         <div class="stat-card">
           <div class="stat-icon">
-            <font-awesome-icon icon="credit-card" class="stat-icon-svg" />
+            <font-awesome-icon icon="dollar-sign" class="stat-icon-svg" />
           </div>
           <div class="stat-info">
-            <h3>{{ stats.paidOrders || 0 }}</h3>
-            <p>Órdenes Pagadas</p>
+            <h3>${{ formatCLP(stats.totalRevenue || 0) }}</h3>
+            <p>Ingresos Totales</p>
           </div>
         </div>
         
+        <!-- Segunda fila: Estados de Órdenes -->
         <div class="stat-card">
           <div class="stat-icon">
             <font-awesome-icon icon="clock" class="stat-icon-svg" />
           </div>
           <div class="stat-info">
-            <h3>{{ stats.pendingPayments || 0 }}</h3>
-            <p>Pagos Pendientes</p>
+            <h3>{{ stats.pendingOrders || 0 }}</h3>
+            <p>Órdenes Pendientes</p>
           </div>
         </div>
         
         <div class="stat-card">
           <div class="stat-icon">
-            <font-awesome-icon icon="undo" class="stat-icon-svg" />
+            <font-awesome-icon icon="cog" class="stat-icon-svg" />
           </div>
           <div class="stat-info">
-            <h3>{{ stats.refundedOrders || 0 }}</h3>
-            <p>Reembolsos</p>
+            <h3>{{ stats.processingOrders || 0 }}</h3>
+            <p>Órdenes en Proceso</p>
           </div>
         </div>
         
         <div class="stat-card">
           <div class="stat-icon">
-            <font-awesome-icon icon="chart-line" class="stat-icon-svg" />
+            <font-awesome-icon icon="truck" class="stat-icon-svg" />
           </div>
           <div class="stat-info">
-            <h3>{{ stats.conversionRate || 0 }}%</h3>
-            <p>Tasa de Conversión</p>
+            <h3>{{ stats.shippedOrders || 0 }}</h3>
+            <p>Órdenes Enviadas</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <font-awesome-icon icon="check-circle" class="stat-icon-svg" />
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.deliveredOrders || 0 }}</h3>
+            <p>Órdenes Recibidas</p>
           </div>
         </div>
       </div>
@@ -215,6 +217,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { adminService, productService } from '../services/api'
 import { useNotifications } from '../composables/useNotifications'
+import { formatCLP } from '../utils/formatters.js'
 
 const router = useRouter()
 const { error } = useNotifications()
@@ -243,7 +246,7 @@ const loadDashboardData = async () => {
     const errors = []
     
     try {
-      ordersStats = await adminService.getOrderStats()
+      ordersStats = await adminService.getOrderStats('all') // Get all orders stats, not just last 30 days
     } catch (err) {
       console.error('[AdminDashboard] Error loading order stats:', err)
       errors.push('estadísticas de órdenes')
@@ -291,10 +294,28 @@ const loadDashboardData = async () => {
       }
     }
     
-    // 🎯 CONTAR SOLO PRODUCTOS ACTIVOS
+    // Calculate product statistics
     const activeProducts = Array.isArray(productsArray) 
-      ? productsArray.filter(p => p.isActive !== false)
-      : []
+      ? productsArray.filter(p => p.isActive !== false && p.is_active !== false).length
+      : 0
+    
+    // Calculate products on sale (checking dates if available)
+    const now = new Date()
+    const productsOnSale = Array.isArray(productsArray)
+      ? productsArray.filter(p => {
+          const isActive = p.isActive !== false && p.is_active !== false
+          const isOnSale = p.isOnSale === true || p.is_on_sale === true
+          if (!isActive || !isOnSale) return false
+          
+          // Check if sale dates are valid
+          if (p.saleStartDate || p.sale_start_date) {
+            const startDate = new Date(p.saleStartDate || p.sale_start_date)
+            const endDate = new Date(p.saleEndDate || p.sale_end_date)
+            return now >= startDate && now <= endDate
+          }
+          return true
+        }).length
+      : 0
 
     // Handle orders format: { success: true, data: { orders: [...], pagination: {...} } }
     // orders is already the response.data from axios, so it's: { success: true, data: { orders: [...] } }
@@ -307,27 +328,77 @@ const loadDashboardData = async () => {
       }
     }
     
-    // Calculate payment statistics from real data only
+    // Calculate order statistics from real data
     const allOrders = Array.isArray(ordersArray) ? ordersArray : []
-    const paidOrders = allOrders.filter(order => order.paymentStatus === 'paid').length
-    const pendingPayments = allOrders.filter(order => order.paymentStatus === 'pending').length
-    const refundedOrders = allOrders.filter(order => order.paymentStatus === 'refunded').length
-    const conversionRate = allOrders.length > 0 ? Math.round((paidOrders / allOrders.length) * 100) : 0
+    
+    // Get order stats from backend response if available, otherwise calculate from orders array
+    const ordersStatsData = ordersStats?.data || ordersStats || {}
+    const ordersByStatus = ordersStatsData.ordersByStatus || {}
+    
+    // Calculate pending orders (only pending status)
+    let pendingOrders = 0
+    if (Object.keys(ordersByStatus).length > 0) {
+      pendingOrders = ordersByStatus.pending || 0
+    } else {
+      pendingOrders = allOrders.filter(order => 
+        order.status === 'pending'
+      ).length
+    }
+    
+    // Calculate processing orders (only processing status)
+    let processingOrders = 0
+    if (Object.keys(ordersByStatus).length > 0) {
+      processingOrders = ordersByStatus.processing || 0
+    } else {
+      processingOrders = allOrders.filter(order => 
+        order.status === 'processing'
+      ).length
+    }
+    
+    // Calculate shipped orders (only shipped status)
+    let shippedOrders = 0
+    if (Object.keys(ordersByStatus).length > 0) {
+      shippedOrders = ordersByStatus.shipped || 0
+    } else {
+      shippedOrders = allOrders.filter(order => 
+        order.status === 'shipped'
+      ).length
+    }
+    
+    // Calculate delivered orders (only delivered status)
+    let deliveredOrders = 0
+    if (Object.keys(ordersByStatus).length > 0) {
+      deliveredOrders = ordersByStatus.delivered || 0
+    } else {
+      deliveredOrders = allOrders.filter(order => 
+        order.status === 'delivered'
+      ).length
+    }
+
+    // Calculate total revenue from paid orders if backend doesn't provide it
+    let totalRevenue = ordersStatsData.summary?.totalRevenue || 0
+    if (totalRevenue === 0 && allOrders.length > 0) {
+      // Calculate from paid orders
+      const paidOrders = allOrders.filter(order => 
+        order.paymentStatus === 'paid' || order.payment_status === 'paid'
+      )
+      totalRevenue = paidOrders.reduce((sum, order) => {
+        return sum + (order.totalAmount || order.total_amount || 0)
+      }, 0)
+    }
 
     // Calculate stats from real data only - no hardcoded defaults
     stats.value = {
-      totalProducts: activeProducts.length,
-      totalOrders: ordersStats?.success && ordersStats.data?.totalOrders ? ordersStats.data.totalOrders : allOrders.length,
-      totalRevenue: ordersStats?.success && ordersStats.data?.totalRevenue ? ordersStats.data.totalRevenue : 0,
-      // Handle new response format: { success: true, data: { users: [...], total: ... } }
-      // usersData is already the response.data from axios, so it's: { success: true, data: { users: [...], total: ... } }
+      activeProducts,
+      productsOnSale,
       totalUsers: usersData?.success 
         ? (usersData.data?.total || (Array.isArray(usersData.data?.users) ? usersData.data.users.length : 0))
         : 0,
-      paidOrders,
-      pendingPayments,
-      refundedOrders,
-      conversionRate
+      totalRevenue,
+      pendingOrders,
+      processingOrders,
+      shippedOrders,
+      deliveredOrders
     }
 
     // Obtener órdenes recientes (últimas 5) solo si hay datos reales
@@ -627,14 +698,16 @@ onMounted(() => {
 }
 
 /* Colores específicos para cada tipo de estadística */
-.stat-card:nth-child(1) .stat-icon-svg { color: var(--icon-admin-products); }
-.stat-card:nth-child(2) .stat-icon-svg { color: var(--icon-admin-orders); }
-.stat-card:nth-child(3) .stat-icon-svg { color: var(--icon-admin-revenue); }
-.stat-card:nth-child(4) .stat-icon-svg { color: var(--icon-admin-users); }
-.stat-card:nth-child(5) .stat-icon-svg { color: var(--icon-admin-payments); }
-.stat-card:nth-child(6) .stat-icon-svg { color: var(--icon-admin-pending); }
-.stat-card:nth-child(7) .stat-icon-svg { color: var(--icon-admin-refunds); }
-.stat-card:nth-child(8) .stat-icon-svg { color: var(--icon-admin-analytics); }
+/* Primera fila */
+.stat-card:nth-child(1) .stat-icon-svg { color: #10b981; } /* Productos Activos - Green */
+.stat-card:nth-child(2) .stat-icon-svg { color: #f59e0b; } /* Productos en Oferta - Orange */
+.stat-card:nth-child(3) .stat-icon-svg { color: var(--icon-admin-users); } /* Total Usuarios */
+.stat-card:nth-child(4) .stat-icon-svg { color: var(--icon-admin-revenue); } /* Ingresos Totales */
+/* Segunda fila */
+.stat-card:nth-child(5) .stat-icon-svg { color: var(--icon-admin-pending); } /* Órdenes Pendientes */
+.stat-card:nth-child(6) .stat-icon-svg { color: #3b82f6; } /* Órdenes en Proceso - Blue */
+.stat-card:nth-child(7) .stat-icon-svg { color: #8b5cf6; } /* Órdenes Enviadas - Purple */
+.stat-card:nth-child(8) .stat-icon-svg { color: #10b981; } /* Órdenes Recibidas - Green */
 
 .stat-info h3 {
   margin: 0 0 0.5rem 0;
