@@ -70,6 +70,24 @@
             <p>Reembolsadas</p>
           </div>
         </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <font-awesome-icon icon="cog" class="stat-icon-svg" />
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.processingOrders || 0 }}</h3>
+            <p>En Procesamiento</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <font-awesome-icon icon="times-circle" class="stat-icon-svg" />
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.cancelledOrders || 0 }}</h3>
+            <p>Canceladas</p>
+          </div>
+        </div>
       </div>
 
       <!-- Filters -->
@@ -220,7 +238,7 @@ const loadOrders = async () => {
     
     const [ordersResponse, statsResponse] = await Promise.all([
       adminService.getAllOrders(params),
-      adminService.getOrderStats()
+      adminService.getOrderStats('all') // Request all orders stats, not just last 30 days
     ])
     
     // Handle response format: { success: true, data: { orders: [...], pagination: {...} } }
@@ -241,7 +259,47 @@ const loadOrders = async () => {
       pagination.value = null
     }
     
-    stats.value = statsResponse?.data || {}
+    // Transform stats response to match frontend format
+    const statsData = statsResponse?.data || statsResponse || {}
+    
+    // Check if it's the backend format (has summary, ordersByStatus, or ordersByPaymentStatus)
+    if (statsData.summary || statsData.ordersByStatus || statsData.ordersByPaymentStatus) {
+      // Backend format: { summary: {...}, ordersByStatus: {...}, ordersByPaymentStatus: {...} }
+      stats.value = {
+        totalOrders: statsData.summary?.totalOrders || 0,
+        totalRevenue: statsData.summary?.totalRevenue || 0,
+        pendingOrders: statsData.ordersByStatus?.pending || 0,
+        completedOrders: (statsData.ordersByStatus?.delivered || 0) + (statsData.ordersByStatus?.shipped || 0),
+        paidOrders: statsData.ordersByPaymentStatus?.paid || 0,
+        refundedOrders: statsData.ordersByPaymentStatus?.refunded || 0,
+        processingOrders: statsData.ordersByStatus?.processing || 0,
+        cancelledOrders: statsData.ordersByStatus?.cancelled || 0
+      }
+    } else if (statsData.totalOrders !== undefined || statsData.pendingOrders !== undefined) {
+      // Frontend format already (legacy or direct)
+      stats.value = {
+        totalOrders: statsData.totalOrders || 0,
+        totalRevenue: statsData.totalRevenue || 0,
+        pendingOrders: statsData.pendingOrders || 0,
+        completedOrders: statsData.completedOrders || 0,
+        paidOrders: statsData.paidOrders || 0,
+        refundedOrders: statsData.refundedOrders || 0,
+        processingOrders: statsData.processingOrders || 0,
+        cancelledOrders: statsData.cancelledOrders || 0
+      }
+    } else {
+      // Fallback: initialize with zeros
+      stats.value = {
+        totalOrders: 0,
+        totalRevenue: 0,
+        pendingOrders: 0,
+        completedOrders: 0,
+        paidOrders: 0,
+        refundedOrders: 0,
+        processingOrders: 0,
+        cancelledOrders: 0
+      }
+    }
   } catch (err) {
     error('Error al cargar órdenes: ' + (err.message || 'Error desconocido'))
     orders.value = []
@@ -472,6 +530,8 @@ onMounted(() => {
 .stat-card:nth-child(4) .stat-icon-svg { color: var(--icon-admin-revenue); }
 .stat-card:nth-child(5) .stat-icon-svg { color: var(--icon-admin-payments); }
 .stat-card:nth-child(6) .stat-icon-svg { color: var(--icon-admin-refunds); }
+.stat-card:nth-child(7) .stat-icon-svg { color: #3b82f6; } /* Blue for processing */
+.stat-card:nth-child(8) .stat-icon-svg { color: #ef4444; } /* Red for cancelled */
 
 .stat-info h3 {
   margin: 0 0 0.25rem 0;

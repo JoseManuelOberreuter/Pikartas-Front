@@ -638,10 +638,13 @@ export const adminService = {
     }
   },
 
-  async getOrderStats() {
+  async getOrderStats(period = '30d') {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.get(routesStore.fullOrderRoutes.getStatsAdmin);
+      const url = period === 'all' 
+        ? routesStore.fullOrderRoutes.getStatsAdmin 
+        : `${routesStore.fullOrderRoutes.getStatsAdmin}?period=${period}`;
+      const response = await axios.get(url);
       return response.data;
     } catch (error) {
       logger.error('Get order stats error:', error);
