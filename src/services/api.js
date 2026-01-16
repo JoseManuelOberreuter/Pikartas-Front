@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useRoutesStore } from '../stores/routes';
+import logger from '../utils/logger.js';
 
 // Configuración del interceptor para manejar tokens
 axios.interceptors.request.use(config => {
@@ -7,23 +8,20 @@ axios.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  console.log('Request Config:', {
-    url: config.url,
-    method: config.method,
-    data: config.data,
-    headers: config.headers
-  });
+  // Use secure logger that sanitizes sensitive data
+  logger.request(config);
   return config;
 });
 
 // Interceptor de respuesta para logs
 axios.interceptors.response.use(
   response => {
-    console.log('Response:', response.data);
+    // Use secure logger that sanitizes sensitive data
+    logger.response(response);
     return response;
   },
   error => {
-    console.error('API Error:', {
+    logger.error('API Error:', {
       message: error.message,
       response: error.response?.data,
       status: error.response?.status
@@ -32,11 +30,35 @@ axios.interceptors.response.use(
   }
 );
 
+export const formatApiError = (error) => {
+  const responseData = error.response?.data;
+  const formattedError = (responseData && typeof responseData === 'object')
+    ? { ...responseData }
+    : { error: error.message };
+
+  formattedError.status = error.response?.status;
+  formattedError.statusCode = error.response?.status;
+
+  if (typeof formattedError.message !== 'string' || formattedError.message.length === 0) {
+    formattedError.message = formattedError.error || 'Ocurrió un error inesperado.';
+  }
+
+  if (responseData?.code) {
+    formattedError.code = responseData.code;
+  }
+
+  if (formattedError.code === 'VERIFICATION_REQUIRED') {
+    formattedError.verificationRequired = true;
+    formattedError.message = formattedError.message || 'Debes verificar tu cuenta antes de continuar.';
+  }
+
+  return formattedError;
+};
+
 export const authService = {
   async register(userData) {
     try {
       const routesStore = useRoutesStore();
-      console.log('Sending registration data:', userData);
       const response = await axios.post(routesStore.fullUserRoutes.register, userData);
       
       // Tu backend NO devuelve token inmediatamente, requiere verificación
@@ -44,37 +66,81 @@ export const authService = {
       
       return response.data;
     } catch (error) {
-      console.error('Registration error:', error);
+      logger.error('Registration error:', error);
       // Propagar el error específico del backend
-      throw error.response?.data || { error: error.message };
+      throw formatApiError(error);
     }
   },
   
   async login(credentials) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.post(routesStore.fullUserRoutes.login, credentials);
+      const loginUrl = routesStore.fullUserRoutes.login;
+      
+      // Log for debugging in production
+      if (import.meta.env.MODE === 'production') {
+        console.log('[AuthService] Login attempt:', {
+          url: loginUrl,
+          hasEmail: !!credentials.email,
+          emailLength: credentials.email?.length || 0,
+          hasPassword: !!credentials.password,
+          passwordLength: credentials.password?.length || 0
+        });
+      }
+      
+      const response = await axios.post(loginUrl, credentials);
+      
+      // Log response structure in production
+      if (import.meta.env.MODE === 'production') {
+        console.log('[AuthService] Login response:', {
+          status: response.status,
+          hasToken: !!response.data?.token,
+          hasSuccess: !!response.data?.success,
+          hasError: !!response.data?.error,
+          errorMessage: response.data?.error
+        });
+      }
+      
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
       return response.data;
     } catch (error) {
-      console.error('Login error:', error);
-      throw error.response?.data || { error: error.message };
+      // Enhanced error logging for production
+      if (import.meta.env.MODE === 'production') {
+        console.error('[AuthService] Login error:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          errorData: error.response?.data,
+          message: error.message,
+          url: error.config?.url
+        });
+      }
+      logger.error('Login error:', error);
+      throw formatApiError(error);
     }
   },
   
   async verifyEmail(token) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.post(routesStore.fullUserRoutes.verify, { token });
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
+      // Usar GET con el token en la URL (como el backend espera)
+      const response = await axios.get(`${routesStore.fullUserRoutes.verify}/${token}`);
       return response.data;
     } catch (error) {
-      console.error('Verification error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Verification error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async resendVerification(email) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post('/api/users/resend-verification', { email });
+      return response.data;
+    } catch (error) {
+      logger.error('Resend verification error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -84,8 +150,8 @@ export const authService = {
       const response = await axios.post(routesStore.fullUserRoutes.resetPasswordRequest, { email });
       return response.data;
     } catch (error) {
-      console.error('Password reset request error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Password reset request error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -95,8 +161,8 @@ export const authService = {
       const response = await axios.post(routesStore.getResetPasswordUrl(token), { password });
       return response.data;
     } catch (error) {
-      console.error('Password reset error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Password reset error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -106,25 +172,11 @@ export const authService = {
       const response = await axios.get(routesStore.getUserProfileUrl(identifier));
       return response.data;
     } catch (error) {
-      console.error('Get user profile error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get user profile error:', error);
+      throw formatApiError(error);
     }
   },
 
-  async uploadAvatar(formData) {
-    try {
-      const routesStore = useRoutesStore();
-      const response = await axios.post(routesStore.fullUserRoutes.uploadAvatar, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Upload avatar error:', error);
-      throw error.response?.data || { error: error.message };
-    }
-  },
 
   async updateProfile(profileData) {
     try {
@@ -133,22 +185,53 @@ export const authService = {
       const response = await axios.put(routesStore.fullUserRoutes.updateProfile, profileData);
       return response.data;
     } catch (error) {
-      console.error('Update profile error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Update profile error:', error);
+      throw formatApiError(error);
     }
   }
 };
 
 // Servicios de productos
 export const productService = {
-  async getAllProducts() {
+  async getAllProducts(params = {}) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.get(routesStore.fullProductRoutes.getAll);
+      // Add cache-busting parameter and pagination params
+      const queryParams = new URLSearchParams({
+        _t: Date.now(),
+        ...(params.limit && { limit: params.limit }),
+        ...(params.page && { page: params.page }),
+        ...(params.category && { category: params.category }),
+        ...(params.search && { search: params.search })
+      });
+      const url = `${routesStore.fullProductRoutes.getAll}?${queryParams.toString()}`;
+      const response = await axios.get(url, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      // Response.data from axios is: { success: true, data: { products: [...], pagination: {...} } }
+      // Log for debugging in production - show the actual structure
+      if (import.meta.env.MODE === 'production') {
+        console.log('[ProductService] Raw axios response.data:', response.data);
+        console.log('[ProductService] Response structure analysis:', {
+          status: response.status,
+          hasSuccess: !!response.data?.success,
+          hasData: !!response.data?.data,
+          dataKeys: response.data?.data ? Object.keys(response.data.data) : [],
+          hasProducts: !!response.data?.data?.products,
+          productsLength: response.data?.data?.products?.length || 0,
+          isProductsArray: Array.isArray(response.data?.data?.products),
+          // What we're returning
+          returning: response.data
+        });
+      }
       return response.data;
     } catch (error) {
-      console.error('Get products error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get products error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -156,27 +239,19 @@ export const productService = {
     try {
       const routesStore = useRoutesStore();
       const url = routesStore.getProductByIdUrl(id);
-      console.log('🔍 API: Consultando producto con URL:', url);
       
       const response = await axios.get(url);
-      console.log('📦 API: Respuesta del servidor para producto:', response.data);
       
       return response.data;
     } catch (error) {
-      console.error('❌ API: Error obteniendo producto por ID:', error);
-      console.error('❌ API: Detalles del error:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data
-      });
-      throw error.response?.data || { error: error.message };
+      logger.error('Error obteniendo producto por ID:', error);
+      throw formatApiError(error);
     }
   },
 
   async createProduct(productData) {
     try {
       const routesStore = useRoutesStore();
-      console.log('Creating product with data:', productData);
       
       // Configurar headers para FormData si es necesario
       const config = {}
@@ -189,15 +264,14 @@ export const productService = {
       const response = await axios.post(routesStore.fullProductRoutes.create, productData, config);
       return response.data;
     } catch (error) {
-      console.error('Create product error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Create product error:', error);
+      throw formatApiError(error);
     }
   },
 
   async updateProduct(id, productData) {
     try {
       const routesStore = useRoutesStore();
-      console.log('Updating product with ID:', id, 'Data:', productData);
       
       // Configurar headers para FormData si es necesario
       const config = {}
@@ -210,8 +284,8 @@ export const productService = {
       const response = await axios.put(routesStore.getUpdateProductUrl(id), productData, config);
       return response.data;
     } catch (error) {
-      console.error('Update product error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Update product error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -221,8 +295,8 @@ export const productService = {
       const response = await axios.delete(routesStore.getDeleteProductUrl(id));
       return response.data;
     } catch (error) {
-      console.error('Delete product error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Delete product error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -232,8 +306,8 @@ export const productService = {
       const response = await axios.patch(routesStore.getUpdateStockUrl(id), { stock });
       return response.data;
     } catch (error) {
-      console.error('Update stock error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Update stock error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -243,8 +317,54 @@ export const productService = {
       const response = await axios.get(routesStore.fullProductRoutes.getCategories);
       return response.data;
     } catch (error) {
-      console.error('Get categories error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get categories error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async getFeaturedProducts(params = {}) {
+    try {
+      const routesStore = useRoutesStore();
+      const queryParams = new URLSearchParams({
+        _t: Date.now(),
+        ...(params.limit && { limit: params.limit }),
+        ...(params.page && { page: params.page })
+      });
+      const url = `${routesStore.fullProductRoutes.getFeatured}?${queryParams.toString()}`;
+      const response = await axios.get(url, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Get featured products error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async getOnSaleProducts(params = {}) {
+    try {
+      const routesStore = useRoutesStore();
+      const queryParams = new URLSearchParams({
+        _t: Date.now(),
+        ...(params.limit && { limit: params.limit }),
+        ...(params.page && { page: params.page })
+      });
+      const url = `${routesStore.fullProductRoutes.getOffers}?${queryParams.toString()}`;
+      const response = await axios.get(url, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Get on sale products error:', error);
+      throw formatApiError(error);
     }
   }
 };
@@ -257,8 +377,8 @@ export const orderService = {
       const response = await axios.post(routesStore.fullOrderRoutes.create, orderData);
       return response.data;
     } catch (error) {
-      console.error('Create order error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Create order error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -268,8 +388,8 @@ export const orderService = {
       const response = await axios.get(routesStore.fullOrderRoutes.getUserOrders);
       return response.data;
     } catch (error) {
-      console.error('Get user orders error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get user orders error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -279,8 +399,8 @@ export const orderService = {
       const response = await axios.get(routesStore.getOrderByIdUrl(orderId));
       return response.data;
     } catch (error) {
-      console.error('Get order error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get order error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -290,8 +410,8 @@ export const orderService = {
       const response = await axios.patch(routesStore.getCancelOrderUrl(orderId));
       return response.data;
     } catch (error) {
-      console.error('Cancel order error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Cancel order error:', error);
+      throw formatApiError(error);
     }
   }
 };
@@ -304,12 +424,8 @@ export const cartService = {
       const response = await axios.get(routesStore.fullCartRoutes.get);
       return response.data;
     } catch (error) {
-      console.error('Get cart error:', error);
-      // Agregar información del status code al error
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      logger.error('Get cart error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -319,11 +435,8 @@ export const cartService = {
       const response = await axios.get(routesStore.fullCartRoutes.getSummary);
       return response.data;
     } catch (error) {
-      console.error('Get cart summary error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      logger.error('Get cart summary error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -333,11 +446,8 @@ export const cartService = {
       const response = await axios.post(routesStore.fullCartRoutes.add, productData);
       return response.data;
     } catch (error) {
-      console.error('Add to cart error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      logger.error('Add to cart error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -347,11 +457,8 @@ export const cartService = {
       const response = await axios.put(routesStore.fullCartRoutes.update, itemData);
       return response.data;
     } catch (error) {
-      console.error('Update cart item error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      logger.error('Update cart item error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -361,11 +468,8 @@ export const cartService = {
       const response = await axios.delete(routesStore.getRemoveFromCartUrl(productId));
       return response.data;
     } catch (error) {
-      console.error('Remove from cart error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      logger.error('Remove from cart error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -375,11 +479,56 @@ export const cartService = {
       const response = await axios.delete(routesStore.fullCartRoutes.clear);
       return response.data;
     } catch (error) {
-      console.error('Clear cart error:', error);
-      const errorWithStatus = error.response?.data || { error: error.message };
-      errorWithStatus.status = error.response?.status;
-      errorWithStatus.statusCode = error.response?.status;
-      throw errorWithStatus;
+      logger.error('Clear cart error:', error);
+      throw formatApiError(error);
+    }
+  }
+};
+
+// Servicios de pagos
+export const paymentService = {
+  async initiatePayment(shippingAddress) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(routesStore.fullPaymentRoutes.initiate, { shippingAddress });
+      return response.data;
+    } catch (error) {
+      logger.error('Initiate payment error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async confirmPayment(tokenWs) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(routesStore.fullPaymentRoutes.confirm, { token_ws: tokenWs });
+      return response.data;
+    } catch (error) {
+      logger.error('Confirm payment error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async getPaymentStatus(orderId) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.getPaymentStatusUrl(orderId));
+      return response.data;
+    } catch (error) {
+      logger.error('Get payment status error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async refundPayment(orderId, amount = null) {
+    try {
+      const routesStore = useRoutesStore();
+      const body = amount ? { amount } : {};
+      const response = await axios.post(routesStore.getRefundPaymentUrl(orderId), body);
+      return response.data;
+    } catch (error) {
+      logger.error('Refund payment error:', error);
+      throw formatApiError(error);
     }
   }
 };
@@ -390,7 +539,6 @@ export const adminService = {
   async createProduct(productData) {
     try {
       const routesStore = useRoutesStore();
-      console.log('Admin creating product with data:', productData);
       
       // Configurar headers para FormData si es necesario
       const config = {}
@@ -403,15 +551,14 @@ export const adminService = {
       const response = await axios.post(routesStore.fullProductRoutes.create, productData, config);
       return response.data;
     } catch (error) {
-      console.error('Create product error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Create product error:', error);
+      throw formatApiError(error);
     }
   },
 
   async updateProduct(id, productData) {
     try {
       const routesStore = useRoutesStore();
-      console.log('Admin updating product with ID:', id, 'Data:', productData);
       
       // Configurar headers para FormData si es necesario
       const config = {}
@@ -424,8 +571,8 @@ export const adminService = {
       const response = await axios.put(routesStore.getUpdateProductUrl(id), productData, config);
       return response.data;
     } catch (error) {
-      console.error('Update product error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Update product error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -435,8 +582,8 @@ export const adminService = {
       const response = await axios.delete(routesStore.getDeleteProductUrl(id));
       return response.data;
     } catch (error) {
-      console.error('Delete product error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Delete product error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -446,64 +593,62 @@ export const adminService = {
       const url = routesStore.getUpdateStockUrl(id);
       const data = { stock };
       
-      console.log('Update stock request:', {
-        url,
-        method: 'PATCH',
-        data,
-        id,
-        stock
-      });
-      
-      // Verificar si hay token de autenticación
-      const token = localStorage.getItem('token');
-      console.log('Auth token present:', !!token);
-      
       const response = await axios.patch(url, data);
-      console.log('Update stock response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Update stock error:', error);
-      console.error('Error details:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message
-      });
-      throw error.response?.data || { error: error.message };
+      logger.error('Update stock error:', error);
+      throw formatApiError(error);
     }
   },
 
   async getAllProducts() {
     try {
       const routesStore = useRoutesStore();
-      console.log('Admin getting all products from:', routesStore.fullProductRoutes.getAllAdmin);
       const response = await axios.get(routesStore.fullProductRoutes.getAllAdmin);
       return response.data;
     } catch (error) {
-      console.error('Admin get all products error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Admin get all products error:', error);
+      throw formatApiError(error);
     }
   },
 
   // Gestión de órdenes
-  async getAllOrders() {
+  async getAllOrders(params = {}) {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.get(routesStore.fullOrderRoutes.getAllAdmin);
+      // Build query parameters
+      const queryParams = new URLSearchParams();
+      
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.paymentStatus) queryParams.append('paymentStatus', params.paymentStatus);
+      if (params.userId) queryParams.append('userId', params.userId);
+      if (params.search) queryParams.append('search', params.search);
+      
+      const url = queryParams.toString() 
+        ? `${routesStore.fullOrderRoutes.getAllAdmin}?${queryParams.toString()}`
+        : routesStore.fullOrderRoutes.getAllAdmin;
+      
+      const response = await axios.get(url);
       return response.data;
     } catch (error) {
-      console.error('Get all orders error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get all orders error:', error);
+      throw formatApiError(error);
     }
   },
 
-  async getOrderStats() {
+  async getOrderStats(period = '30d') {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.get(routesStore.fullOrderRoutes.getStatsAdmin);
+      const url = period === 'all' 
+        ? routesStore.fullOrderRoutes.getStatsAdmin 
+        : `${routesStore.fullOrderRoutes.getStatsAdmin}?period=${period}`;
+      const response = await axios.get(url);
       return response.data;
     } catch (error) {
-      console.error('Get order stats error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get order stats error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -513,30 +658,32 @@ export const adminService = {
       const response = await axios.patch(routesStore.getUpdateOrderStatusUrl(orderId), { status });
       return response.data;
     } catch (error) {
-      console.error('Update order status error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Update order status error:', error);
+      throw formatApiError(error);
     }
   },
 
   // Transbank Payment Management
   async getPaymentStatus(orderId) {
     try {
-      const response = await axios.get(`/api/payments/status/${orderId}`);
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.getPaymentStatusUrl(orderId));
       return response.data;
     } catch (error) {
-      console.error('Get payment status error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get payment status error:', error);
+      throw formatApiError(error);
     }
   },
 
   async refundPayment(orderId, amount = null) {
     try {
+      const routesStore = useRoutesStore();
       const body = amount ? { amount } : {};
-      const response = await axios.post(`/api/payments/refund/${orderId}`, body);
+      const response = await axios.post(routesStore.getRefundPaymentUrl(orderId), body);
       return response.data;
     } catch (error) {
-      console.error('Refund payment error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Refund payment error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -546,26 +693,66 @@ export const adminService = {
       const response = await axios.get(routesStore.getOrderByIdUrl(orderId));
       return response.data;
     } catch (error) {
-      console.error('Get order details error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get order details error:', error);
+      throw formatApiError(error);
     }
   },
 
   // Gestión de usuarios
   async getAllUsers() {
     try {
-      // Usar la URL correcta del backend (sin /api)
-      const response = await axios.get('http://localhost:4005/users/all');
-      console.log('✅ Users API Response:', response.data);
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.fullUserRoutes.getAllAdmin);
       return response.data;
     } catch (error) {
-      console.error('❌ Get all users error:', error);
-      console.error('❌ Error details:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message
-      });
-      throw error.response?.data || { error: error.message };
+      logger.error('Get all users error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async getUserById(id) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.get(routesStore.getUserByIdUrl(id));
+      return response.data;
+    } catch (error) {
+      logger.error('Get user by ID error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async updateUser(id, userData) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.put(routesStore.getUpdateUserUrl(id), userData);
+      return response.data;
+    } catch (error) {
+      logger.error('Update user error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async deleteUser(id) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.delete(routesStore.getDeleteUserUrl(id));
+      return response.data;
+    } catch (error) {
+      logger.error('Delete user error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async reactivateUser(id) {
+    try {
+      const routesStore = useRoutesStore();
+      // Llamar al endpoint dedicado de restauración
+      const restoreUrl = `${routesStore.getUpdateUserUrl(id)}/restore`;
+      const response = await axios.put(restoreUrl);
+      return response.data;
+    } catch (error) {
+      logger.error('Reactivate user error:', error);
+      throw formatApiError(error);
     }
   },
 
@@ -574,8 +761,22 @@ export const adminService = {
       const response = await axios.get('/api/users/stats');
       return response.data;
     } catch (error) {
-      console.error('Get user stats error:', error);
-      throw error.response?.data || { error: error.message };
+      logger.error('Get user stats error:', error);
+      throw formatApiError(error);
+    }
+  }
+};
+
+// Contact service
+export const contactService = {
+  async submitContactForm(contactData) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(routesStore.fullContactRoute, contactData);
+      return response.data;
+    } catch (error) {
+      logger.error('Submit contact form error:', error);
+      throw formatApiError(error);
     }
   }
 }; 

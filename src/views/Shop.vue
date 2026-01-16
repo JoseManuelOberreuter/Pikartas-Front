@@ -3,7 +3,7 @@
     <div class="container">
       <div class="shop-header">
         <h1><font-awesome-icon icon="dice-d20" class="shop-header-icon" /> Nuestra Tienda</h1>
-        <p>Explora nuestra colección de cartas Pokémon</p>
+        <p class="text-hero-subtitle">Explora nuestra colección de cartas Pokémon</p>
       </div>
 
       <div class="shop-controls">
@@ -26,18 +26,10 @@
             </select>
           </div>
           
-          <div class="filter-group">
-            <label>Precio máximo: ${{ maxPrice }}</label>
-            <input 
-              type="range" 
-              v-model="maxPrice" 
-              :min="0" 
-              :max="2000" 
-              :step="50"
-              @input="filterProducts"
-              class="price-slider"
-            >
-          </div>
+          <button @click="resetFilters" class="reset-btn" title="Limpiar filtros">
+            <font-awesome-icon icon="times" class="reset-icon" />
+            Limpiar
+          </button>
         </div>
         
         <div class="search-box">
@@ -102,10 +94,10 @@ const products = ref([])
 const loading = ref(false)
 const selectedCategory = ref('Todos')
 const sortBy = ref('name')
-const maxPrice = ref(2000)
 const searchQuery = ref('')
 
 // Categorías (se pueden cargar desde el backend también)
+// Inicializar con categorías de Pikartas, pero se cargarán dinámicamente desde el backend
 const categories = ref([
   'Todos',
   'Cartas Raras', 
@@ -118,35 +110,99 @@ const categories = ref([
 const loadProducts = async () => {
   loading.value = true
   try {
-    console.log('🔍 Shop: Cargando productos desde el backend...');
     const response = await productService.getAllProducts()
-    console.log('📦 Shop: Respuesta del servidor:', response);
+    
+    // Response from service is: { success: true, data: { products: [...], pagination: {...} } }
+    // Handle new response format: { success: true, data: { products: [...] } }
+    // Or legacy format: { success: true, data: [...] } (array directly)
+    let productsArray = []
+    
+    if (response?.success) {
+      // New format: response.data is an object with products property
+      if (response.data?.products && Array.isArray(response.data.products)) {
+        productsArray = response.data.products
+      }
+      // Legacy format: response.data is directly an array
+      else if (Array.isArray(response.data)) {
+        productsArray = response.data
+      }
+    }
     
     // Mapear la respuesta del backend al formato esperado
-    if (response.success && response.data) {
-      console.log(`✅ Shop: ${response.data.length} productos recibidos del servidor`);
-      products.value = response.data.map(product => ({
+    if (productsArray.length > 0) {
+      products.value = productsArray.map(product => ({
         id: product._id || product.id, // Manejar tanto _id como id
         name: product.name,
         price: product.price,
         image: product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         description: product.description,
         category: product.category,
-        stock: product.stock
+        stock: product.stock,
+        // Include sale information for ProductCard to display offers
+        is_on_sale: product.is_on_sale || false,
+        discount_percentage: product.discount_percentage || null,
+        sale_start_date: product.sale_start_date || null,
+        sale_end_date: product.sale_end_date || null,
+        sale_price: product.sale_price || null
       }))
-      console.log('🎯 Shop: Productos mapeados:', products.value);
     } else {
-      console.warn('⚠️ Shop: Respuesta inválida del servidor:', response);
       products.value = []
     }
   } catch (error) {
-    console.error('❌ Shop: Error cargando productos:', error)
-    // Fallback a productos mock si falla
+    console.error('[Shop] Error loading products:', error);
     products.value = []
   } finally {
     loading.value = false
-    console.log(`📊 Shop: Carga finalizada. Total productos: ${products.value.length}`);
   }
+}
+
+// Cargar categorías desde el backend
+const loadCategories = async () => {
+  try {
+    // Intentar cargar categorías desde el endpoint específico
+    const response = await productService.getCategories()
+    if (response.success && response.data && Array.isArray(response.data)) {
+      // Agregar "Todos" al inicio y ordenar el resto
+      const uniqueCategories = [...new Set(response.data.filter(Boolean))].sort()
+      categories.value = ['Todos', ...uniqueCategories]
+    } else {
+      // Fallback: extraer categorías de productos cargados
+      loadCategoriesFromProducts()
+    }
+  } catch (error) {
+    console.error('[Shop] Error loading categories from endpoint:', error);
+    // Fallback: extraer categorías de productos cargados
+    loadCategoriesFromProducts()
+  }
+}
+
+// Fallback: extraer categorías de productos cargados
+const loadCategoriesFromProducts = () => {
+  if (products.value.length > 0) {
+    // Extraer categorías únicas de los productos
+    const uniqueCategories = [...new Set(products.value.map(p => p.category).filter(Boolean))].sort()
+    categories.value = ['Todos', ...uniqueCategories]
+  }
+}
+
+// Helper function to get final price (considering offers)
+const getFinalPrice = (product) => {
+  if (!product) return 0
+  
+  // Check if product is currently on sale
+  if (product.is_on_sale && product.discount_percentage) {
+    const now = new Date()
+    const startDate = product.sale_start_date ? new Date(product.sale_start_date) : null
+    const endDate = product.sale_end_date ? new Date(product.sale_end_date) : null
+    
+    if (startDate && endDate && now >= startDate && now <= endDate) {
+      // Product is currently on sale
+      return product.price * (1 - product.discount_percentage / 100)
+    }
+  }
+  
+  // Return regular price
+  return product.price
 }
 
 // Computed properties
@@ -158,9 +214,6 @@ const filteredProducts = computed(() => {
     result = result.filter(product => product.category === selectedCategory.value)
   }
   
-  // Filter by price
-  result = result.filter(product => product.price <= maxPrice.value)
-  
   // Filter by search query
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
@@ -171,13 +224,13 @@ const filteredProducts = computed(() => {
     )
   }
   
-  // Sort products
+  // Sort products (using final price for price sorting)
   switch (sortBy.value) {
     case 'price-low':
-      result.sort((a, b) => a.price - b.price)
+      result.sort((a, b) => getFinalPrice(a) - getFinalPrice(b))
       break
     case 'price-high':
-      result.sort((a, b) => b.price - a.price)
+      result.sort((a, b) => getFinalPrice(b) - getFinalPrice(a))
       break
     case 'name':
     default:
@@ -190,7 +243,6 @@ const filteredProducts = computed(() => {
 
 // Methods
 const viewProduct = (productId) => {
-  console.log('🔍 Shop: Navegando a producto con ID:', productId);
   router.push(`/product/${productId}`)
 }
 
@@ -207,7 +259,6 @@ const sortProducts = () => {
 const resetFilters = () => {
   selectedCategory.value = 'Todos'
   sortBy.value = 'name'
-  maxPrice.value = 2000
   searchQuery.value = ''
 }
 
@@ -215,11 +266,8 @@ onMounted(async () => {
   // Cargar productos primero
   await loadProducts()
   
-  // Set initial max price based on the highest product price
-  if (products.value.length > 0) {
-    const highestPrice = Math.max(...products.value.map(p => p.price))
-    maxPrice.value = Math.ceil(highestPrice / 100) * 100
-  }
+  // Cargar categorías después de cargar productos (para tener fallback)
+  await loadCategories()
 })
 </script>
 
@@ -243,20 +291,35 @@ onMounted(async () => {
 }
 
 .shop-header h1 {
-  font-size: 2.5rem;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
   margin: 0 0 1rem 0;
-  color: var(--color-primary);
-  font-weight: 700;
+  color: var(--color-white);
+  font-weight: normal;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  text-shadow: 
+    3px 3px 0px rgba(0, 0, 0, 0.9),
+    6px 6px 0px rgba(0, 0, 0, 0.7),
+    -2px -2px 0px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    0 0 60px rgba(255, 215, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }
 
 .shop-header-icon {
   color: var(--color-primary);
   font-size: 0.9em;
   transition: all var(--transition-normal);
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.8));
 }
 
 .shop-header h1:hover .shop-header-icon {
@@ -265,8 +328,10 @@ onMounted(async () => {
 
 .shop-header p {
   font-size: 1.1rem;
-  color: var(--color-white);
   margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .shop-controls {
@@ -274,14 +339,15 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 2rem;
-  gap: 2rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
 }
 
 .filters {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
+  align-items: flex-end;
 }
 
 .filter-group {
@@ -306,9 +372,31 @@ onMounted(async () => {
   min-width: 120px;
 }
 
-.price-slider {
-  width: 150px;
-  margin: 0;
+.reset-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.reset-btn:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+  transform: translateY(-1px);
+}
+
+.reset-icon {
+  font-size: 0.875rem;
 }
 
 .search-box {
@@ -350,7 +438,8 @@ onMounted(async () => {
 .results-info {
   margin-bottom: 2rem;
   padding: 1rem;
-  background: rgba(255, 215, 0, 0.1);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--color-primary);
   border-radius: 6px;
   text-align: center;
@@ -366,6 +455,10 @@ onMounted(async () => {
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid var(--color-primary);
 }
 
 .loading-spinner {
@@ -413,14 +506,30 @@ onMounted(async () => {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
+  align-items: start;
+}
+
+/* Responsive: 2 columns on medium screens */
+@media (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Responsive: 1 column on small screens */
+@media (max-width: 640px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .no-results {
   text-align: center;
   padding: 4rem 2rem;
-  background: rgba(255, 215, 0, 0.1);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--color-primary);
   border-radius: 12px;
   margin-top: 2rem;
@@ -472,7 +581,6 @@ onMounted(async () => {
   transform: translateY(-2px);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .shop {
     padding-top: 100px;
@@ -509,16 +617,93 @@ onMounted(async () => {
 }
 
 @media (max-width: 480px) {
+  .shop {
+    padding-top: 90px;
+    padding-bottom: 60px;
+  }
+  
+  .container {
+    padding: 0 var(--spacing-md, 1rem);
+  }
+  
+  .shop-header {
+    margin-bottom: 2rem;
+  }
+  
+  .shop-header h1 {
+    font-size: 1.5rem;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .shop-header p {
+    font-size: 0.9rem;
+  }
+  
+  .shop-controls {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
   .filters {
     flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
   }
   
   .filter-group {
     flex: none;
+    width: 100%;
+  }
+  
+  .filter-group label {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .filter-group select {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    min-width: auto;
+    border-radius: 6px;
+  }
+  
+  .reset-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  .search-box {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .search-input {
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .search-icon {
+    right: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .results-info {
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .results-info p {
+    font-size: 0.875rem;
   }
   
   .products-grid {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 }
 </style> 

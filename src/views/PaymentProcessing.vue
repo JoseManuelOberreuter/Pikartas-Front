@@ -80,19 +80,12 @@ const transbankUrl = ref(route.query.transbankUrl)
 const transbankToken = ref(route.query.token_ws)
 
 onMounted(async () => {
-  console.log('PaymentProcessing mounted with query params:', route.query)
-  console.log('OrderId:', orderId.value)
-  console.log('OrderNumber:', orderNumber.value)
-  console.log('TransbankUrl:', transbankUrl.value)
-  console.log('TransbankToken:', transbankToken.value)
-  
   // If we have a token from Transbank return, try to get stored payment data
   if (transbankToken.value && !orderId.value) {
     const storedData = transbankService.getStoredPaymentData()
     if (storedData) {
       orderId.value = storedData.orderId
       orderNumber.value = storedData.orderNumber
-      console.log('Restored payment data from storage:', storedData)
     }
   }
   
@@ -101,30 +94,21 @@ onMounted(async () => {
 
 const processPayment = async () => {
   try {
-    console.log('Processing payment...')
-    console.log('Has transbankToken:', !!transbankToken.value)
-    console.log('Has transbankUrl:', !!transbankUrl.value)
-    console.log('Has orderId:', !!orderId.value)
-    
     // Step 1: If we have a Transbank token, confirm the payment (return from Transbank)
     if (transbankToken.value) {
-      console.log('Confirming payment with token:', transbankToken.value)
       currentStep.value = 3
       await confirmPayment()
     } 
     // Step 2: If we have a Transbank URL, redirect to Transbank
     else if (transbankUrl.value) {
-      console.log('Redirecting to Transbank URL:', transbankUrl.value)
       currentStep.value = 2
       await redirectToTransbank()
     } 
     // Step 3: Otherwise, initiate payment (coming from checkout)
     else {
-      console.log('Initiating new payment...')
       await initiatePayment()
     }
   } catch (err) {
-    console.error('Payment processing error:', err)
     error.value = err.message || 'Error al procesar el pago'
     showError(error.value)
   }
@@ -158,13 +142,11 @@ const initiatePayment = async () => {
           country: "Chile"
         }
       } catch (err) {
-        console.warn('Error parsing shipping data:', err)
+        // Error parsing shipping data - continue with default
       }
     }
 
-    console.log('Calling transbankService.initiatePayment with:', shippingAddress)
     const data = await transbankService.initiatePayment(shippingAddress)
-    console.log('Received response from backend:', data)
 
     // Store payment data
     orderId.value = data.data.orderId
@@ -172,19 +154,11 @@ const initiatePayment = async () => {
     transbankUrl.value = data.data.transbankUrl
     transbankToken.value = data.data.transbankToken
 
-    console.log('Stored payment data:', {
-      orderId: orderId.value,
-      orderNumber: orderNumber.value,
-      transbankUrl: transbankUrl.value,
-      transbankToken: transbankToken.value
-    })
-
     // Redirect to Transbank
     currentStep.value = 2
     await redirectToTransbank()
 
   } catch (err) {
-    console.error('Error in initiatePayment:', err)
     if (err.message.includes('Failed to fetch') || err.message.includes('ERR_CONNECTION_REFUSED')) {
       throw new Error('No se puede conectar con el servidor. Por favor, asegúrate de que el backend esté corriendo en el puerto 3000.')
     }

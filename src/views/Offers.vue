@@ -2,218 +2,112 @@
   <div class="offers">
     <div class="container">
       <div class="offers-header">
-        <h1><font-awesome-icon icon="fire" class="offers-header-icon" /> Ofertas Especiales</h1>
-        <p>Descubre las mejores ofertas en cartas Pokémon</p>
+        <h1>Ofertas Especiales</h1>
+        <p class="text-hero-subtitle">Descubre las mejores ofertas en cartas Pokémon</p>
       </div>
 
-      <div class="offers-filters">
-        <div class="filter-group">
-          <label>Tipo de Oferta:</label>
-          <select v-model="selectedOfferType" @change="filterOffers">
-            <option value="all">Todas las Ofertas</option>
-            <option value="discount">Descuentos</option>
-            <option value="bundle">Paquetes</option>
-            <option value="flash">Flash Sale</option>
-          </select>
-        </div>
-        
-        <div class="filter-group">
-          <label>Ordenar por:</label>
-          <select v-model="sortBy" @change="sortOffers">
-            <option value="discount">Mayor Descuento</option>
-            <option value="price">Precio</option>
-            <option value="name">Nombre</option>
-            <option value="expires">Expira Pronto</option>
-          </select>
-        </div>
+      <div class="results-info">
+        <p v-if="!loading">Mostrando {{ products.length }} productos en oferta</p>
+        <p v-else>Cargando ofertas...</p>
       </div>
 
-      <div class="offers-grid">
-        <!-- Oferta Flash Sale -->
-        <div class="offer-card flash-sale" v-if="showFlashSale">
-          <div class="offer-badge">
-            <font-awesome-icon icon="bolt" class="badge-icon" />
-            <span>FLASH SALE</span>
-          </div>
-          <div class="offer-content">
-            <h3>Booster Pack Especial</h3>
-            <p>Cartas holográficas y rarezas únicas</p>
-            <div class="offer-price">
-              <span class="original-price">$50.00</span>
-              <span class="discount-price">$25.00</span>
-              <span class="discount-percent">50% OFF</span>
-            </div>
-            <div class="offer-timer">
-              <font-awesome-icon icon="clock" class="timer-icon" />
-              <span>Termina en: 2h 15m</span>
-            </div>
-            <button class="btn btn-primary">
-              <font-awesome-icon icon="shopping-cart" />
-              Comprar Ahora
-            </button>
-          </div>
-        </div>
-
-        <!-- Ofertas de Descuento -->
-        <div class="offer-card discount" v-for="offer in discountOffers" :key="offer.id">
-          <div class="offer-badge">
-            <font-awesome-icon icon="percent" class="badge-icon" />
-            <span>{{ offer.discount }}% OFF</span>
-          </div>
-          <div class="offer-content">
-            <h3>{{ offer.title }}</h3>
-            <p>{{ offer.description }}</p>
-            <div class="offer-price">
-              <span class="original-price">${{ offer.originalPrice }}</span>
-              <span class="discount-price">${{ offer.discountPrice }}</span>
-            </div>
-            <button class="btn btn-primary">
-              <font-awesome-icon icon="shopping-cart" />
-              Ver Oferta
-            </button>
-          </div>
-        </div>
-
-        <!-- Paquetes Especiales -->
-        <div class="offer-card bundle" v-for="bundle in bundleOffers" :key="bundle.id">
-          <div class="offer-badge">
-            <font-awesome-icon icon="gift" class="badge-icon" />
-            <span>PAQUETE</span>
-          </div>
-          <div class="offer-content">
-            <h3>{{ bundle.title }}</h3>
-            <p>{{ bundle.description }}</p>
-            <div class="bundle-items">
-              <span v-for="item in bundle.items" :key="item" class="bundle-item">
-                {{ item }}
-              </span>
-            </div>
-            <div class="offer-price">
-              <span class="bundle-price">${{ bundle.price }}</span>
-              <span class="bundle-value">Valor: ${{ bundle.originalValue }}</span>
-            </div>
-            <button class="btn btn-primary">
-              <font-awesome-icon icon="shopping-cart" />
-              Comprar Paquete
-            </button>
-          </div>
-        </div>
+      <div v-if="loading" class="loading-state">
+        <font-awesome-icon icon="spinner" class="loading-spinner" spin />
+        <p>Cargando ofertas desde el servidor...</p>
       </div>
 
-      <!-- Newsletter de Ofertas -->
-      <div class="offers-newsletter">
-        <div class="newsletter-content">
-          <h3><font-awesome-icon icon="envelope" class="newsletter-icon" /> No te pierdas ninguna oferta</h3>
-          <p>Suscríbete para recibir las mejores ofertas directamente en tu correo</p>
-          <div class="newsletter-form">
-            <input 
-              type="email" 
-              v-model="emailSubscription" 
-              placeholder="Tu correo electrónico"
-              class="newsletter-input"
-            >
-            <button @click="subscribeNewsletter" class="btn btn-primary">
-              Suscribirse
-            </button>
-          </div>
-        </div>
+      <div v-else-if="products.length === 0" class="empty-state">
+        <font-awesome-icon icon="tag" class="empty-icon" />
+        <h3>No hay ofertas disponibles</h3>
+        <p>No hay productos en oferta en este momento. ¡Vuelve pronto para ver nuestras ofertas especiales!</p>
+        <router-link to="/shop" class="btn btn-primary">
+          <font-awesome-icon icon="store" class="btn-icon" />
+          Ver Tienda Completa
+        </router-link>
+      </div>
+
+      <div v-else class="products-grid">
+        <ProductCard 
+          v-for="product in products" 
+          :key="product.id" 
+          :product="product"
+          @view-product="viewProduct"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { productService } from '../services/api'
+import ProductCard from '../components/ProductCard.vue'
 import { useNotifications } from '../composables/useNotifications'
 
+const router = useRouter()
 const { success } = useNotifications()
 
 // Referencias reactivas
-const selectedOfferType = ref('all')
-const sortBy = ref('discount')
-const emailSubscription = ref('')
-const showFlashSale = ref(true)
+const products = ref([])
+const loading = ref(false)
 
-// Ofertas de descuento
-const discountOffers = ref([
-  {
-    id: 1,
-    title: 'Cartas Raras - 30% OFF',
-    description: 'Selección de cartas raras con descuento especial',
-    originalPrice: 100,
-    discountPrice: 70,
-    discount: 30
-  },
-  {
-    id: 2,
-    title: 'Booster Packs - 25% OFF',
-    description: 'Paquetes de cartas con descuento limitado',
-    originalPrice: 40,
-    discountPrice: 30,
-    discount: 25
-  },
-  {
-    id: 3,
-    title: 'Coleccionables - 40% OFF',
-    description: 'Figuras y accesorios coleccionables',
-    originalPrice: 80,
-    discountPrice: 48,
-    discount: 40
+// Cargar productos en oferta desde el backend
+const loadProducts = async () => {
+  loading.value = true
+  try {
+    const response = await productService.getOnSaleProducts({ limit: 100, page: 1 })
+    
+    // Response from service is: { success: true, data: { products: [...], pagination: {...} } }
+    let productsArray = []
+    
+    if (response?.success) {
+      // New format: response.data is an object with products property
+      if (response.data?.products && Array.isArray(response.data.products)) {
+        productsArray = response.data.products
+      }
+      // Legacy format: response.data is directly an array
+      else if (Array.isArray(response.data)) {
+        productsArray = response.data
+      }
+    }
+    
+    // Mapear la respuesta del backend al formato esperado
+    if (productsArray.length > 0) {
+      products.value = productsArray.map(product => ({
+        id: product._id || product.id, // Manejar tanto _id como id
+        name: product.name,
+        price: product.price,
+        sale_price: product.sale_price,
+        discount_percentage: product.discount_percentage,
+        is_featured: product.is_featured,
+        is_on_sale: product.is_on_sale,
+        sale_start_date: product.sale_start_date,
+        sale_end_date: product.sale_end_date,
+        image: product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
+        description: product.description,
+        category: product.category,
+        stock: product.stock
+      }))
+    } else {
+      products.value = []
+    }
+  } catch (error) {
+    console.error('[Offers] Error loading products on sale:', error);
+    products.value = []
+  } finally {
+    loading.value = false
   }
-])
-
-// Paquetes especiales
-const bundleOffers = ref([
-  {
-    id: 1,
-    title: 'Paquete Iniciador',
-    description: 'Perfecto para comenzar tu colección',
-    items: ['5 Booster Packs', '1 Carta Rara', '1 Estuche'],
-    price: 75,
-    originalValue: 120
-  },
-  {
-    id: 2,
-    title: 'Paquete Avanzado',
-    description: 'Para coleccionistas experimentados',
-    items: ['10 Booster Packs', '3 Cartas Raras', '2 Estuches', '1 Figura'],
-    price: 150,
-    originalValue: 250
-  }
-])
-
-// Computed properties
-const filteredOffers = computed(() => {
-  let offers = []
-  
-  if (selectedOfferType.value === 'all' || selectedOfferType.value === 'discount') {
-    offers = [...offers, ...discountOffers.value]
-  }
-  
-  if (selectedOfferType.value === 'all' || selectedOfferType.value === 'bundle') {
-    offers = [...offers, ...bundleOffers.value]
-  }
-  
-  if (selectedOfferType.value === 'flash') {
-    offers = showFlashSale.value ? [{ id: 'flash', type: 'flash' }] : []
-  }
-  
-  return offers
-})
+}
 
 // Methods
-const filterOffers = () => {
-  // La función se ejecuta cuando cambian los filtros
+const viewProduct = (productId) => {
+  router.push(`/product/${productId}`)
 }
 
-const sortOffers = () => {
-  // La función se ejecuta cuando cambia el ordenamiento
-}
-
-const subscribeNewsletter = () => {
-  success(`¡Gracias por suscribirte con ${emailSubscription.value}!`)
-  emailSubscription.value = ''
-}
+onMounted(async () => {
+  await loadProducts()
+})
 </script>
 
 <style scoped>
@@ -236,213 +130,112 @@ const subscribeNewsletter = () => {
 }
 
 .offers-header h1 {
-  font-size: 2.5rem;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
   margin: 0 0 1rem 0;
-  color: var(--color-primary);
-  font-weight: 700;
+  color: var(--color-white);
+  font-weight: normal;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-}
-
-.offers-header-icon {
-  color: var(--color-primary);
-  font-size: 0.9em;
-  transition: all var(--transition-normal);
-}
-
-.offers-header h1:hover .offers-header-icon {
-  transform: scale(1.1);
+  text-shadow: 
+    3px 3px 0px rgba(0, 0, 0, 0.9),
+    6px 6px 0px rgba(0, 0, 0, 0.7),
+    -2px -2px 0px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    0 0 60px rgba(255, 215, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }
 
 .offers-header p {
   font-size: 1.1rem;
-  color: var(--color-white);
   margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.offers-filters {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 3rem;
-  flex-wrap: wrap;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.filter-group label {
-  font-weight: 600;
-  color: var(--color-white);
-  font-size: 0.875rem;
-}
-
-.filter-group select {
-  padding: 0.5rem;
+.results-info {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--color-primary);
-  border-radius: 4px;
-  background: var(--color-white);
-  color: var(--color-black);
-  font-size: 0.875rem;
-  min-width: 150px;
+  border-radius: 6px;
+  text-align: center;
 }
 
-.offers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
-  margin-bottom: 4rem;
-}
-
-.offer-card {
-  background: var(--color-white);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s, box-shadow 0.3s;
-  position: relative;
-  border: 2px solid transparent;
-}
-
-.offer-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.offer-card.flash-sale {
-  border-color: var(--color-quaternary);
-  background: linear-gradient(135deg, var(--color-white) 0%, #fff5f5 100%);
-}
-
-.offer-card.discount {
-  border-color: var(--color-primary);
-}
-
-.offer-card.bundle {
-  border-color: var(--color-primary);
-  background: linear-gradient(135deg, var(--color-white) 0%, #fffbf0 100%);
-}
-
-.offer-badge {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: var(--color-quaternary);
+.results-info p {
+  margin: 0;
   color: var(--color-white);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  z-index: 2;
+  font-weight: 500;
 }
 
-.offer-card.discount .offer-badge {
-  background: var(--color-primary);
-  color: var(--color-black);
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid var(--color-primary);
 }
 
-.offer-card.bundle .offer-badge {
-  background: var(--color-primary);
-  color: var(--color-black);
-}
-
-.badge-icon {
-  font-size: 0.8em;
-}
-
-.offer-content {
-  padding: 2rem;
-  padding-top: 3rem;
-}
-
-.offer-content h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-black);
-  margin: 0 0 0.5rem 0;
-}
-
-.offer-content p {
-  color: var(--color-black);
-  margin: 0 0 1.5rem 0;
-  opacity: 0.8;
-}
-
-.offer-price {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.loading-spinner {
+  font-size: 3rem;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
+  color: var(--color-primary);
+  animation: spin 2s linear infinite;
 }
 
-.original-price {
-  text-decoration: line-through;
-  color: #666;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  margin: 0;
+  color: var(--color-white);
+  font-size: 1.1rem;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-primary);
+  opacity: 0.5;
+  transition: all var(--transition-normal);
+}
+
+.empty-state:hover .empty-icon {
+  opacity: 0.7;
+  transform: scale(1.05);
+}
+
+.empty-state h3 {
+  margin: 0 0 1rem 0;
+  color: var(--color-white);
+  font-size: 1.5rem;
+}
+
+.empty-state p {
+  margin: 0 0 2rem 0;
+  color: var(--color-white);
   font-size: 1rem;
 }
 
-.discount-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-quaternary);
-}
-
-.discount-percent {
-  background: var(--color-quaternary);
-  color: var(--color-white);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.bundle-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.bundle-value {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.bundle-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.bundle-item {
-  background: var(--color-primary);
-  color: var(--color-black);
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.offer-timer {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--color-quaternary);
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.timer-icon {
-  font-size: 0.9em;
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  align-items: start;
 }
 
 .btn {
@@ -457,74 +250,31 @@ const subscribeNewsletter = () => {
   gap: 0.5rem;
   transition: all 0.3s;
   font-size: 1rem;
-  justify-content: center;
 }
 
 .btn-primary {
   background: var(--color-primary);
   color: var(--color-black);
-  width: 100%;
 }
 
 .btn-primary:hover {
   background: var(--color-quaternary);
   color: var(--color-white);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
-.offers-newsletter {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-quaternary) 100%);
-  border-radius: 12px;
-  padding: 3rem;
-  text-align: center;
-  margin-top: 4rem;
-}
-
-.newsletter-content h3 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--color-black);
-  margin: 0 0 1rem 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.newsletter-icon {
-  color: var(--color-black);
-}
-
-.newsletter-content p {
-  color: var(--color-black);
-  margin: 0 0 2rem 0;
-  opacity: 0.9;
-}
-
-.newsletter-form {
-  display: flex;
-  gap: 1rem;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.newsletter-input {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid var(--color-black);
-  border-radius: 6px;
-  font-size: 1rem;
-  background: var(--color-white);
-  color: var(--color-black);
-}
-
-.newsletter-input:focus {
-  outline: none;
-  border-color: var(--color-quaternary);
-  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
+.btn-icon {
+  font-size: 0.875rem;
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .offers {
     padding-top: 100px;
@@ -534,37 +284,15 @@ const subscribeNewsletter = () => {
     font-size: 2rem;
   }
   
-  .offers-filters {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .offers-grid {
-    grid-template-columns: 1fr;
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
-  }
-  
-  .newsletter-form {
-    flex-direction: column;
-  }
-  
-  .offers-newsletter {
-    padding: 2rem;
   }
 }
 
 @media (max-width: 480px) {
-  .offers-header h1 {
-    font-size: 1.8rem;
-  }
-  
-  .offer-content {
-    padding: 1.5rem;
-    padding-top: 2.5rem;
-  }
-  
-  .newsletter-content h3 {
-    font-size: 1.5rem;
+  .products-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

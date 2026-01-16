@@ -94,6 +94,16 @@
             <option value="desc">Descendente</option>
           </select>
         </div>
+        <div class="filter-group">
+          <label class="filter-checkbox-label">
+            <input 
+              v-model="showInactive" 
+              type="checkbox" 
+              class="filter-checkbox"
+            />
+            <span>Mostrar usuarios desactivados</span>
+          </label>
+        </div>
       </div>
 
       <!-- Loading -->
@@ -115,6 +125,7 @@
                 <th>Dirección</th>
                 <th>Registro</th>
                 <th>Última Actividad</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -122,10 +133,7 @@
                 <td>
                   <div class="user-info">
                     <div class="user-avatar">
-                      <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
-                      <div v-else class="avatar-placeholder">
-                        {{ user.name?.charAt(0)?.toUpperCase() }}
-                      </div>
+                      <font-awesome-icon icon="user" class="avatar-icon" />
                     </div>
                     <div class="user-details">
                       <h4>{{ user.name || 'Sin nombre' }}</h4>
@@ -137,9 +145,17 @@
                   <span class="user-email">{{ user.email }}</span>
                 </td>
                 <td>
-                  <span class="role-badge" :class="`role-${user.role}`">
-                    {{ user.role === 'admin' ? 'Admin' : 'Usuario' }}
-                  </span>
+                  <div class="role-status-container">
+                    <span class="role-badge" :class="`role-${user.role}`">
+                      {{ user.role === 'admin' ? 'Admin' : 'Usuario' }}
+                    </span>
+                    <span 
+                      v-if="user.deleted_at || user.is_deleted === true || user.is_active === false" 
+                      class="status-badge status-inactive"
+                    >
+                      Desactivado
+                    </span>
+                  </div>
                 </td>
                 <td>
                   <span class="contact-info">{{ user.telefono || 'No disponible' }}</span>
@@ -152,6 +168,43 @@
                 </td>
                 <td>
                   <span class="date-info">{{ formatDate(user.last_login) }}</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button @click="viewUserDetails(user)" class="btn btn-sm btn-outline" title="Ver detalles">
+                      <font-awesome-icon icon="eye" class="action-icon" />
+                    </button>
+                    <button 
+                      v-if="!(user.deleted_at || user.is_deleted === true || user.is_active === false)"
+                      @click="editUser(user)" 
+                      class="btn btn-sm btn-outline" 
+                      title="Editar usuario"
+                    >
+                      <font-awesome-icon icon="edit" class="action-icon" />
+                    </button>
+                    <button 
+                      v-if="user.deleted_at || user.is_deleted === true || user.is_active === false"
+                      @click="reactivateUser(user)" 
+                      class="btn btn-sm btn-success" 
+                      title="Reactivar usuario"
+                      :disabled="reactivatingUser === user.id"
+                    >
+                      <font-awesome-icon 
+                        :icon="reactivatingUser === user.id ? 'spinner' : 'undo'" 
+                        :spin="reactivatingUser === user.id"
+                        class="action-icon" 
+                      />
+                      Reactivar
+                    </button>
+                    <button 
+                      v-if="!(user.deleted_at || user.is_deleted === true || user.is_active === false)"
+                      @click="deleteUser(user)" 
+                      class="btn btn-sm btn-danger" 
+                      title="Eliminar usuario"
+                    >
+                      <font-awesome-icon icon="trash" class="action-icon" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -168,9 +221,154 @@
           </div>
         </div>
       </div>
+
+      <!-- User Details Modal -->
+      <div v-if="selectedUser" class="modal-overlay" @click="closeUserDetails">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h2>Detalles del Usuario</h2>
+            <button @click="closeUserDetails" class="close-btn">
+              <font-awesome-icon icon="times" class="close-icon" />
+            </button>
+          </div>
+          
+          <div class="modal-body" v-if="selectedUser">
+            <div class="user-details-section">
+              <div class="user-avatar-large">
+                <font-awesome-icon icon="user" class="avatar-icon-large" />
+              </div>
+              <h3>{{ selectedUser.name || 'Sin nombre' }}</h3>
+            </div>
+
+            <div class="user-info-section">
+              <h3>Información Personal</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Email:</label>
+                  <span>{{ selectedUser.email }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Teléfono:</label>
+                  <span>{{ selectedUser.telefono || 'No disponible' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Dirección:</label>
+                  <span>{{ selectedUser.direccion || 'No disponible' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Rol:</label>
+                  <span class="role-badge" :class="`role-${selectedUser.role}`">
+                    {{ selectedUser.role === 'admin' ? 'Administrador' : 'Usuario' }}
+                  </span>
+                </div>
+                <div class="info-item">
+                  <label>Verificado:</label>
+                  <span :class="selectedUser.is_verified ? 'status-verified' : 'status-unverified'">
+                    {{ selectedUser.is_verified ? 'Sí' : 'No' }}
+                  </span>
+                </div>
+                <div class="info-item">
+                  <label>Fecha de Registro:</label>
+                  <span>{{ formatDate(selectedUser.created_at) }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Última Actividad:</label>
+                  <span>{{ formatDate(selectedUser.last_login) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button @click="closeUserDetails" class="btn btn-secondary">Cerrar</button>
+            <button @click="editUserFromDetails" class="btn btn-primary">
+              <font-awesome-icon icon="edit" class="btn-icon" />
+              Editar Usuario
+            </button>
+          </div>
+        </div>
       </div>
 
+      <!-- User Edit Modal -->
+      <Modal
+        v-model:show="showEditModal"
+        title="Editar Usuario"
+        icon="edit"
+        max-width="lg"
+        @close="closeEditModal"
+      >
+        <form @submit.prevent="submitUserEdit" class="user-form">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input 
+              v-model="userForm.name" 
+              type="text" 
+              required 
+              placeholder="Nombre completo"
+              class="form-input"
+            />
+          </div>
 
+          <div class="form-group">
+            <label>Email *</label>
+            <input 
+              v-model="userForm.email" 
+              type="email" 
+              required 
+              placeholder="email@ejemplo.com"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input 
+              v-model="userForm.telefono" 
+              type="text" 
+              placeholder="+56 9 1234 5678"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Dirección</label>
+            <textarea 
+              v-model="userForm.direccion" 
+              placeholder="Dirección completa"
+              class="form-textarea"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Rol *</label>
+            <select v-model="userForm.role" required class="form-select">
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <div class="verification-display">
+              <font-awesome-icon 
+                :icon="userForm.is_verified ? 'check-circle' : 'times-circle'" 
+                :class="userForm.is_verified ? 'verified' : 'unverified'"
+              />
+              <span>{{ userForm.is_verified ? 'Usuario Verificado' : 'Usuario No Verificado' }}</span>
+            </div>
+          </div>
+        </form>
+
+        <template #footer>
+          <button type="button" @click="closeEditModal" class="btn btn-secondary">
+            Cancelar
+          </button>
+          <button type="button" @click="submitUserEdit" :disabled="submitting" class="btn btn-primary">
+            {{ submitting ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </template>
+      </Modal>
+    </div>
   </div>
 </template>
 
@@ -178,6 +376,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { adminService } from '../services/api'
 import { useNotifications } from '../composables/useNotifications'
+import Modal from '../components/Modal.vue'
 
 const { success, error } = useNotifications()
 
@@ -189,10 +388,39 @@ const searchTerm = ref('')
 const roleFilter = ref('')
 const sortBy = ref('created_at')
 const sortOrder = ref('desc')
+const showInactive = ref(false)
+const selectedUser = ref(null)
+const showEditModal = ref(false)
+const submitting = ref(false)
+const reactivatingUser = ref(null)
+
+// Form data for editing
+const userForm = ref({
+  id: null,
+  name: '',
+  email: '',
+  telefono: '',
+  direccion: '',
+  role: 'user',
+  is_verified: false
+})
 
 // Computed
 const filteredUsers = computed(() => {
   let filtered = users.value
+
+  // Filtrar usuarios activos/inactivos según el checkbox
+  if (!showInactive.value) {
+    // Mostrar solo usuarios activos (no tienen deleted_at o is_deleted = false)
+    filtered = filtered.filter(user => 
+      !user.deleted_at && user.is_deleted !== true && user.is_active !== false
+    )
+  } else {
+    // Mostrar solo usuarios desactivados
+    filtered = filtered.filter(user => 
+      user.deleted_at || user.is_deleted === true || user.is_active === false
+    )
+  }
 
   if (searchTerm.value) {
     const term = searchTerm.value.toLowerCase()
@@ -203,7 +431,6 @@ const filteredUsers = computed(() => {
       user.direccion?.toLowerCase().includes(term)
     )
   }
-
 
   if (roleFilter.value) {
     filtered = filtered.filter(user => user.role === roleFilter.value)
@@ -250,12 +477,28 @@ const loadUsers = async () => {
   loading.value = true
   try {
     const response = await adminService.getAllUsers()
-    users.value = response.data || []
+    // Response from service is: { success: true, data: { users: [...], total: ... } }
+    // Handle new response format: { success: true, data: { users: [...] } }
+    // Or legacy format: { success: true, data: [...] } (array directly)
+    let usersArray = []
+    
+    if (response?.success) {
+      // New format: response.data is an object with users property
+      if (response.data?.users && Array.isArray(response.data.users)) {
+        usersArray = response.data.users
+      }
+      // Legacy format: response.data is directly an array
+      else if (Array.isArray(response.data)) {
+        usersArray = response.data
+      }
+    }
+    
+    users.value = usersArray
     
     // Calcular estadísticas
     calculateStats()
   } catch (err) {
-    console.error('Error loading users:', err)
+    console.error('[AdminUsers] Error loading users:', err);
     error('Error al cargar usuarios')
   } finally {
     loading.value = false
@@ -305,7 +548,6 @@ const exportUsers = () => {
     downloadCSV(csvContent, filename)
     success(`✅ Exportados ${filteredUsers.value.length} usuarios exitosamente`)
   } catch (err) {
-    console.error('Error exporting users:', err)
     error('❌ Error al exportar la lista de usuarios')
   }
 }
@@ -349,6 +591,154 @@ const formatDate = (dateString) => {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+const viewUserDetails = async (user) => {
+  try {
+    // Cargar detalles completos del usuario desde el API
+    if (user.id) {
+      loading.value = true
+      const response = await adminService.getUserById(user.id)
+      selectedUser.value = response.data || user
+    } else {
+      selectedUser.value = user
+    }
+  } catch (err) {
+    // Si falla, usar los datos que ya tenemos
+    selectedUser.value = user
+    error('Error al cargar detalles del usuario')
+  } finally {
+    loading.value = false
+  }
+}
+
+const closeUserDetails = () => {
+  selectedUser.value = null
+}
+
+const editUser = (user) => {
+  userForm.value = {
+    id: user.id,
+    name: user.name || '',
+    email: user.email || '',
+    telefono: user.telefono || '',
+    direccion: user.direccion || '',
+    role: user.role || 'user',
+    is_verified: user.is_verified || false
+  }
+  showEditModal.value = true
+}
+
+const editUserFromDetails = () => {
+  if (selectedUser.value) {
+    editUser(selectedUser.value)
+    closeUserDetails()
+  }
+}
+
+const closeEditModal = () => {
+  showEditModal.value = false
+  userForm.value = {
+    id: null,
+    name: '',
+    email: '',
+    telefono: '',
+    direccion: '',
+    role: 'user',
+    is_verified: false
+  }
+}
+
+const submitUserEdit = async () => {
+  submitting.value = true
+  try {
+    if (!userForm.value.id) {
+      error('Error: ID de usuario no encontrado')
+      return
+    }
+
+    // Prepare update data, ensuring no undefined values are sent
+    const updateData = {}
+    
+    // Always include required fields
+    if (userForm.value.name !== undefined && userForm.value.name !== null) {
+      updateData.name = userForm.value.name
+    }
+    if (userForm.value.email !== undefined && userForm.value.email !== null) {
+      updateData.email = userForm.value.email
+    }
+    if (userForm.value.role !== undefined && userForm.value.role !== null) {
+      updateData.role = userForm.value.role
+    }
+    if (userForm.value.is_verified !== undefined && userForm.value.is_verified !== null) {
+      updateData.is_verified = Boolean(userForm.value.is_verified)
+    }
+
+    // Handle telefono - send null if empty, otherwise send the value
+    if (userForm.value.telefono !== undefined) {
+      updateData.telefono = (userForm.value.telefono && userForm.value.telefono.trim() !== '') 
+        ? userForm.value.telefono.trim() 
+        : null
+    }
+
+    // Handle direccion - send null if empty, otherwise send the value
+    if (userForm.value.direccion !== undefined) {
+      updateData.direccion = (userForm.value.direccion && userForm.value.direccion.trim() !== '') 
+        ? userForm.value.direccion.trim() 
+        : null
+    }
+
+    await adminService.updateUser(userForm.value.id, updateData)
+
+    success('Usuario actualizado correctamente')
+    await loadUsers()
+    closeEditModal()
+  } catch (err) {
+    error(err.message || 'Error al actualizar usuario')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const deleteUser = async (user) => {
+  if (!user.id) {
+    error('Error: ID de usuario no encontrado')
+    return
+  }
+
+  if (!confirm(`¿Estás seguro de que quieres eliminar al usuario "${user.name || user.email}"?\n\nEsta acción realizará un soft delete.`)) {
+    return
+  }
+
+  try {
+    await adminService.deleteUser(user.id)
+    success('Usuario eliminado correctamente')
+    await loadUsers()
+  } catch (err) {
+    error(err.message || 'Error al eliminar usuario')
+  }
+}
+
+const reactivateUser = async (user) => {
+  if (!user.id) {
+    error('Error: ID de usuario no encontrado')
+    return
+  }
+
+  if (!confirm(`¿Estás seguro de que quieres reactivar al usuario "${user.name || user.email}"?`)) {
+    return
+  }
+
+  reactivatingUser.value = user.id
+  try {
+    await adminService.reactivateUser(user.id)
+    success('Usuario reactivado correctamente')
+    await loadUsers()
+  } catch (err) {
+    error(err.message || 'Error al reactivar usuario')
+  } finally {
+    reactivatingUser.value = null
+  }
 }
 
 // Lifecycle
@@ -449,6 +839,22 @@ onMounted(() => {
   min-width: 200px;
 }
 
+.filter-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 1.5rem;
+}
+
+.filter-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #007bff;
+}
+
 .loading {
   text-align: center;
   padding: 4rem;
@@ -497,6 +903,19 @@ th {
   color: #555;
 }
 
+/* Columnas de fecha - Registro y Última Actividad */
+th:nth-child(6),
+td:nth-child(6) {
+  min-width: 180px;
+  white-space: nowrap;
+}
+
+th:nth-child(7),
+td:nth-child(7) {
+  min-width: 180px;
+  white-space: nowrap;
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -509,23 +928,15 @@ th {
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-}
-
-.user-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: #007bff;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: 2px solid #007bff;
+}
+
+.avatar-icon {
+  color: white;
   font-size: 1.2rem;
 }
 
@@ -564,6 +975,27 @@ th {
 .role-badge.role-user {
   background: #28a745;
   color: white;
+}
+
+.role-status-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  display: inline-block;
+}
+
+.status-badge.status-inactive {
+  background: #f8d7da;
+  color: #721c24;
 }
 
 .status-info {
@@ -642,6 +1074,16 @@ th {
 }
 
 
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.action-icon {
+  font-size: 0.875rem;
+}
+
 .btn {
   padding: 0.5rem 1rem;
   border: none;
@@ -649,6 +1091,10 @@ th {
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .btn-outline {
@@ -667,6 +1113,29 @@ th {
   font-size: 0.875rem;
 }
 
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #218838;
+}
+
+.btn-success:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 
 .no-users {
   padding: 4rem;
@@ -724,5 +1193,284 @@ th {
     min-width: auto;
   }
   
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.close-btn:hover {
+  color: #dc3545;
+  transform: scale(1.1);
+}
+
+.close-icon {
+  font-size: 1rem;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #eee;
+  background: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+}
+
+.user-details-section {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.user-avatar-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 1rem;
+  border: 4px solid #007bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.avatar-icon-large {
+  color: white;
+  font-size: 4rem;
+}
+
+.user-details-section h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.user-info-section {
+  margin-top: 2rem;
+}
+
+.user-info-section h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-item label {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.info-item span {
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.status-verified {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.status-unverified {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* Form Styles */
+.user-form {
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-input, .form-textarea, .form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+.form-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.form-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #007bff;
+}
+
+.verification-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+.verification-display .verified {
+  color: #28a745;
+}
+
+.verification-display .unverified {
+  color: #dc3545;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.btn-primary:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-content {
+    margin: 10px;
+    max-height: 95vh;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
 }
 </style>

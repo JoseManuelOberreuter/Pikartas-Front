@@ -24,12 +24,24 @@
         <p>Estamos verificando tu cuenta, por favor espera.</p>
       </div>
       
-      <div v-if="verified" class="success">
+      <div v-if="verified && !alreadyVerified" class="success">
         <h2>
           <font-awesome-icon icon="check-circle" class="section-icon" />
           ¡Cuenta Verificada!
         </h2>
-        <p>Tu cuenta ha sido verificada exitosamente. Ya puedes iniciar sesión.</p>
+        <p>{{ successMessage || 'Tu cuenta ha sido verificada exitosamente. Ya puedes iniciar sesión.' }}</p>
+        <router-link to="/" class="btn btn-primary">
+          <font-awesome-icon icon="home" class="btn-icon" />
+          Ir al Inicio
+        </router-link>
+      </div>
+      
+      <div v-if="alreadyVerified" class="info">
+        <h2>
+          <font-awesome-icon icon="info-circle" class="section-icon" />
+          Cuenta Ya Verificada
+        </h2>
+        <p>{{ successMessage || 'Tu cuenta ya estaba verificada anteriormente. Puedes iniciar sesión directamente.' }}</p>
         <router-link to="/" class="btn btn-primary">
           <font-awesome-icon icon="home" class="btn-icon" />
           Ir al Inicio
@@ -42,6 +54,33 @@
           Error de Verificación
         </h2>
         <p>{{ error }}</p>
+        <div v-if="showResendForm" class="resend-form">
+          <h3>
+            <font-awesome-icon icon="envelope" class="section-icon" />
+            Solicitar Nuevo Correo
+          </h3>
+          <p>Puedes solicitar un nuevo correo de verificación:</p>
+          <form @submit.prevent="handleResendVerification" class="resend-form-content">
+            <input 
+              type="email" 
+              v-model="emailInput" 
+              placeholder="tu@email.com" 
+              required
+              class="email-input"
+            />
+            <button type="submit" :disabled="resending" class="btn btn-primary">
+              <font-awesome-icon 
+                :icon="resending ? 'spinner' : 'paper-plane'" 
+                :spin="resending"
+                class="btn-icon" 
+              />
+              {{ resending ? 'Enviando...' : 'Solicitar Correo' }}
+            </button>
+          </form>
+          <p v-if="resendMessage" :class="resendSuccess ? 'success-message' : 'error-message'">
+            {{ resendMessage }}
+          </p>
+        </div>
         <router-link to="/" class="btn btn-outline">
           <font-awesome-icon icon="home" class="btn-icon" />
           Volver al Inicio
@@ -55,14 +94,49 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { authService } from '../services/api'
+import { useNotifications } from '../composables/useNotifications'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const { success, error: showError } = useNotifications()
 
 const verifying = ref(false)
 const verified = ref(false)
+const alreadyVerified = ref(false)
 const error = ref(null)
+const successMessage = ref(null)
 const token = ref(null)
+const showResendForm = ref(false)
+const emailInput = ref('')
+const resending = ref(false)
+const resendMessage = ref('')
+const resendSuccess = ref(false)
+
+const handleResendVerification = async () => {
+  if (!emailInput.value) {
+    resendMessage.value = 'Por favor ingresa tu correo electrónico'
+    resendSuccess.value = false
+    return
+  }
+
+  try {
+    resending.value = true
+    resendMessage.value = ''
+    
+    await authService.resendVerification(emailInput.value)
+    
+    resendMessage.value = 'Correo de verificación enviado. Revisa tu bandeja de entrada.'
+    resendSuccess.value = true
+    success('Correo de verificación enviado exitosamente')
+  } catch (err) {
+    resendMessage.value = err.error || err.message || 'Error al enviar el correo'
+    resendSuccess.value = false
+    showError(resendMessage.value)
+  } finally {
+    resending.value = false
+  }
+}
 
 onMounted(async () => {
   token.value = route.query.token
@@ -70,10 +144,37 @@ onMounted(async () => {
   if (token.value) {
     try {
       verifying.value = true
-      await authStore.verifyEmail(token.value)
-      verified.value = true
+      const response = await authStore.verifyEmail(token.value)
+      
+      // Manejar diferentes tipos de respuesta
+      if (response.type === 'ALREADY_VERIFIED') {
+        alreadyVerified.value = true
+        verified.value = true
+        successMessage.value = response.message || 'Tu cuenta ya estaba verificada'
+      } else if (response.type === 'VERIFIED') {
+        verified.value = true
+        successMessage.value = response.message || 'Cuenta verificada exitosamente'
+        success('¡Cuenta verificada exitosamente!')
+      }
     } catch (err) {
-      error.value = err.error || 'Error al verificar la cuenta'
+      const errorData = err.response?.data || err
+      
+      // Determinar el tipo de error y mostrar mensaje apropiado
+      if (errorData.type === 'TOKEN_EXPIRED') {
+        error.value = errorData.message || 'El enlace de verificación ha expirado'
+        showResendForm.value = true
+      } else if (errorData.type === 'USER_NOT_FOUND') {
+        error.value = errorData.message || 'Usuario no encontrado'
+        showResendForm.value = true
+      } else if (errorData.type === 'INVALID_TOKEN') {
+        error.value = errorData.message || 'Token inválido'
+        showResendForm.value = true
+      } else {
+        error.value = errorData.message || errorData.error || 'Error al verificar la cuenta'
+        showResendForm.value = true
+      }
+      
+      showError(error.value)
     } finally {
       verifying.value = false
     }
@@ -252,6 +353,70 @@ onMounted(async () => {
 
 .verifying h2 {
   color: var(--color-secondary);
+}
+
+.info {
+  color: var(--color-info);
+}
+
+.info h2 {
+  color: var(--color-info);
+}
+
+.resend-form {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--color-gray-50);
+  border-radius: var(--border-radius-md);
+  border: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+.resend-form h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.resend-form-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.email-input {
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-primary);
+  transition: all var(--transition-normal);
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.success-message {
+  color: var(--color-success);
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background: rgba(0, 184, 148, 0.1);
+  border-radius: var(--border-radius-sm);
+}
+
+.error-message {
+  color: var(--color-error);
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background: rgba(231, 76, 60, 0.1);
+  border-radius: var(--border-radius-sm);
 }
 
 @media (max-width: 768px) {

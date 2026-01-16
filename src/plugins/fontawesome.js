@@ -71,7 +71,16 @@ import {
   faPercent,
   faDice,
   faGift,
-  faGem
+  faGem,
+  faTag,
+  faArrowUp,
+  faArrowDown,
+  faSort,
+  faSortUp,
+  faSortDown,
+  faTicketAlt,
+  faAngleDoubleLeft,
+  faAngleDoubleRight
 } from '@fortawesome/free-solid-svg-icons'
 
 import { 
@@ -163,6 +172,15 @@ library.add(
   faDice,
   faGift,
   faGem,
+  faTag,
+  faArrowUp,
+  faArrowDown,
+  faSort,
+  faSortUp,
+  faSortDown,
+  faTicketAlt,
+  faAngleDoubleLeft,
+  faAngleDoubleRight,
   
   // Regular icons
   faHeartRegular,

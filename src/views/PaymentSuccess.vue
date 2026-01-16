@@ -27,7 +27,7 @@
             
             <div class="detail-row">
               <span class="label">Monto Total:</span>
-              <span class="value amount">${{ amount?.toFixed(2) }}</span>
+              <span class="value amount">${{ formatCLP(amount || 0) }}</span>
             </div>
             
             <div v-if="authorizationCode" class="detail-row">
@@ -98,6 +98,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import transbankService from '../services/transbank.js'
+import { formatCLP } from '../utils/formatters.js'
 
 const route = useRoute()
 

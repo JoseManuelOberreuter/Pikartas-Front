@@ -7,6 +7,13 @@
     <meta name="description" content="Pikartas - Tu tienda online de cartas Pokémon favorita">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <title>Pikartas - Cartas Pokémon</title>
+    <!-- Preload critical CSS for faster rendering -->
+    <link rel="preload" href="/src/assets/styles/variables.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/src/assets/styles/colors.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+      <link rel="stylesheet" href="/src/assets/styles/variables.css">
+      <link rel="stylesheet" href="/src/assets/styles/colors.css">
+    </noscript>
   </head>
   <body>
     <div id="app"></div>

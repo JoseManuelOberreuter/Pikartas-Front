@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { cartService, productService } from '../services/api';
+import { cartService } from '../services/api';
 import { useAuthStore } from './auth';
 import { useNotifications } from '../composables/useNotifications';
 
@@ -10,56 +10,60 @@ export const useCartStore = defineStore('cart', () => {
   const isOpen = ref(false);
   const loading = ref(false);
   const error = ref(null);
+  const isInitializing = ref(false);
 
   // Composables
   const { success, error: errorNotification } = useNotifications();
 
-  // Función para obtener información completa de productos
-  async function getProductDetails(productIds) {
-    const productDetails = {};
-    
-    try {
-      // Obtener detalles de cada producto
-      const promises = productIds.map(async (productId) => {
-        try {
-          const product = await productService.getProductById(productId);
-          if (product.success && product.data) {
-            productDetails[productId] = product.data;
-          } else if (product.product) {
-            productDetails[productId] = product.product;
-          } else {
-            productDetails[productId] = product;
-          }
-        } catch (error) {
-          console.warn(`No se pudo obtener detalles del producto ${productId}:`, error);
-          // Usar datos por defecto si falla
-          productDetails[productId] = {
-            id: productId,
-            name: `Producto ${productId}`,
-            image: '/placeholder-product.svg',
-            category: 'General',
-            rating: 5,
-            description: ''
-          };
-        }
-      });
-      
-      await Promise.all(promises);
-      return productDetails;
-    } catch (error) {
-      console.error('Error obteniendo detalles de productos:', error);
-      return {};
+  const verificationRequiredMessage = 'Debes verificar tu cuenta para usar el carrito. Revisa tu correo electrónico.';
+
+  const resolveCartErrorMessage = (err, fallbackMessage) => {
+    if (err?.verificationRequired) {
+      return verificationRequiredMessage;
     }
+    return err?.message || err?.error || fallbackMessage;
+  };
+
+  // Helper function to map backend cart items to frontend format
+  // Uses data directly from backend without additional API calls
+  function mapItemsToCartFormat(itemsArray) {
+    if (!itemsArray || !Array.isArray(itemsArray) || itemsArray.length === 0) {
+      return [];
+    }
+    
+    return itemsArray
+      .filter(item => item.productId) // Filter out items without productId
+      .map(item => ({
+        id: item.productId,
+        _id: item.productId,
+        name: item.productName || `Producto ${item.productId}`,
+        price: item.price, // Recalculated price from backend
+        image: item.image || '/placeholder-product.svg',
+        stock: item.stock ?? 999,
+        quantity: item.quantity,
+        category: item.category || 'General',
+        rating: 5, // Default rating (not provided by backend)
+        description: item.description || '',
+        subtotal: item.subtotal || (item.price * item.quantity),
+        // Include sale information from backend
+        isOnSale: item.isOnSale || false,
+        discountPercentage: item.discountPercentage || null,
+        originalPrice: item.originalPrice || item.price
+      }));
   }
 
-  // Computed (mantenemos la misma API que antes)
+  // Computed properties - Pinia maneja la reactividad automáticamente
+  // Estos computed se actualizan automáticamente cuando items.value cambia
   const cartItems = computed(() => items.value);
+  
   const cartTotal = computed(() => 
     items.value.reduce((total, item) => total + (item.price * item.quantity), 0)
   );
+  
   const cartItemCount = computed(() => 
-    items.value.reduce((total, item) => total + item.quantity, 0)
+    items.value.reduce((total, item) => total + (item.quantity || 0), 0)
   );
+  
   const isCartOpen = computed(() => isOpen.value);
 
   // Acciones
@@ -72,162 +76,98 @@ export const useCartStore = defineStore('cart', () => {
       return;
     }
 
+    // Prevent multiple simultaneous loads
+    // No verificar isInitializing aquí porque initializeCart lo usa para prevenir múltiples inicializaciones
+    if (loading.value) {
+      return;
+    }
     loading.value = true;
     error.value = null;
     
     try {
-      // Intentar obtener el carrito completo primero
+      // Get cart from backend
       const response = await cartService.getCart();
       
-              // Si no hay items en la respuesta principal, intentar con el summary
-        if (!response.data || (!response.data.items && !Array.isArray(response.data))) {
-          const summaryResponse = await cartService.getCartSummary();
-        
-        if (summaryResponse.success && summaryResponse.data && summaryResponse.data.items) {
-                // Obtener IDs únicos de productos
-      const productIds = [...new Set(summaryResponse.data.items.map(item => item.productId))];
+      // Check for removed products notification
+      let removedProductsInfo = null;
+      if (response.success && response.data && response.data.removedProducts) {
+        removedProductsInfo = response.data.removedProducts;
+      }
       
-      // Obtener detalles de productos
-      const productDetails = await getProductDetails(productIds);
+      let mappedItems = [];
       
-      items.value = summaryResponse.data.items.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-              quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-        } else if (summaryResponse.data && Array.isArray(summaryResponse.data)) {
-          // Obtener IDs únicos de productos
-          const productIds = [...new Set(summaryResponse.data.map(item => item.productId))];
-          
-          // Obtener detalles de productos
-          const productDetails = await getProductDetails(productIds);
-          
-          items.value = summaryResponse.data.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-              quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-        } else {
-          items.value = [];
+      // Extract items from response (backend already includes all product details)
+      if (response.success && response.data) {
+        // Case 1: response.data.items (standard format from formatCart)
+        if (response.data.items && Array.isArray(response.data.items)) {
+          mappedItems = mapItemsToCartFormat(response.data.items);
         }
+        // Case 2: response.data is an array directly
+        else if (Array.isArray(response.data)) {
+          mappedItems = mapItemsToCartFormat(response.data);
+        }
+        // Case 3: response.data.cartItems
+        else if (response.data.cartItems && Array.isArray(response.data.cartItems)) {
+          mappedItems = mapItemsToCartFormat(response.data.cartItems);
+        }
+        // Case 4: Try summary endpoint as fallback
+        else {
+          const summaryResponse = await cartService.getCartSummary();
+          
+          // Check for removed products in summary response too
+          if (summaryResponse.success && summaryResponse.data && summaryResponse.data.removedProducts) {
+            removedProductsInfo = summaryResponse.data.removedProducts;
+          }
+          
+          if (summaryResponse.success && summaryResponse.data) {
+            if (summaryResponse.data.items && Array.isArray(summaryResponse.data.items)) {
+              mappedItems = mapItemsToCartFormat(summaryResponse.data.items);
+            } else if (Array.isArray(summaryResponse.data)) {
+              mappedItems = mapItemsToCartFormat(summaryResponse.data);
+            }
+          }
+        }
+      } else if (response.data && Array.isArray(response.data)) {
+        // Direct array response
+        mappedItems = mapItemsToCartFormat(response.data);
       } else {
-      // Mapear la respuesta del backend al formato esperado por el frontend
-      if (response.success && response.data && response.data.items) {
-          // Obtener IDs únicos de productos
-          const productIds = [...new Set(response.data.items.map(item => item.productId))];
-          
-          // Obtener detalles de productos
-          const productDetails = await getProductDetails(productIds);
-          
-          items.value = response.data.items.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-              quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-        } else if (response.data && Array.isArray(response.data)) {
-          // Obtener IDs únicos de productos
-          const productIds = [...new Set(response.data.map(item => item.productId))];
-          
-          // Obtener detalles de productos
-          const productDetails = await getProductDetails(productIds);
-          
-          items.value = response.data.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-              quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-        } else if (response.success && response.data && response.data.cartItems) {
-          // Obtener IDs únicos de productos
-          const productIds = [...new Set(response.data.cartItems.map(item => item.productId))];
-          
-          // Obtener detalles de productos
-          const productDetails = await getProductDetails(productIds);
-          
-          items.value = response.data.cartItems.map(item => {
-            
-            const productDetail = productDetails[item.productId] || {};
-            
-            return {
-              id: item.productId,
-              _id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: productDetail.image || '/placeholder-product.svg',
-              stock: productDetail.stock || 999,
-          quantity: item.quantity,
-              category: productDetail.category || 'General',
-              rating: productDetail.rating || 5,
-              description: productDetail.description || '',
-              subtotal: item.subtotal
-            };
-          });
-      } else {
-        items.value = [];
+        // Try summary as fallback
+        const summaryResponse = await cartService.getCartSummary();
+        
+        // Check for removed products in summary response too
+        if (summaryResponse.success && summaryResponse.data && summaryResponse.data.removedProducts) {
+          removedProductsInfo = summaryResponse.data.removedProducts;
+        }
+        
+        if (summaryResponse.success && summaryResponse.data) {
+          if (summaryResponse.data.items && Array.isArray(summaryResponse.data.items)) {
+            mappedItems = mapItemsToCartFormat(summaryResponse.data.items);
+          } else if (Array.isArray(summaryResponse.data)) {
+            mappedItems = mapItemsToCartFormat(summaryResponse.data);
+          }
         }
       }
-    } catch (err) {
-      console.error('Error loading cart:', err);
       
+      // Show notification if products were removed
+      if (removedProductsInfo && removedProductsInfo.count > 0) {
+        errorNotification('Un artículo ya no existe o no queda stock');
+      }
+      
+      // Update items - Pinia handles reactivity automatically
+      items.value = mappedItems;
+      
+    } catch (err) {
+      console.error('[Cart Store] Error loading cart:', err);
       // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        error.value = resolveCartErrorMessage(err, verificationRequiredMessage);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para ver tu carrito';
         // Limpiar carrito local si no está autenticado
         items.value = [];
       } else {
-      error.value = err.message || 'Error al cargar el carrito';
-      items.value = [];
+        error.value = resolveCartErrorMessage(err, 'Error al cargar el carrito');
+        items.value = [];
       }
     } finally {
       loading.value = false;
@@ -243,6 +183,32 @@ export const useCartStore = defineStore('cart', () => {
       return;
     }
 
+    // Optimistic update: add item immediately to UI
+    const existingItem = items.value.find(item => item.id === product.id);
+    if (existingItem) {
+      existingItem.quantity += 1;
+      existingItem.subtotal = existingItem.price * existingItem.quantity;
+    } else {
+      // Create temporary item with product data
+      const tempItem = {
+        id: product.id,
+        _id: product.id,
+        name: product.name,
+        price: product.price || 0,
+        image: product.image || '/placeholder-product.svg',
+        stock: product.stock ?? 999,
+        quantity: 1,
+        category: product.category || 'General',
+        rating: product.rating || 5,
+        description: product.description || '',
+        subtotal: (product.price || 0) * 1,
+        isOnSale: product.isOnSale || false,
+        discountPercentage: product.discountPercentage || null,
+        originalPrice: product.originalPrice || product.price || 0
+      };
+      items.value.push(tempItem);
+    }
+
     loading.value = true;
     error.value = null;
     
@@ -252,21 +218,45 @@ export const useCartStore = defineStore('cart', () => {
         quantity: 1
       };
       
-      await cartService.addToCart(productData);
-      await loadCart(); // Recargar carrito después de agregar
+      // Backend returns the updated cart with all items
+      const response = await cartService.addToCart(productData);
+      
+      // Use backend response directly instead of reloading
+      if (response.success && response.data) {
+        let backendItems = [];
+        if (response.data.items && Array.isArray(response.data.items)) {
+          backendItems = mapItemsToCartFormat(response.data.items);
+        } else if (Array.isArray(response.data)) {
+          backendItems = mapItemsToCartFormat(response.data);
+        }
+        
+        // Update with backend data (this ensures consistency)
+        if (backendItems.length > 0) {
+          items.value = backendItems;
+        }
+      }
       
       success(`${product.name} agregado al carrito`);
       
     } catch (err) {
-      console.error('Error adding to cart:', err);
+      // Revert optimistic update on error
+      await loadCart();
       
-      // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        const message = resolveCartErrorMessage(err, verificationRequiredMessage);
+        error.value = message;
+        errorNotification(message);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para agregar productos al carrito';
         errorNotification(error.value);
       } else {
-      error.value = err.message || 'Error al agregar producto al carrito';
-      errorNotification(error.value);
+        // Extraer mensaje de error del response si está disponible
+        const errorMessage = err?.response?.data?.error || 
+                            err?.message || 
+                            'Error al agregar producto al carrito';
+        const message = resolveCartErrorMessage(err, errorMessage);
+        error.value = message;
+        errorNotification(message);
       }
     } finally {
       loading.value = false;
@@ -281,25 +271,48 @@ export const useCartStore = defineStore('cart', () => {
       return;
     }
 
+    // Optimistic update: remove item immediately from UI
+    const itemToRemove = items.value.find(item => item.id === productId);
+    const previousItems = [...items.value];
+    items.value = items.value.filter(item => item.id !== productId);
+
     loading.value = true;
     error.value = null;
     
     try {
-      await cartService.removeFromCart(productId);
-      await loadCart(); // Recargar carrito después de eliminar
+      // Backend returns the updated cart with all items
+      const response = await cartService.removeFromCart(productId);
+      
+      // Use backend response directly instead of reloading
+      if (response.success && response.data) {
+        let backendItems = [];
+        if (response.data.items && Array.isArray(response.data.items)) {
+          backendItems = mapItemsToCartFormat(response.data.items);
+        } else if (Array.isArray(response.data)) {
+          backendItems = mapItemsToCartFormat(response.data);
+        }
+        
+        // Update with backend data (this ensures consistency)
+        items.value = backendItems;
+      }
       
       success('Producto eliminado del carrito');
       
     } catch (err) {
-      console.error('Error removing from cart:', err);
+      // Revert optimistic update on error
+      items.value = previousItems;
       
-      // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        const message = resolveCartErrorMessage(err, verificationRequiredMessage);
+        error.value = message;
+        errorNotification(message);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para modificar el carrito';
         errorNotification(error.value);
       } else {
-      error.value = err.message || 'Error al eliminar producto del carrito';
-      errorNotification(error.value);
+        const message = resolveCartErrorMessage(err, 'Error al eliminar producto del carrito');
+        error.value = message;
+        errorNotification(message);
       }
     } finally {
       loading.value = false;
@@ -320,6 +333,16 @@ export const useCartStore = defineStore('cart', () => {
       return;
     }
 
+    // Optimistic update: update quantity immediately in UI
+    const itemToUpdate = items.value.find(item => item.id === productId);
+    const previousQuantity = itemToUpdate?.quantity;
+    const previousSubtotal = itemToUpdate?.subtotal;
+    
+    if (itemToUpdate) {
+      itemToUpdate.quantity = quantity;
+      itemToUpdate.subtotal = itemToUpdate.price * quantity;
+    }
+
     loading.value = true;
     error.value = null;
     
@@ -329,19 +352,42 @@ export const useCartStore = defineStore('cart', () => {
         quantity: quantity
       };
       
-      await cartService.updateCartItem(itemData);
-      await loadCart(); // Recargar carrito después de actualizar
+      // Backend returns the updated cart with all items
+      const response = await cartService.updateCartItem(itemData);
+      
+      // Use backend response directly instead of reloading
+      if (response.success && response.data) {
+        let backendItems = [];
+        if (response.data.items && Array.isArray(response.data.items)) {
+          backendItems = mapItemsToCartFormat(response.data.items);
+        } else if (Array.isArray(response.data)) {
+          backendItems = mapItemsToCartFormat(response.data);
+        }
+        
+        // Update with backend data (this ensures consistency)
+        if (backendItems.length > 0) {
+          items.value = backendItems;
+        }
+      }
       
     } catch (err) {
-      console.error('Error updating cart item:', err);
+      // Revert optimistic update on error
+      if (itemToUpdate) {
+        itemToUpdate.quantity = previousQuantity;
+        itemToUpdate.subtotal = previousSubtotal;
+      }
       
-      // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        const message = resolveCartErrorMessage(err, verificationRequiredMessage);
+        error.value = message;
+        errorNotification(message);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para modificar el carrito';
         errorNotification(error.value);
       } else {
-      error.value = err.message || 'Error al actualizar cantidad';
-      errorNotification(error.value);
+        const message = resolveCartErrorMessage(err, 'Error al actualizar cantidad');
+        error.value = message;
+        errorNotification(message);
       }
     } finally {
       loading.value = false;
@@ -365,19 +411,27 @@ export const useCartStore = defineStore('cart', () => {
       success('Carrito vaciado');
       
     } catch (err) {
-      console.error('Error clearing cart:', err);
-      
-      // Manejar errores específicos de autenticación
-      if (err.status === 401 || err.statusCode === 401) {
+      if (err?.verificationRequired) {
+        const message = resolveCartErrorMessage(err, verificationRequiredMessage);
+        error.value = message;
+        errorNotification(message);
+      } else if (err?.status === 401 || err?.statusCode === 401) {
         error.value = 'Debes iniciar sesión para vaciar el carrito';
         errorNotification(error.value);
       } else {
-      error.value = err.message || 'Error al vaciar el carrito';
-      errorNotification(error.value);
+        const message = resolveCartErrorMessage(err, 'Error al vaciar el carrito');
+        error.value = message;
+        errorNotification(message);
       }
     } finally {
       loading.value = false;
     }
+  }
+
+  // Función para resetear el carrito localmente (sin llamadas al servidor)
+  function resetCart() {
+    items.value = [];
+    error.value = null;
   }
 
   // Funciones de UI (mantener compatibilidad)
@@ -395,7 +449,33 @@ export const useCartStore = defineStore('cart', () => {
 
   // Inicializar carrito cuando se autentica
   const initializeCart = async () => {
-    await loadCart();
+    // Prevent multiple simultaneous initializations
+    if (isInitializing.value) {
+      return;
+    }
+    
+    // Si ya está cargando, simplemente esperar a que termine
+    if (loading.value) {
+      // Esperar hasta 5 segundos máximo
+      let attempts = 0;
+      while (loading.value && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      if (!loading.value) {
+        return;
+      }
+    }
+    
+    isInitializing.value = true;
+    try {
+      await loadCart();
+    } catch (error) {
+      console.error('[Cart Store] Error inicializando carrito:', error);
+      // Don't throw - allow app to continue even if cart init fails
+    } finally {
+      isInitializing.value = false;
+    }
   };
 
   return {
@@ -417,6 +497,7 @@ export const useCartStore = defineStore('cart', () => {
     removeFromCart,
     updateQuantity,
     clearCart,
+    resetCart,
     toggleCart,
     openCart,
     closeCart,

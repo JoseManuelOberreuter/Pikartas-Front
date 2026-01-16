@@ -34,7 +34,45 @@ import { ref, computed } from 'vue';
 
 export const useRoutesStore = defineStore('routes', () => {
   // Base URL del backend
-  const baseURL = ref('http://localhost:4005');
+  // In development: use localhost
+  // In production: use VITE_API_BASE_URL or auto-detect
+  const getBaseURL = () => {
+    if (import.meta.env.MODE === 'production') {
+      // Use environment variable if set (remove trailing slash if present)
+      if (import.meta.env.VITE_API_BASE_URL) {
+        const url = import.meta.env.VITE_API_BASE_URL.trim();
+        const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+        // Log for debugging
+        console.log('[RoutesStore] Using VITE_API_BASE_URL:', cleanUrl);
+        return cleanUrl;
+      }
+      // Auto-detect: try to infer backend URL from frontend URL
+      // For Vercel deployments, backend and frontend often follow a pattern
+      // This is a fallback - explicit VITE_API_BASE_URL is recommended
+      const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+      // Replace frontend project name with backend project name pattern
+      // Example: shop-vue-core -> shop-node-core
+      const inferredBackendUrl = currentOrigin.replace(/shop-vue-core/i, 'shop-node-core');
+      // Only use inferred URL if it's different from current origin (avoid loop)
+      if (inferredBackendUrl !== currentOrigin && inferredBackendUrl.startsWith('http')) {
+        console.warn('[RoutesStore] Auto-detecting backend URL:', inferredBackendUrl);
+        console.warn('[RoutesStore] ⚠️ Consider setting VITE_API_BASE_URL explicitly in Vercel environment variables');
+        return inferredBackendUrl;
+      }
+      // Last resort: return original (should never happen in production with proper config)
+      console.error('[RoutesStore] ⚠️ No VITE_API_BASE_URL set and auto-detection failed. Using fallback.');
+      return currentOrigin || 'http://localhost:4005';
+    }
+    // Development mode
+    return 'http://localhost:4005';
+  };
+  
+  const baseURL = ref(getBaseURL());
+  
+  // Log base URL in production for debugging
+  if (import.meta.env.MODE === 'production') {
+    console.log('[RoutesStore] Base URL initialized:', baseURL.value);
+  }
   
   // Rutas de usuarios
   const userRoutes = ref({
@@ -45,7 +83,10 @@ export const useRoutesStore = defineStore('routes', () => {
     resetPassword: '/users/reset-password',
     profile: '/users/profile',
     updateProfile: '/users/profile', // Ruta PUT para actualizar perfil
-    uploadAvatar: '/users/upload-avatar'
+    getAllAdmin: '/users/all', // Ruta GET para obtener todos los usuarios (Admin)
+    getById: '/users', // Base para obtener usuario por ID
+    updateById: '/users', // Base para actualizar usuario por ID
+    deleteById: '/users' // Base para eliminar usuario por ID
   });
 
   // Rutas de productos
@@ -57,7 +98,9 @@ export const useRoutesStore = defineStore('routes', () => {
     delete: '/api/products',
     updateStock: '/api/products',
     getAllAdmin: '/api/products/admin/all',
-    getCategories: '/api/products/categories'
+    getCategories: '/api/products/categories',
+    getFeatured: '/api/products/featured',
+    getOffers: '/api/products/offers'
   });
 
   // Rutas de órdenes
@@ -80,6 +123,17 @@ export const useRoutesStore = defineStore('routes', () => {
     remove: '/api/cart/remove',
     clear: '/api/cart/clear'
   });
+
+  // Rutas de pagos
+  const paymentRoutes = ref({
+    initiate: '/api/payments/initiate',
+    confirm: '/api/payments/confirm',
+    status: '/api/payments/status',
+    refund: '/api/payments/refund'
+  });
+
+  // Ruta de contacto
+  const contactRoute = ref('/api/contact');
 
   // Computed para obtener URLs completas
   const fullUserRoutes = computed(() => {
@@ -112,6 +166,18 @@ export const useRoutesStore = defineStore('routes', () => {
       routes[key] = `${baseURL.value}${cartRoutes.value[key]}`;
     });
     return routes;
+  });
+
+  const fullPaymentRoutes = computed(() => {
+    const routes = {};
+    Object.keys(paymentRoutes.value).forEach(key => {
+      routes[key] = `${baseURL.value}${paymentRoutes.value[key]}`;
+    });
+    return routes;
+  });
+
+  const fullContactRoute = computed(() => {
+    return `${baseURL.value}${contactRoute.value}`;
   });
 
   // Métodos para construir URLs dinámicas
@@ -155,6 +221,27 @@ export const useRoutesStore = defineStore('routes', () => {
     return `${baseURL.value}${cartRoutes.value.remove}/${productId}`;
   };
 
+  const getPaymentStatusUrl = (orderId) => {
+    return `${baseURL.value}${paymentRoutes.value.status}/${orderId}`;
+  };
+
+  const getRefundPaymentUrl = (orderId) => {
+    return `${baseURL.value}${paymentRoutes.value.refund}/${orderId}`;
+  };
+
+  // Métodos para URLs de administración de usuarios
+  const getUserByIdUrl = (id) => {
+    return `${baseURL.value}${userRoutes.value.getById}/${id}`;
+  };
+
+  const getUpdateUserUrl = (id) => {
+    return `${baseURL.value}${userRoutes.value.updateById}/${id}`;
+  };
+
+  const getDeleteUserUrl = (id) => {
+    return `${baseURL.value}${userRoutes.value.deleteById}/${id}`;
+  };
+
   // Método para cambiar la base URL (útil para diferentes ambientes)
   const setBaseURL = (newBaseURL) => {
     baseURL.value = newBaseURL;
@@ -166,7 +253,8 @@ export const useRoutesStore = defineStore('routes', () => {
       users: fullUserRoutes.value,
       products: fullProductRoutes.value,
       orders: fullOrderRoutes.value,
-      cart: fullCartRoutes.value
+      cart: fullCartRoutes.value,
+      payments: fullPaymentRoutes.value
     };
   });
 
@@ -177,12 +265,16 @@ export const useRoutesStore = defineStore('routes', () => {
     productRoutes,
     orderRoutes,
     cartRoutes,
+    paymentRoutes,
+    contactRoute,
     
     // Computed
     fullUserRoutes,
     fullProductRoutes,
     fullOrderRoutes,
     fullCartRoutes,
+    fullPaymentRoutes,
+    fullContactRoute,
     getAllRoutes,
     
     // Métodos
@@ -196,6 +288,11 @@ export const useRoutesStore = defineStore('routes', () => {
     getOrderByIdUrl,
     getCancelOrderUrl,
     getUpdateOrderStatusUrl,
-    getRemoveFromCartUrl
+    getRemoveFromCartUrl,
+    getPaymentStatusUrl,
+    getRefundPaymentUrl,
+    getUserByIdUrl,
+    getUpdateUserUrl,
+    getDeleteUserUrl
   };
 }); 

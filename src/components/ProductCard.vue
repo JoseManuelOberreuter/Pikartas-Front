@@ -2,6 +2,12 @@
   <div class="product-card">
     <div class="product-image">
       <img :src="product.image" :alt="product.name" />
+      <div class="product-badges">
+        <span class="badge badge-sale" v-if="isOnSale">
+          <font-awesome-icon icon="tag" class="badge-icon" />
+          {{ discountPercentage }}% OFF
+        </span>
+      </div>
       <div class="product-actions">
         <button class="quick-view-btn" @click="viewProduct">
           <font-awesome-icon icon="eye" class="btn-icon" />
@@ -18,16 +24,9 @@
       <h3 class="product-name">{{ product.name }}</h3>
       <p class="product-category">{{ product.category }}</p>
       <div class="product-price">
-        ${{ product.price }}
-      </div>
-      <div class="product-stock" v-if="product.stock <= 10">
-        <span class="stock-warning" v-if="product.stock > 0">
-          <font-awesome-icon icon="exclamation-triangle" class="warning-icon" />
-          Solo quedan {{ product.stock }} unidades
-        </span>
-        <span class="out-of-stock" v-else>
-          <font-awesome-icon icon="times-circle" class="error-icon" />
-          Sin stock
+        <span v-if="isOnSale" class="price-original">${{ formatCLP(product.price) }}</span>
+        <span :class="{ 'price-sale': isOnSale, 'price-normal': !isOnSale }">
+          ${{ formatCLP(displayPrice) }}
         </span>
       </div>
     </div>
@@ -35,7 +34,9 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useCartStore } from '../stores/cart.js'
+import { formatCLP } from '../utils/formatters.js'
 
 const props = defineProps({
   product: {
@@ -47,6 +48,39 @@ const props = defineProps({
 const emit = defineEmits(['view-product'])
 const cartStore = useCartStore()
 
+// Check if product is currently on sale (within date range)
+const isOnSale = computed(() => {
+  if (!props.product.is_on_sale || !props.product.discount_percentage) {
+    return false
+  }
+  
+  const now = new Date()
+  const startDate = props.product.sale_start_date ? new Date(props.product.sale_start_date) : null
+  const endDate = props.product.sale_end_date ? new Date(props.product.sale_end_date) : null
+  
+  if (!startDate || !endDate) {
+    return false
+  }
+  
+  return now >= startDate && now <= endDate
+})
+
+// Calculate discount percentage
+const discountPercentage = computed(() => {
+  if (!isOnSale.value || !props.product.discount_percentage) {
+    return 0
+  }
+  return Math.round(props.product.discount_percentage)
+})
+
+// Calculate display price (sale price if on sale, otherwise regular price)
+const displayPrice = computed(() => {
+  if (isOnSale.value && props.product.discount_percentage) {
+    return props.product.price * (1 - props.product.discount_percentage / 100)
+  }
+  return props.product.price
+})
+
 const addToCart = async () => {
   if (props.product.stock > 0) {
     await cartStore.addToCart(props.product)
@@ -55,8 +89,6 @@ const addToCart = async () => {
 }
 
 const viewProduct = () => {
-  console.log('🔍 ProductCard: Producto completo:', props.product);
-  console.log('🎯 ProductCard: ID del producto:', props.product.id);
   emit('view-product', props.product.id)
 }
 </script>
@@ -81,6 +113,44 @@ const viewProduct = () => {
   position: relative;
   overflow: hidden;
   height: 240px;
+}
+
+.product-badges {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  padding: 0.375rem 0.625rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+}
+
+.badge-sale {
+  color: #dc3545;
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.95) 0%, rgba(255, 0, 0, 0.95) 100%);
+  color: white;
+}
+
+.badge-sale .badge-icon {
+  color: white;
+}
+
+.badge-icon {
+  font-size: 0.7rem;
 }
 
 .product-image img {
@@ -197,40 +267,30 @@ const viewProduct = () => {
 }
 
 .product-price {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0;
+}
+
+.price-normal {
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-quaternary);
   margin-bottom: 0.5rem;
 }
 
-.product-stock {
-  font-size: 0.875rem;
+.price-sale {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #dc3545;
 }
 
-.stock-warning {
-  color: var(--color-primary);
+.price-original {
+  font-size: 1rem;
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.stock-warning .warning-icon {
-  color: var(--color-primary);
-  font-size: 0.875rem;
-}
-
-.out-of-stock {
-  color: var(--color-quaternary);
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.out-of-stock .error-icon {
-  color: var(--color-quaternary);
-  font-size: 0.875rem;
+  color: #6c757d;
+  text-decoration: line-through;
 }
 
 @media (max-width: 768px) {

@@ -34,12 +34,38 @@ cd simple-web-template
 npm install
 ```
 
-3. Inicia el servidor de desarrollo:
+3. **Configurar variables de entorno** (opcional para desarrollo)
+   
+   Para desarrollo local, las variables de entorno son opcionales ya que el frontend usa `http://localhost:4005` por defecto.
+   
+   Para producción, crea un archivo `.env.production` basándote en `.env.production.example`:
+   ```env
+    VITE_API_BASE_URL=https://tu-backend.vercel.app
+    VITE_EMAILJS_SERVICE_ID=service_dsadsa
+    VITE_EMAILJS_TEMPLATE_ID=template_dsadsad
+    VITE_EMAILJS_PUBLIC_KEY=dsadsadsadfasdsa
+   ```
+
+4. Inicia el servidor de desarrollo:
 ```bash
 npm run dev
 ```
 
-4. Abre tu navegador en `http://localhost:5173`
+5. Abre tu navegador en `http://localhost:5173`
+
+## Configuración para Despliegue
+
+### Variables de Entorno en Vercel
+
+Para desplegar el frontend en Vercel con un nombre diferente:
+
+1. En el dashboard de Vercel, ve a Settings > Environment Variables
+2. Agrega la variable `VITE_API_BASE_URL` con la URL de tu backend:
+   - Ejemplo: `https://tu-backend-nombre.vercel.app`
+
+### Auto-detección de Backend
+
+El frontend intenta detectar automáticamente la URL del backend en producción basándose en el nombre del proyecto. Si tu frontend se llama `shop-vue-core` y tu backend `shop-node-core`, la detección automática funcionará. Sin embargo, se recomienda configurar explícitamente `VITE_API_BASE_URL` para mayor control.
 
 ## Comandos Disponibles
 

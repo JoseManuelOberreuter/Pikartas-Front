@@ -5,24 +5,8 @@
       <div class="profile-header">
         <div class="avatar-section">
           <div class="avatar-container">
-            <img 
-              :src="userAvatar" 
-              :alt="authStore.user?.name || 'Usuario'"
-              class="avatar"
-              @error="handleAvatarError"
-            />
-            <div class="avatar-overlay" @click="openAvatarModal">
-              <font-awesome-icon icon="camera" class="avatar-edit-icon" />
-              <span class="avatar-edit-text">Cambiar</span>
-            </div>
+            <font-awesome-icon icon="user" class="avatar-icon" />
           </div>
-          <input 
-            ref="avatarInput"
-            type="file"
-            accept="image/*"
-            @change="handleAvatarChange"
-            style="display: none"
-          />
         </div>
         
         <div class="user-info">
@@ -192,7 +176,6 @@ const authStore = useAuthStore()
 const { success, error, warning, info } = useNotifications()
 
 // Refs
-const avatarInput = ref(null)
 const editMode = ref(false)
 const saving = ref(false)
 
@@ -206,17 +189,11 @@ const profileForm = reactive({
   telefono: '',
   fechaNacimiento: '',
   direccion: '',
-  avatar: '',
   role: ''
 })
 
 
 
-
-// Computed
-const userAvatar = computed(() => {
-  return authStore.user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(authStore.user?.name || 'Usuario')}&background=ddebc7&color=4a5d23&size=150`
-})
 
 // Methods
 const loadUserData = () => {
@@ -227,7 +204,6 @@ const loadUserData = () => {
     profileForm.telefono = authStore.user.telefono || authStore.user.phone || ''
     profileForm.fechaNacimiento = authStore.user.fechaNacimiento || authStore.user.birthDate || ''
     profileForm.direccion = authStore.user.direccion || authStore.user.address || ''
-    profileForm.avatar = authStore.user.avatar || ''
     profileForm.role = authStore.user.role || 'user'
   }
 }
@@ -266,49 +242,6 @@ const saveProfile = async () => {
   } finally {
     saving.value = false
   }
-}
-
-const openAvatarModal = () => {
-  avatarInput.value?.click()
-}
-
-const handleAvatarChange = async (event) => {
-  const file = event.target.files[0]
-  if (!file) return
-
-  // Validar tipo de archivo
-  if (!file.type.startsWith('image/')) {
-    error('Por favor selecciona una imagen válida')
-    return
-  }
-
-  // Validar tamaño (máx 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    error('La imagen debe ser menor a 5MB')
-    return
-  }
-
-  try {
-    const formData = new FormData()
-    formData.append('avatar', file)
-
-    info('Subiendo avatar...', 2000)
-    
-    const response = await authService.uploadAvatar(formData)
-    
-    // Actualizar el avatar en el store si la respuesta incluye la nueva URL
-    if (response.avatarUrl) {
-      authStore.user.avatar = response.avatarUrl
-    }
-    
-    success('Avatar actualizado exitosamente')
-  } catch (err) {
-    error('Error al subir el avatar: ' + (err.message || 'Error desconocido'))
-  }
-}
-
-const handleAvatarError = (event) => {
-  event.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(authStore.user?.name || 'Usuario')}&background=ddebc7&color=4a5d23&size=150`
 }
 
 const changePassword = async () => {
@@ -368,53 +301,31 @@ onMounted(() => {
 
 .avatar-container {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+  border: 4px solid var(--color-primary);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all var(--transition-normal);
 }
 
 .avatar-container:hover {
   transform: scale(1.05);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
 }
 
-.avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.avatar-icon {
+  font-size: 4rem;
   color: white;
-  font-size: 0.875rem;
-}
-
-.avatar-container:hover .avatar-overlay {
-  opacity: 1;
-}
-
-.avatar-edit-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.25rem;
-  color: var(--icon-profile-camera);
   transition: all var(--transition-normal);
 }
 
-.avatar-overlay:hover .avatar-edit-icon {
+.avatar-container:hover .avatar-icon {
   transform: scale(1.1);
 }
 
