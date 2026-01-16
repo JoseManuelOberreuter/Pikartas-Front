@@ -11,7 +11,7 @@
       <div class="form-container">
           <form @submit.prevent="handleSubmit" class="contact-form">
             <div class="form-group">
-              <label for="name">Nombre *</label>
+              <label for="name" class="text-body-accent">Nombre *</label>
               <input
                 id="name"
                 v-model="form.name"
@@ -20,11 +20,11 @@
                 required
                 :class="{ 'error': errors.name }"
               />
-              <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
+              <span v-if="errors.name" class="error-message text-body-accent">{{ errors.name }}</span>
             </div>
 
             <div class="form-group">
-              <label for="email">Email *</label>
+              <label for="email" class="text-body-accent">Email *</label>
               <input
                 id="email"
                 v-model="form.email"
@@ -33,11 +33,11 @@
                 required
                 :class="{ 'error': errors.email }"
               />
-              <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
+              <span v-if="errors.email" class="error-message text-body-accent">{{ errors.email }}</span>
             </div>
 
             <div class="form-group">
-              <label for="subject">Asunto *</label>
+              <label for="subject" class="text-body-accent">Asunto *</label>
               <input
                 id="subject"
                 v-model="form.subject"
@@ -46,11 +46,11 @@
                 required
                 :class="{ 'error': errors.subject }"
               />
-              <span v-if="errors.subject" class="error-message">{{ errors.subject }}</span>
+              <span v-if="errors.subject" class="error-message text-body-accent">{{ errors.subject }}</span>
             </div>
 
             <div class="form-group">
-              <label for="message">Mensaje *</label>
+              <label for="message" class="text-body-accent">Mensaje *</label>
               <textarea
                 id="message"
                 v-model="form.message"
@@ -59,8 +59,8 @@
                 required
                 :class="{ 'error': errors.message }"
               ></textarea>
-              <span v-if="errors.message" class="error-message">{{ errors.message }}</span>
-              <span class="char-count">{{ form.message.length }}/5000</span>
+              <span v-if="errors.message" class="error-message text-body-accent">{{ errors.message }}</span>
+              <span class="char-count text-body-accent">{{ form.message.length }}/5000</span>
             </div>
 
             <button 
@@ -219,12 +219,12 @@ const handleSubmit = async () => {
 
 .contact-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 
 .contact-header h1 {
   font-size: clamp(1.5rem, 4vw, 2.5rem);
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.5rem 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,52 +244,92 @@ const handleSubmit = async () => {
   margin: 0 auto;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
-  padding: 2.5rem;
+  padding: 3rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   border: 2px solid var(--color-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.form-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-primary);
+  opacity: 0.8;
 }
 
 .contact-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl);
+  gap: var(--spacing-2xl);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  position: relative;
 }
 
 .form-group label {
-  font-weight: 600;
-  color: var(--color-white);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 .form-group input,
 .form-group textarea {
-  padding: 0.75rem;
-  border: 1px solid var(--color-primary);
-  border-radius: 6px;
-  font-size: 1rem;
+  padding: 0.875rem 1rem;
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
+  font-size: var(--font-size-base);
   font-family: inherit;
-  transition: all 0.3s;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--color-black);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  color: var(--color-white) !important;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+  opacity: 1;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
   border-color: var(--color-quaternary);
+  background: rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+  color: var(--color-white);
 }
 
+.form-group input:hover:not(:focus),
+.form-group textarea:hover:not(:focus) {
+  border-color: var(--color-primary-light);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* CAMBIO: El borde NO debe ser rojo cuando hay error */
 .form-group input.error,
 .form-group textarea.error {
-  border-color: #ef4444;
+  /* border-color: var(--color-quaternary);  Eliminado el borde rojo */
+  border-color: var(--color-primary);  /* Mantiene el borde normal */
+  background: rgba(255, 0, 0, 0.1);
+  color: var(--color-white) !important;
+}
+
+.form-group input.error:focus,
+.form-group textarea.error:focus {
+  /* box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);   Eliminado el borde rojo en focus */
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);   /* Igual que focus normal */
 }
 
 .form-group textarea {
@@ -298,41 +338,50 @@ const handleSubmit = async () => {
 }
 
 .error-message {
-  color: #ef4444;
+  color: var(--color-quaternary);
   font-size: var(--font-size-sm);
   margin-top: var(--spacing-xs);
 }
 
 .char-count {
   font-size: var(--font-size-xs);
-  color: var(--color-gray-500);
   text-align: right;
   margin-top: var(--spacing-xs);
+  opacity: 0.7;
 }
 
 .btn-submit {
-  margin-top: 1.5rem;
-  padding: 0.75rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
+  margin-top: 2rem;
+  padding: 1rem 2.5rem;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  min-height: 50px;
+  gap: 0.75rem;
+  min-height: 56px;
   background: var(--color-primary);
   color: var(--color-black);
-  border: none;
-  border-radius: 6px;
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all var(--transition-normal);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(253, 179, 28, 0.3);
 }
 
 .btn-submit:hover:not(:disabled) {
   background: var(--color-quaternary);
   color: var(--color-white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  border-color: var(--color-quaternary);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
 }
 
 .btn-submit:disabled {

@@ -463,7 +463,7 @@ const handleForgotPassword = async () => {
 
 .auth-switch {
   text-align: center;
-  margin: 0;
+  margin: var(--spacing-2xl) 0 0 0;
   color: var(--color-white);
   font-size: var(--font-size-sm);
 }
@@ -482,7 +482,7 @@ const handleForgotPassword = async () => {
 
 .forgot-password {
   text-align: center;
-  margin: 0 0 var(--spacing-lg) 0;
+  margin: var(--spacing-2xl) 0 var(--spacing-xl) 0;
   color: var(--color-white);
   font-size: var(--font-size-sm);
 }

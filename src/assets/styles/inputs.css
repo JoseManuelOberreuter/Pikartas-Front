@@ -25,7 +25,7 @@
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
-  color: var(--color-white);
+  color: var(--color-white) !important;
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   min-width: 150px;
@@ -41,6 +41,7 @@
 .filter-select:hover {
   border-color: var(--color-quaternary);
   background: rgba(0, 0, 0, 0.5);
+  color: var(--color-white);
 }
 
 .filter-select:focus {
@@ -48,6 +49,7 @@
   border-color: var(--color-quaternary);
   box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
   background: rgba(0, 0, 0, 0.5);
+  color: var(--color-white) ;
 }
 
 .filter-select option {
@@ -76,8 +78,14 @@
 .filter-reset-btn:hover {
   background: rgba(0, 0, 0, 0.6);
   border-color: var(--color-quaternary);
+  color: var(--color-white);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.filter-reset-btn svg,
+.filter-reset-btn .fa-icon {
+  color: var(--color-white);
 }
 
 /* === BÚSQUEDA REUTILIZABLE === */
@@ -94,7 +102,7 @@
   font-size: var(--font-size-base);
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
-  color: var(--color-white);
+  color: var(--color-white) !important;
   transition: all var(--transition-normal);
 }
 
@@ -107,6 +115,7 @@
   border-color: var(--color-quaternary);
   box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
   background: rgba(0, 0, 0, 0.5);
+  color: var(--color-white) !important;
 }
 
 .search-icon {

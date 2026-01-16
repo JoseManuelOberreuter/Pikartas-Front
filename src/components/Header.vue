@@ -675,6 +675,7 @@ onUnmounted(() => {
   cursor: pointer;
   font-weight: var(--font-weight-medium);
   font-size: 0.5rem;
+  line-height: 1.6;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   -webkit-font-smoothing: none;
   font-smooth: never;
@@ -690,8 +691,10 @@ onUnmounted(() => {
   justify-content: center;
 }
 .btn-sm {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: 0.6rem;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.65rem;
+  line-height: 1.8;
+  min-height: 42px;
 }
 .btn-outline {
   background: transparent;

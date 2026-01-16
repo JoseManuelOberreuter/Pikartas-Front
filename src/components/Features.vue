@@ -96,17 +96,11 @@
 }
 
 .feature-card h3 {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
   margin: 0 0 var(--spacing-lg) 0;
-  color: var(--color-primary);
 }
 
 .feature-card p {
-  color: var(--color-white);
-  line-height: var(--line-height-relaxed);
   margin: 0;
-  font-size: var(--font-size-base);
 }
 
 /* Responsive Design */

@@ -6,20 +6,19 @@
         <p class="text-hero-subtitle">Descubre las mejores ofertas en cartas Pokémon</p>
       </div>
 
-      <div class="results-info">
-        <p v-if="!loading">Mostrando {{ products.length }} productos en oferta</p>
-        <p v-else>Cargando ofertas...</p>
+      <div class="results-info overlay-dark">
+        <p v-if="!loading" class="text-hero-subtitle">Mostrando {{ products.length }} productos en oferta</p>
+        <p v-else class="text-hero-subtitle">Cargando ofertas...</p>
       </div>
 
-      <div v-if="loading" class="loading-state">
+      <div v-if="loading" class="loading-state overlay-dark">
         <font-awesome-icon icon="spinner" class="loading-spinner" spin />
-        <p>Cargando ofertas desde el servidor...</p>
+        <p class="text-hero-subtitle">Cargando ofertas desde el servidor...</p>
       </div>
 
-      <div v-else-if="products.length === 0" class="empty-state">
-        <font-awesome-icon icon="tag" class="empty-icon" />
-        <h3>No hay ofertas disponibles</h3>
-        <p>No hay productos en oferta en este momento. ¡Vuelve pronto para ver nuestras ofertas especiales!</p>
+      <div v-else-if="products.length === 0" class="empty-state overlay-dark">
+        <h3 class="text-title-quaternary">No hay ofertas disponibles</h3>
+        <p class="text-hero-subtitle">No hay productos en oferta en este momento. ¡Vuelve pronto para ver nuestras ofertas especiales!</p>
         <router-link to="/shop" class="btn btn-primary">
           <font-awesome-icon icon="store" class="btn-icon" />
           Ver Tienda Completa
@@ -126,12 +125,12 @@ onMounted(async () => {
 
 .offers-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 
 .offers-header h1 {
   font-size: clamp(1.5rem, 4vw, 2.5rem);
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.5rem 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -147,8 +146,8 @@ onMounted(async () => {
 }
 
 .results-info {
-  margin-bottom: 2rem;
-  padding: 1rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
   border: 1px solid var(--color-primary);
@@ -156,11 +155,6 @@ onMounted(async () => {
   text-align: center;
 }
 
-.results-info p {
-  margin: 0;
-  color: var(--color-white);
-  font-weight: 500;
-}
 
 .loading-state,
 .empty-state {
@@ -170,6 +164,15 @@ onMounted(async () => {
   backdrop-filter: blur(10px);
   border-radius: 12px;
   border: 1px solid var(--color-primary);
+  margin-bottom: 3rem;
+}
+
+.empty-state h3 {
+  margin: 0 0 1.5rem 0;
+}
+
+.empty-state p {
+  margin: 0 0 2rem 0;
 }
 
 .loading-spinner {
@@ -184,36 +187,6 @@ onMounted(async () => {
   100% { transform: rotate(360deg); }
 }
 
-.loading-state p {
-  margin: 0;
-  color: var(--color-white);
-  font-size: 1.1rem;
-}
-
-.empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1.5rem;
-  color: var(--color-primary);
-  opacity: 0.5;
-  transition: all var(--transition-normal);
-}
-
-.empty-state:hover .empty-icon {
-  opacity: 0.7;
-  transform: scale(1.05);
-}
-
-.empty-state h3 {
-  margin: 0 0 1rem 0;
-  color: var(--color-white);
-  font-size: 1.5rem;
-}
-
-.empty-state p {
-  margin: 0 0 2rem 0;
-  color: var(--color-white);
-  font-size: 1rem;
-}
 
 .products-grid {
   display: grid;

@@ -51,19 +51,18 @@
 
       <div v-if="loading" class="loading-state">
         <font-awesome-icon icon="spinner" class="loading-spinner" spin />
-        <p>Cargando productos desde el servidor...</p>
+        <p class="text-hero-subtitle">Cargando productos desde el servidor...</p>
       </div>
 
       <div v-else-if="products.length === 0" class="empty-state">
-        <font-awesome-icon icon="box" class="empty-icon" />
-        <h3>No hay productos disponibles</h3>
-        <p>No se pudieron cargar los productos del servidor.</p>
+        <h3 class="text-title-quaternary">No hay productos disponibles</h3>
+        <p class="text-hero-subtitle">No se pudieron cargar los productos del servidor.</p>
       </div>
 
       <div v-else-if="filteredProducts.length === 0" class="no-results">
         <font-awesome-icon icon="times-circle" class="no-results-icon" />
-        <h3>No se encontraron productos</h3>
-        <p>Intenta ajustar los filtros o buscar con otros términos</p>
+        <h3 class="text-title-quaternary">No se encontraron productos</h3>
+        <p class="text-hero-subtitle">Intenta ajustar los filtros o buscar con otros términos</p>
         <button @click="resetFilters" class="btn btn-primary">
           Limpiar Filtros
         </button>
@@ -287,12 +286,12 @@ onMounted(async () => {
 
 .shop-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 
 .shop-header h1 {
   font-size: clamp(1.5rem, 4vw, 2.5rem);
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.5rem 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -322,14 +321,14 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   gap: 1.5rem;
   flex-wrap: wrap;
 }
 
 .results-info {
-  margin-bottom: 2rem;
-  padding: 1rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
   border: 1px solid var(--color-primary);
@@ -349,6 +348,7 @@ onMounted(async () => {
   backdrop-filter: blur(10px);
   border-radius: 12px;
   border: 1px solid var(--color-primary);
+  margin-bottom: 3rem;
 }
 
 .loading-spinner {
@@ -363,36 +363,6 @@ onMounted(async () => {
   100% { transform: rotate(360deg); }
 }
 
-.loading-state p {
-  margin: 0;
-  color: var(--color-white);
-  font-size: 1.1rem;
-}
-
-.empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1.5rem;
-  color: var(--color-primary);
-  opacity: 0.5;
-  transition: all var(--transition-normal);
-}
-
-.empty-state:hover .empty-icon {
-  opacity: 0.7;
-  transform: scale(1.05);
-}
-
-.empty-state h3 {
-  margin: 0 0 1rem 0;
-  color: var(--color-white);
-  font-size: 1.5rem;
-}
-
-.empty-state p {
-  margin: 0;
-  color: var(--color-white);
-  font-size: 1rem;
-}
 
 .products-grid {
   display: grid;
@@ -422,7 +392,16 @@ onMounted(async () => {
   backdrop-filter: blur(10px);
   border: 1px solid var(--color-primary);
   border-radius: 12px;
-  margin-top: 2rem;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+.no-results h3 {
+  margin: 0 0 1.5rem 0;
+}
+
+.no-results p {
+  margin: 0 0 2rem 0;
 }
 
 .no-results-icon {
@@ -436,17 +415,6 @@ onMounted(async () => {
   transform: scale(1.05);
 }
 
-.no-results h3 {
-  margin: 0 0 1rem 0;
-  color: var(--color-white);
-  font-size: 1.5rem;
-}
-
-.no-results p {
-  margin: 0 0 2rem 0;
-  color: var(--color-white);
-  font-size: 1.1rem;
-}
 
 .btn {
   padding: 0.75rem 1.5rem;
