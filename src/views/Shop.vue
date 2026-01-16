@@ -2,15 +2,15 @@
   <div class="shop">
     <div class="container">
       <div class="shop-header">
-        <h1><font-awesome-icon icon="dice-d20" class="shop-header-icon" /> Nuestra Tienda</h1>
+        <h1 class="text-hero-title"><font-awesome-icon icon="dice-d20" class="shop-header-icon" /> Nuestra Tienda</h1>
         <p class="text-hero-subtitle">Explora nuestra colección de cartas Pokémon</p>
       </div>
 
       <div class="shop-controls">
-        <div class="filters">
+        <div class="filter-container">
           <div class="filter-group">
-            <label>Categoría:</label>
-            <select v-model="selectedCategory" @change="filterProducts">
+            <label class="filter-label text-hero-subtitle">Categoría:</label>
+            <select v-model="selectedCategory" @change="filterProducts" class="filter-select">
               <option v-for="category in categories" :key="category" :value="category">
                 {{ category }}
               </option>
@@ -18,21 +18,21 @@
           </div>
           
           <div class="filter-group">
-            <label>Ordenar por:</label>
-            <select v-model="sortBy" @change="sortProducts">
+            <label class="filter-label text-hero-subtitle">Ordenar por:</label>
+            <select v-model="sortBy" @change="sortProducts" class="filter-select">
               <option value="name">Nombre</option>
               <option value="price-low">Precio: Menor a Mayor</option>
               <option value="price-high">Precio: Mayor a Menor</option>
             </select>
           </div>
           
-          <button @click="resetFilters" class="reset-btn" title="Limpiar filtros">
-            <font-awesome-icon icon="times" class="reset-icon" />
+          <button @click="resetFilters" class="filter-reset-btn" title="Limpiar filtros">
+            <font-awesome-icon icon="times" />
             Limpiar
           </button>
         </div>
         
-        <div class="search-box">
+        <div class="search-container">
           <input 
             type="text" 
             v-model="searchQuery" 
@@ -45,8 +45,8 @@
       </div>
 
       <div class="results-info">
-        <p v-if="!loading">Mostrando {{ filteredProducts.length }} productos</p>
-        <p v-else>Cargando productos...</p>
+        <p v-if="!loading" class="text-hero-subtitle">Mostrando {{ filteredProducts.length }} productos</p>
+        <p v-else class="text-hero-subtitle">Cargando productos...</p>
       </div>
 
       <div v-if="loading" class="loading-state">
@@ -291,28 +291,12 @@ onMounted(async () => {
 }
 
 .shop-header h1 {
-  font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: clamp(1.5rem, 4vw, 2.5rem);
   margin: 0 0 1rem 0;
-  color: var(--color-white);
-  font-weight: normal;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  text-shadow: 
-    3px 3px 0px rgba(0, 0, 0, 0.9),
-    6px 6px 0px rgba(0, 0, 0, 0.7),
-    -2px -2px 0px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(255, 215, 0, 0.4),
-    0 0 60px rgba(255, 215, 0, 0.3),
-    0 8px 16px rgba(0, 0, 0, 0.8);
-  letter-spacing: 0.5px;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-  -webkit-font-smoothing: none;
-  font-smooth: never;
 }
 
 .shop-header-icon {
@@ -343,98 +327,6 @@ onMounted(async () => {
   flex-wrap: wrap;
 }
 
-.filters {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.filter-group label {
-  font-weight: 600;
-  color: var(--color-white);
-  font-size: 0.875rem;
-}
-
-.filter-group select {
-  padding: 0.5rem;
-  border: 1px solid var(--color-primary);
-  border-radius: 4px;
-  background: var(--color-white);
-  color: var(--color-black);
-  font-size: 0.875rem;
-  min-width: 120px;
-}
-
-.reset-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-  color: #666;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s;
-  white-space: nowrap;
-}
-
-.reset-btn:hover {
-  background: #f8f9fa;
-  border-color: #007bff;
-  color: #007bff;
-  transform: translateY(-1px);
-}
-
-.reset-icon {
-  font-size: 0.875rem;
-}
-
-.search-box {
-  position: relative;
-  min-width: 250px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
-  border: 1px solid var(--color-primary);
-  border-radius: 25px;
-  font-size: 1rem;
-  background: var(--color-white);
-  color: var(--color-black);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--color-quaternary);
-  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
-}
-
-.search-icon {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-primary);
-  font-size: 1rem;
-  transition: all var(--transition-normal);
-}
-
-.search-input:focus + .search-icon {
-  color: var(--color-quaternary);
-  transform: translateY(-50%) scale(1.1);
-}
-
 .results-info {
   margin-bottom: 2rem;
   padding: 1rem;
@@ -447,8 +339,6 @@ onMounted(async () => {
 
 .results-info p {
   margin: 0;
-  color: var(--color-white);
-  font-weight: 500;
 }
 
 .loading-state,
@@ -596,20 +486,6 @@ onMounted(async () => {
     gap: 1.5rem;
   }
   
-  .filters {
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  
-  .filter-group {
-    flex: 1;
-    min-width: 100px;
-  }
-  
-  .search-box {
-    min-width: auto;
-  }
-  
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
@@ -643,53 +519,6 @@ onMounted(async () => {
   .shop-controls {
     gap: 1rem;
     margin-bottom: 1.5rem;
-  }
-  
-  .filters {
-    flex-direction: column;
-    gap: 0.75rem;
-    width: 100%;
-  }
-  
-  .filter-group {
-    flex: none;
-    width: 100%;
-  }
-  
-  .filter-group label {
-    font-size: 0.8rem;
-    margin-bottom: 0.25rem;
-  }
-  
-  .filter-group select {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 0.9rem;
-    min-width: auto;
-    border-radius: 6px;
-  }
-  
-  .reset-btn {
-    width: 100%;
-    justify-content: center;
-    padding: 0.75rem;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-  }
-  
-  .search-box {
-    width: 100%;
-    min-width: auto;
-  }
-  
-  .search-input {
-    padding: 0.75rem 2.5rem 0.75rem 1rem;
-    font-size: 0.9rem;
-  }
-  
-  .search-icon {
-    right: 0.75rem;
-    font-size: 0.9rem;
   }
   
   .results-info {

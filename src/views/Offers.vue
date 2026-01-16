@@ -2,7 +2,7 @@
   <div class="offers">
     <div class="container">
       <div class="offers-header">
-        <h1>Ofertas Especiales</h1>
+        <h1 class="text-hero-title">Ofertas Especiales</h1>
         <p class="text-hero-subtitle">Descubre las mejores ofertas en cartas Pokémon</p>
       </div>
 
@@ -130,28 +130,12 @@ onMounted(async () => {
 }
 
 .offers-header h1 {
-  font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: clamp(1.5rem, 4vw, 2.5rem);
   margin: 0 0 1rem 0;
-  color: var(--color-white);
-  font-weight: normal;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  text-shadow: 
-    3px 3px 0px rgba(0, 0, 0, 0.9),
-    6px 6px 0px rgba(0, 0, 0, 0.7),
-    -2px -2px 0px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(255, 215, 0, 0.4),
-    0 0 60px rgba(255, 215, 0, 0.3),
-    0 8px 16px rgba(0, 0, 0, 0.8);
-  letter-spacing: 0.5px;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-  -webkit-font-smoothing: none;
-  font-smooth: never;
 }
 
 .offers-header p {

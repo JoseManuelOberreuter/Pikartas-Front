@@ -1,0 +1,115 @@
+/* ===== TIPOGRAFÍA Y TEXTOS ===== */
+
+/* === TÍTULOS PRINCIPALES === */
+
+/* Título Hero - Blanco con borde negro */
+.text-hero-title {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-weight: normal;
+  color: var(--color-white);
+  text-shadow: 
+    3px 3px 0px rgba(0, 0, 0, 1),
+    -3px -3px 0px rgba(0, 0, 0, 1),
+    3px -3px 0px rgba(0, 0, 0, 1),
+    -3px 3px 0px rgba(0, 0, 0, 1),
+    0 3px 0px rgba(0, 0, 0, 1),
+    0 -3px 0px rgba(0, 0, 0, 1),
+    3px 0 0px rgba(0, 0, 0, 1),
+    -3px 0 0px rgba(0, 0, 0, 1);
+  letter-spacing: 0.5px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+/* Título Primary - Amarillo con borde negro */
+.text-title-primary {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-weight: normal;
+  color: var(--color-primary);
+  text-shadow: 
+    3px 3px 0px rgba(0, 0, 0, 1),
+    -3px -3px 0px rgba(0, 0, 0, 1),
+    3px -3px 0px rgba(0, 0, 0, 1),
+    -3px 3px 0px rgba(0, 0, 0, 1),
+    0 3px 0px rgba(0, 0, 0, 1),
+    0 -3px 0px rgba(0, 0, 0, 1),
+    3px 0 0px rgba(0, 0, 0, 1),
+    -3px 0 0px rgba(0, 0, 0, 1);
+  letter-spacing: 0.5px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+/* Título Quaternary - Rojo con borde negro */
+.text-title-quaternary {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-weight: normal;
+  color: var(--color-quaternary);
+  text-shadow: 
+    3px 3px 0px rgba(0, 0, 0, 1),
+    -3px -3px 0px rgba(0, 0, 0, 1),
+    3px -3px 0px rgba(0, 0, 0, 1),
+    -3px 3px 0px rgba(0, 0, 0, 1),
+    0 3px 0px rgba(0, 0, 0, 1),
+    0 -3px 0px rgba(0, 0, 0, 1),
+    3px 0 0px rgba(0, 0, 0, 1),
+    -3px 0 0px rgba(0, 0, 0, 1);
+  letter-spacing: 0.5px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+/* === TEXTOS Y SUBTÍTULOS === */
+
+/* Subtítulo Hero - Blanco con borde negro */
+.text-hero-subtitle {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
+  line-height: var(--line-height-relaxed);
+  letter-spacing: 0.1rem;
+  text-shadow: 
+    2px 2px 0px rgba(0, 0, 0, 0.5),
+    -2px -2px 0px rgba(0, 0, 0, 0.5),
+    2px -2px 0px rgba(0, 0, 0, 0.5),
+    -2px 2px 0px rgba(0, 0, 0, 0.5),
+    0 2px 0px rgba(0, 0, 0, 0.5),
+    0 -2px 0px rgba(0, 0, 0, 0.5),
+    2px 0 0px rgba(0, 0, 0, 0.5),
+    -2px 0 0px rgba(0, 0, 0, 0.5);
+}
+
+/* Texto Body Primary - Amarillo destacado */
+.text-body-primary {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  line-height: var(--line-height-normal);
+  letter-spacing: 0.05rem;
+  text-shadow: 
+    1px 1px 0px rgba(0, 0, 0, 0.8),
+    -1px -1px 0px rgba(0, 0, 0, 0.8),
+    1px -1px 0px rgba(0, 0, 0, 0.8),
+    -1px 1px 0px rgba(0, 0, 0, 0.8);
+}
+
+/* Texto Body Accent - Blanco con énfasis */
+.text-body-accent {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  line-height: var(--line-height-relaxed);
+  letter-spacing: 0.08rem;
+  text-shadow: 
+    1px 1px 2px rgba(0, 0, 0, 0.6),
+    -1px -1px 2px rgba(0, 0, 0, 0.6),
+    1px -1px 2px rgba(0, 0, 0, 0.6),
+    -1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+

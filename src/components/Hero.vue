@@ -9,7 +9,7 @@
       <div class="carousel-container" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
         <div class="carousel-slide" data-slide="0">
           <div class="slide-content">
-            <h1 class="slide-title">
+            <h1 class="slide-title text-hero-title">
               ¡Atrapa Todas Las Cartas!
             </h1>
             <p class="slide-description text-hero-subtitle">
@@ -31,7 +31,7 @@
         
         <div class="carousel-slide" data-slide="1">
           <div class="slide-content">
-            <h1 class="slide-title">
+            <h1 class="slide-title text-hero-title">
               ¡Descuentos Increíbles!
             </h1>
             <p class="slide-description text-hero-subtitle">
@@ -53,7 +53,7 @@
         
         <div class="carousel-slide" data-slide="2">
           <div class="slide-content">
-            <h1 class="slide-title">
+            <h1 class="slide-title text-hero-title">
               Cartas Legendarias
             </h1>
             <p class="slide-description text-hero-subtitle">
@@ -216,25 +216,10 @@ onUnmounted(() => {
 }
 
 .slide-title {
-  font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: clamp(1.8rem, 4vw, 3rem);
-  font-weight: normal;
   margin: 0 0 1.5rem 0;
   line-height: 1.6;
   animation: slideInUp 0.8s ease-out 0.2s both;
-  text-shadow: 
-    3px 3px 0px rgba(0, 0, 0, 0.9),
-    6px 6px 0px rgba(0, 0, 0, 0.7),
-    -2px -2px 0px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(255, 255, 255, 0.4),
-    0 0 60px rgba(255, 255, 255, 0.3),
-    0 8px 16px rgba(0, 0, 0, 0.8);
-  letter-spacing: 0.5px;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-  -webkit-font-smoothing: none;
-  font-smooth: never;
 }
 
 .slide-description {

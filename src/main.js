@@ -7,6 +7,8 @@ import './assets/styles/colors.css'
 import './assets/styles/variables.css'
 import './assets/styles/icons.css'
 import './assets/styles/buttons.css'
+import './assets/styles/inputs.css'
+import './assets/styles/typography.css'
 // Font Awesome
 import { FontAwesomeIcon } from './plugins/fontawesome'
 // Preloader for critical data

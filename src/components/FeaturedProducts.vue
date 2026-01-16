@@ -2,7 +2,7 @@
   <section class="featured-products">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Productos Destacados</h2>
+        <h2 class="section-title text-title-quaternary">Productos Destacados</h2>
         <router-link to="/shop" class="view-all-link">
           Ver todos <font-awesome-icon icon="chevron-down" class="arrow-icon" />
         </router-link>
@@ -62,47 +62,35 @@ const handleViewProduct = (productId) => {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   margin: 0;
-  color: var(--color-black);
-  position: relative;
+  color: var(--color-white);
   text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 }
 
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -var(--spacing-lg);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 4px;
-  background: var(--color-black);
-  border-radius: var(--border-radius-full);
-}
-
 .view-all-link {
-  color: var(--color-black);
+  color: var(--color-white);
   text-decoration: none;
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
   transition: all var(--transition-normal);
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--border-radius-md);
-  border: var(--border-width-thin) solid var(--color-black);
+  border: var(--border-width-thin) solid var(--color-white);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
 }
 
 .view-all-link:hover {
-  color: var(--color-white);
-  background: var(--color-black);
-  border-color: var(--color-black);
+  color: var(--color-primary);
+  background: rgba(0, 0, 0, 0.6);
+  border-color: var(--color-primary);
   transform: translateX(var(--spacing-xs));
 }
 
 .arrow-icon {
-  color: var(--color-black);
+  color: var(--color-white);
   font-size: 0.8em;
   transition: all var(--transition-normal);
   transform: rotate(-90deg);

@@ -2,8 +2,8 @@
   <section class="newsletter">
     <div class="container">
       <div class="newsletter-content">
-        <h2>Mantente al día con nuestras ofertas</h2>
-        <p>Suscríbete a nuestro newsletter y recibe ofertas exclusivas</p>
+        <h2 class="text-title-primary">Mantente al día con nuestras ofertas</h2>
+        <p class="text-body-accent">Suscríbete a nuestro newsletter y recibe ofertas exclusivas</p>
         <form @submit.prevent="handleSubscribe" class="newsletter-form">
           <input 
             type="email" 
