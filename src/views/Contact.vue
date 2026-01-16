@@ -1,20 +1,14 @@
 <template>
   <div class="contact">
-    <section class="contact-hero">
-      <div class="container">
-        <div class="hero-content">
-          <h1>
-            <font-awesome-icon icon="envelope" class="hero-icon" />
-            Contáctanos
-          </h1>
-          <p>Estamos aquí para ayudarte. Envíanos un mensaje y te responderemos lo antes posible.</p>
-        </div>
+    <div class="container">
+      <div class="contact-header">
+        <h1>Contáctanos</h1>
+        <p class="text-hero-subtitle">Estamos aquí para ayudarte. Envíanos un mensaje y te responderemos lo antes posible.</p>
       </div>
-    </section>
+    </div>
 
-    <section class="contact-form-section">
-      <div class="container">
-        <div class="form-container">
+    <div class="container">
+      <div class="form-container">
           <form @submit.prevent="handleSubmit" class="contact-form">
             <div class="form-group">
               <label for="name">Nombre *</label>
@@ -90,7 +84,6 @@
           </form>
         </div>
       </div>
-    </section>
   </div>
 </template>
 
@@ -212,81 +205,65 @@ const handleSubmit = async () => {
 
 <style scoped>
 .contact {
-  margin-top: var(--header-height);
-}
-
-/* Hero Section */
-.contact-hero {
-  background: linear-gradient(135deg, var(--color-tertiary) 0%, var(--color-quaternary) 100%);
-  color: var(--color-white);
-  padding: var(--spacing-6xl) 0 var(--spacing-5xl);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.contact-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-  opacity: 0.3;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-}
-
-.hero-content h1 {
-  font-size: var(--font-size-4xl);
-  font-weight: var(--font-weight-extrabold);
-  margin: 0 0 var(--spacing-lg) 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.hero-icon {
-  color: var(--icon-home-hero);
-  font-size: 1.1em;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.hero-content p {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-normal);
-  margin: 0;
-  opacity: 0.95;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: var(--line-height-relaxed);
-}
-
-/* Form Section */
-.contact-form-section {
-  padding: var(--spacing-6xl) 0;
-  background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-primary-light) 100%);
+  padding-top: 120px;
+  padding-bottom: 80px;
+  min-height: 100vh;
+  background: transparent;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 var(--spacing-xl);
+  padding: 0 20px;
+}
+
+.contact-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.contact-header h1 {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  margin: 0 0 1rem 0;
+  color: var(--color-white);
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-shadow: 
+    3px 3px 0px rgba(0, 0, 0, 0.9),
+    6px 6px 0px rgba(0, 0, 0, 0.7),
+    -2px -2px 0px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    0 0 60px rgba(255, 215, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.contact-header p {
+  font-size: 1.1rem;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .form-container {
   max-width: 700px;
   margin: 0 auto;
-  background: var(--color-white);
-  padding: var(--spacing-5xl);
-  border-radius: var(--border-radius-xl);
-  box-shadow: var(--shadow-lg);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid var(--color-primary);
 }
 
 .contact-form {
@@ -302,27 +279,28 @@ const handleSubmit = async () => {
 }
 
 .form-group label {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-tertiary);
-  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-white);
+  font-size: 0.875rem;
 }
 
 .form-group input,
 .form-group textarea {
-  padding: var(--spacing-md);
-  border: var(--border-width-thin) solid var(--color-gray-300);
-  border-radius: var(--border-radius-md);
-  font-size: var(--font-size-base);
-  font-family: var(--font-family-primary);
-  transition: all var(--transition-normal);
-  background: var(--color-white);
+  padding: 0.75rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-black);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  border-color: var(--color-quaternary);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
 }
 
 .form-group input.error,
@@ -349,15 +327,28 @@ const handleSubmit = async () => {
 }
 
 .btn-submit {
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-md) var(--spacing-3xl);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  margin-top: 1.5rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
+  gap: 0.5rem;
   min-height: 50px;
+  background: var(--color-primary);
+  color: var(--color-black);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: var(--color-quaternary);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
 .btn-submit:disabled {
@@ -370,86 +361,74 @@ const handleSubmit = async () => {
 }
 
 @media (max-width: 768px) {
-  .contact-hero {
-    padding: var(--spacing-4xl) 0 var(--spacing-3xl);
+  .contact {
+    padding-top: 100px;
   }
-  .hero-content h1 {
-    font-size: var(--font-size-3xl);
+  .contact-header h1 {
+    font-size: 2rem;
   }
-  .hero-content p {
-    font-size: var(--font-size-lg);
-  }
-  .contact-form-section {
-    padding: var(--spacing-4xl) 0;
-  }
-  .container {
-    padding: 0 var(--spacing-lg);
+  .contact-header p {
+    font-size: 1rem;
   }
   .form-container {
-    padding: var(--spacing-3xl);
+    padding: 2rem;
   }
   .contact-form {
-    gap: var(--spacing-lg);
+    gap: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .contact {
-    margin-top: var(--header-height);
-  }
-  .contact-hero {
-    padding: var(--spacing-3xl) 0 var(--spacing-2xl);
-  }
-  .hero-content h1 {
-    font-size: var(--font-size-xl);
-    flex-direction: column;
-    gap: var(--spacing-xs);
-  }
-  .hero-icon {
-    font-size: 1em;
-  }
-  .hero-content p {
-    font-size: var(--font-size-base);
-    padding: 0 var(--spacing-md);
-  }
-  .contact-form-section {
-    padding: var(--spacing-2xl) 0;
+    padding-top: 90px;
+    padding-bottom: 60px;
   }
   .container {
-    padding: 0 var(--spacing-md);
+    padding: 0 1rem;
+  }
+  .contact-header {
+    margin-bottom: 2rem;
+  }
+  .contact-header h1 {
+    font-size: 1.5rem;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .contact-header p {
+    font-size: 0.9rem;
+    padding: 0 1rem;
   }
   .form-container {
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    border-radius: 8px;
   }
   .contact-form {
-    gap: var(--spacing-md);
+    gap: 1rem;
   }
   .form-group {
-    gap: var(--spacing-xs);
+    gap: 0.5rem;
   }
   .form-group label {
-    font-size: var(--font-size-sm);
+    font-size: 0.875rem;
   }
   .form-group input,
   .form-group textarea {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: var(--font-size-sm);
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
   }
   .form-group textarea {
     min-height: 120px;
-    rows: 5;
   }
   .error-message {
-    font-size: var(--font-size-xs);
+    font-size: 0.75rem;
   }
   .char-count {
-    font-size: var(--font-size-xs);
+    font-size: 0.75rem;
   }
   .btn-submit {
-    margin-top: var(--spacing-md);
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-size: var(--font-size-base);
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
     width: 100%;
     min-height: 44px;
   }

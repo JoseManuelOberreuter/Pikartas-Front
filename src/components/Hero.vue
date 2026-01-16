@@ -12,7 +12,7 @@
             <h1 class="slide-title">
               ¡Atrapa Todas Las Cartas!
             </h1>
-            <p class="slide-description">
+            <p class="slide-description text-hero-subtitle">
               Descubre las cartas Pokémon más raras y poderosas. 
               Booster packs, cartas holográficas y coleccionables exclusivos.
             </p>
@@ -34,7 +34,7 @@
             <h1 class="slide-title">
               ¡Descuentos Increíbles!
             </h1>
-            <p class="slide-description">
+            <p class="slide-description text-hero-subtitle">
               Hasta 50% de descuento en booster packs seleccionados. 
               Cartas holográficas y rarezas únicas a precios especiales.
             </p>
@@ -56,7 +56,7 @@
             <h1 class="slide-title">
               Cartas Legendarias
             </h1>
-            <p class="slide-description">
+            <p class="slide-description text-hero-subtitle">
               Las cartas más raras y valiosas de Pokémon. 
               Ediciones limitadas y cartas de primera generación.
             </p>
@@ -239,18 +239,10 @@ onUnmounted(() => {
 
 .slide-description {
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
   margin: 0 0 2rem 0;
   opacity: 1;
-  line-height: var(--line-height-relaxed);
   animation: slideInUp 0.8s ease-out 0.4s both;
   max-width: 600px;
-  text-shadow: 
-    2px 2px 4px rgba(0, 0, 0, 0.9),
-    4px 4px 8px rgba(0, 0, 0, 0.7),
-    0 0 20px rgba(0, 0, 0, 0.8),
-    0 0 40px rgba(0, 0, 0, 0.5),
-    -2px -2px 0px rgba(0, 0, 0, 0.6);
 }
 
 .slide-actions {
