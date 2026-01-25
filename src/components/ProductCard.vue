@@ -96,23 +96,29 @@ const viewProduct = () => {
 <style scoped>
 .product-card {
   background: var(--color-white);
-  border-radius: 12px;
+  border-radius: var(--border-radius-xl);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  border: 1px solid var(--color-primary);
+  border: 1px solid var(--color-gray-200);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-primary);
 }
 
 .product-image {
   position: relative;
   overflow: hidden;
-  height: 240px;
+  height: 320px;
+  flex-shrink: 0;
 }
 
 .product-badges {
@@ -245,6 +251,9 @@ const viewProduct = () => {
 
 .product-info {
   padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .product-name {
@@ -261,9 +270,10 @@ const viewProduct = () => {
 
 .product-category {
   font-size: 0.875rem;
-  color: var(--color-primary);
+  color: var(--color-gray-600);
   margin: 0 0 0.75rem 0;
   font-weight: 500;
+  text-transform: capitalize;
 }
 
 .product-price {
@@ -271,31 +281,32 @@ const viewProduct = () => {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0;
+  flex-wrap: wrap;
 }
 
 .price-normal {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--color-quaternary);
+  color: var(--color-black);
   margin-bottom: 0.5rem;
 }
 
 .price-sale {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #dc3545;
+  color: var(--color-quaternary);
 }
 
 .price-original {
   font-size: 1rem;
   font-weight: 500;
-  color: #6c757d;
+  color: var(--color-gray-500);
   text-decoration: line-through;
 }
 
 @media (max-width: 768px) {
   .product-image {
-    height: 200px;
+    height: 280px;
   }
   
   .product-info {

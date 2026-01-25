@@ -8,7 +8,7 @@
         </router-link>
       </div>
       
-      <div class="products-grid">
+      <div class="products-grid" :class="{ 'single-product': featuredProducts.length === 1, 'few-products': featuredProducts.length === 2 }">
         <ProductCard 
           v-for="product in featuredProducts" 
           :key="product.id" 
@@ -105,6 +105,25 @@ const handleViewProduct = (productId) => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--spacing-3xl);
+  justify-items: center;
+}
+
+/* Center content when there's only 1 product */
+.products-grid.single-product {
+  grid-template-columns: 1fr;
+  justify-content: center;
+  max-width: 350px;
+  margin: 0 auto;
+  place-items: center;
+}
+
+/* Center content when there are 2 products */
+.products-grid.few-products {
+  grid-template-columns: repeat(2, 1fr);
+  justify-content: center;
+  max-width: calc(350px * 2 + var(--spacing-3xl));
+  margin: 0 auto;
+  place-items: center;
 }
 
 /* Responsive Design */
@@ -120,8 +139,24 @@ const handleViewProduct = (productId) => {
     gap: var(--spacing-xl);
   }
   
+  .products-grid.single-product {
+    max-width: 100%;
+  }
+  
+  .products-grid.few-products {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 100%;
+  }
+  
   .featured-products {
     padding: var(--spacing-5xl) 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .products-grid.few-products {
+    grid-template-columns: 1fr;
+    max-width: 100%;
   }
 }
 </style>
