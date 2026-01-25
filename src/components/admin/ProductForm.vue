@@ -212,6 +212,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:show', 'close', 'submit', 'add-category', 'delete-category', 'update:newCategoryName', 'update:productForm'])
 
+const fileInputRef = ref(null)
 const selectedImage = ref(null)
 const imagePreviewUrl = ref('')
 
