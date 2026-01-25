@@ -3,6 +3,11 @@
 <!-- TODO: los colores de los botones y de los iconos -->
 
   <div class="admin-dashboard">
+    <!-- Logo Section - Matching Home Hero Style -->
+    <div class="hero-logo">
+      <img src="@/assets/img/logo.png" alt="Pikartas Logo" class="logo-image" />
+    </div>
+
     <!-- Loading State -->
     <div v-if="loading" class="loading-container">
       <div class="loading-content">
@@ -556,10 +561,35 @@ onMounted(() => {
 }
 
 .admin-dashboard {
-  padding-top: 120px;
+  position: relative;
+  padding-top: calc(var(--header-height) + 8rem);
   padding-bottom: 80px;
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+/* Logo Section - Same as Hero */
+.hero-logo {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  animation: fadeInDown 1s ease-out;
+  filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.8));
+  transition: transform 0.3s ease;
+}
+
+.hero-logo:hover {
+  transform: translateX(-50%) scale(1.05);
+}
+
+.logo-image {
+  height: 180px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 /* Loading State Styles */
@@ -579,7 +609,7 @@ onMounted(() => {
 
 .loading-spinner {
   font-size: 4rem;
-  color: var(--color-primary, #4CAF50);
+  color: var(--color-primary);
   margin-bottom: 2rem;
 }
 
@@ -598,7 +628,7 @@ onMounted(() => {
 
 .loading-content h2 {
   font-size: 1.5rem;
-  color: #333;
+  color: var(--color-white);
   margin-bottom: 2rem;
   font-weight: 600;
 }
@@ -614,7 +644,7 @@ onMounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary, #4CAF50), #66BB6A);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
   border-radius: 4px;
   animation: progress 1.5s ease-in-out infinite;
   width: 70%;
@@ -633,12 +663,13 @@ onMounted(() => {
 .dashboard-header {
   text-align: center;
   margin-bottom: 3rem;
+  animation: slideInUp 0.8s ease-out 0.2s both;
 }
 
 .dashboard-header h1 {
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
   margin: 0 0 1rem 0;
-  color: #333;
+  color: var(--color-white);
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -670,13 +701,22 @@ onMounted(() => {
 }
 
 .stat-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-primary);
 }
 
 .stat-icon {
@@ -711,12 +751,12 @@ onMounted(() => {
   margin: 0 0 0.5rem 0;
   font-size: 2rem;
   font-weight: 700;
-  color: #333;
+  color: var(--color-white);
 }
 
 .stat-info p {
   margin: 0;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.9rem;
 }
 
@@ -731,18 +771,22 @@ onMounted(() => {
 }
 
 .action-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   text-align: center;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: all 0.3s ease;
 }
 
 .action-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .action-icon {
@@ -772,27 +816,37 @@ onMounted(() => {
 
 .action-card h3 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: var(--color-white);
   font-size: 1.25rem;
 }
 
 .action-card p {
   margin: 0 0 1.5rem 0;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.9rem;
 }
 
 .action-button {
-  background: #007bff;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  background: var(--color-white);
+  color: var(--color-black);
+  padding: 1rem 2rem;
+  border: 2px solid var(--color-white);
+  border-radius: 50px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: all var(--transition-normal);
+  transition: all 0.3s ease;
+  font-size: var(--font-size-lg);
+}
+
+.action-button:hover {
+  background: transparent;
+  color: var(--color-white);
+  border-color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
 }
 
 .action-btn-icon {
@@ -806,15 +860,17 @@ onMounted(() => {
 }
 
 .recent-activity {
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .recent-activity h2 {
   margin: 0 0 1.5rem 0;
-  color: #333;
+  color: var(--color-white);
   font-size: 1.5rem;
   display: flex;
   align-items: center;
@@ -842,8 +898,15 @@ onMounted(() => {
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid #eee;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-primary);
 }
 
 .activity-icon {
@@ -889,13 +952,13 @@ onMounted(() => {
 
 .activity-info h4 {
   margin: 0 0 0.25rem 0;
-  color: #333;
+  color: var(--color-white);
   font-size: 1rem;
 }
 
 .activity-info p {
   margin: 0;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
 }
 
@@ -907,48 +970,55 @@ onMounted(() => {
 }
 
 .status-pending {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(255, 193, 7, 0.2);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning);
 }
 
 .status-processing {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
 }
 
 .status-shipped {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid #10b981;
 }
 
 .status-delivered {
-  background: #d1f2eb;
-  color: #00695c;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid #10b981;
 }
 
 .status-cancelled {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(220, 53, 69, 0.2);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
 }
 
 .no-activity {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* Payment Alerts */
 .payment-alerts {
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   margin-bottom: 2rem;
 }
 
 .payment-alerts h2 {
   margin: 0 0 1.5rem 0;
-  color: #333;
+  color: var(--color-white);
   font-size: 1.5rem;
 }
 
@@ -963,23 +1033,26 @@ onMounted(() => {
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 12px;
   border-left: 4px solid;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.alert-item:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .alert-item.alert-warning {
-  background: #fff3cd;
-  border-left-color: #ffc107;
+  border-left-color: var(--color-warning);
 }
 
 .alert-item.alert-info {
-  background: #d1ecf1;
-  border-left-color: #17a2b8;
+  border-left-color: var(--color-info);
 }
 
 .alert-item.alert-danger {
-  background: #f8d7da;
-  border-left-color: #dc3545;
+  border-left-color: var(--color-error);
 }
 
 .alert-icon {
@@ -992,13 +1065,13 @@ onMounted(() => {
 
 .alert-content h4 {
   margin: 0 0 0.25rem 0;
-  color: #333;
+  color: var(--color-white);
   font-size: 1rem;
 }
 
 .alert-content p {
   margin: 0;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
 }
 
@@ -1025,10 +1098,10 @@ onMounted(() => {
   min-width: 50px;
 }
 
-.payment-badge.payment-pending { background: #fff3cd; color: #856404; }
-.payment-badge.payment-paid { background: #d4edda; color: #155724; }
-.payment-badge.payment-failed { background: #f8d7da; color: #721c24; }
-.payment-badge.payment-refunded { background: #d1ecf1; color: #0c5460; }
+.payment-badge.payment-pending { background: rgba(255, 193, 7, 0.2); color: var(--color-warning); border: 1px solid var(--color-warning); }
+.payment-badge.payment-paid { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+.payment-badge.payment-failed { background: rgba(220, 53, 69, 0.2); color: var(--color-error); border: 1px solid var(--color-error); }
+.payment-badge.payment-refunded { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid #3b82f6; }
 
 .auth-code {
   font-size: 0.7rem;
@@ -1040,20 +1113,21 @@ onMounted(() => {
 
 /* Error Alert */
 .error-alert {
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 8px;
+  background: rgba(220, 53, 69, 0.2);
+  border: 1px solid var(--color-error);
+  border-radius: 12px;
   padding: 1rem 1.5rem;
   margin-bottom: 2rem;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #721c24;
+  color: var(--color-white);
+  backdrop-filter: blur(10px);
 }
 
 .error-icon {
   font-size: 1.25rem;
-  color: #dc3545;
+  color: var(--color-error);
   flex-shrink: 0;
 }
 
@@ -1224,6 +1298,29 @@ onMounted(() => {
   }
   .error-alert p {
     font-size: 0.85rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style> 

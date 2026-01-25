@@ -1,5 +1,10 @@
 <template>
   <div class="settings-page">
+    <!-- Logo Section - Matching Home Hero Style -->
+    <div class="hero-logo">
+      <img src="@/assets/img/logo.png" alt="Pikartas Logo" class="logo-image" />
+    </div>
+
     <div class="container">
       <!-- Header de configuración -->
       <div class="settings-header">
@@ -278,10 +283,35 @@ const changePassword = async () => {
 
 <style scoped>
 .settings-page {
+  position: relative;
   min-height: 100vh;
-  background: var(--color-gray-50);
-  padding-top: 120px;
+  background: var(--color-black);
+  padding-top: calc(var(--header-height) + 8rem);
   padding-bottom: 80px;
+  color: var(--color-white);
+}
+
+/* Logo Section - Same as Hero */
+.hero-logo {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  animation: fadeInDown 1s ease-out;
+  filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.8));
+  transition: transform 0.3s ease;
+}
+
+.hero-logo:hover {
+  transform: translateX(-50%) scale(1.05);
+}
+
+.logo-image {
+  height: 180px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .container {
@@ -300,10 +330,13 @@ const changePassword = async () => {
   align-items: center;
   gap: 1.5rem;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  color: var(--color-quaternary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  color: var(--color-white);
+  animation: slideInUp 0.8s ease-out 0.2s both;
 }
 
 .header-icon {
@@ -329,16 +362,16 @@ const changePassword = async () => {
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
   font-weight: 700;
   margin: 0 0 0.5rem 0;
-  color: var(--color-quaternary);
+  color: var(--color-white);
 }
 
 .page-subtitle {
   font-size: 1.1rem;
   margin: 0;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* === CONTENT === */
@@ -349,10 +382,13 @@ const changePassword = async () => {
 }
 
 .settings-section {
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  animation: slideInUp 0.8s ease-out 0.4s both;
 }
 
 .section-header {
@@ -360,7 +396,7 @@ const changePassword = async () => {
   justify-content: space-between;
   align-items: center;
   padding: 2rem 2rem 1rem 2rem;
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .section-title {
@@ -369,7 +405,7 @@ const changePassword = async () => {
   gap: 0.75rem;
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--color-gray-800);
+  color: var(--color-white);
   margin: 0;
 }
 
@@ -384,7 +420,7 @@ const changePassword = async () => {
 }
 
 .section-description {
-  color: var(--color-gray-600);
+  color: rgba(255, 255, 255, 0.8);
   margin: 0;
   font-size: 0.875rem;
 }
@@ -398,7 +434,7 @@ const changePassword = async () => {
   justify-content: space-between;
   align-items: flex-start;
   padding: 2rem 0;
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
 }
 
@@ -407,10 +443,11 @@ const changePassword = async () => {
 }
 
 .setting-item:hover {
-  background-color: var(--color-gray-50);
+  background-color: rgba(255, 255, 255, 0.05);
   margin: 0 -2rem;
   padding: 2rem;
   border-radius: 12px;
+  border-color: var(--color-primary);
 }
 
 .setting-info {
@@ -421,12 +458,12 @@ const changePassword = async () => {
 .setting-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--color-gray-800);
+  color: var(--color-white);
   margin: 0 0 0.5rem 0;
 }
 
 .setting-description {
-  color: var(--color-gray-600);
+  color: rgba(255, 255, 255, 0.8);
   margin: 0;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -460,28 +497,37 @@ const changePassword = async () => {
 
 .btn-outline {
   background: transparent;
-  color: var(--color-tertiary);
-  border-color: var(--color-tertiary);
+  color: var(--color-white);
+  border: 2px solid var(--color-white);
+  border-radius: 50px;
+  padding: 1rem 2rem;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: var(--color-tertiary);
-  color: var(--color-white);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background: var(--color-white);
+  color: var(--color-black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
 }
 
 .btn-primary {
-  background: var(--color-primary);
-  color: var(--color-quaternary);
-  border-color: var(--color-primary);
+  background: var(--color-white);
+  color: var(--color-black);
+  border: 2px solid var(--color-white);
+  border-radius: 50px;
+  padding: 1rem 2rem;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background: transparent;
+  color: var(--color-white);
+  border-color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
 }
 
 .btn-icon {
@@ -491,22 +537,30 @@ const changePassword = async () => {
 /* === SELECTS === */
 .theme-select,
 .language-select {
-  padding: 0.75rem;
-  border: 1px solid var(--color-gray-300);
-  border-radius: 8px;
-  background: var(--color-white);
-  color: var(--color-gray-700);
+  padding: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 120px;
+  text-align: center;
+}
+
+.theme-select option,
+.language-select option {
+  background: var(--color-black);
+  color: var(--color-white);
 }
 
 .theme-select:focus,
 .language-select:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(221, 235, 157, 0.1);
+  border-color: var(--color-white);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 /* === STATUS BADGES === */
@@ -545,13 +599,15 @@ const changePassword = async () => {
 }
 
 .modal-content {
-  background: var(--color-white);
+  background: var(--color-black);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  backdrop-filter: blur(10px);
 }
 
 .modal-header {
@@ -559,13 +615,13 @@ const changePassword = async () => {
   align-items: center;
   justify-content: space-between;
   padding: 2rem 2rem 1rem 2rem;
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--color-gray-800);
+  color: var(--color-white);
   margin: 0;
 }
 
@@ -573,7 +629,7 @@ const changePassword = async () => {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: var(--icon-settings-close);
+  color: var(--color-white);
   cursor: pointer;
   padding: 0.25rem;
   line-height: 1;
@@ -584,7 +640,8 @@ const changePassword = async () => {
 }
 
 .modal-close:hover {
-  color: var(--icon-settings-close-hover);
+  color: var(--color-primary);
+  transform: scale(1.1);
 }
 
 .close-icon {
@@ -614,23 +671,30 @@ const changePassword = async () => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-size: 0.875rem;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--color-gray-300);
-  border-radius: 8px;
+  padding: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(221, 235, 157, 0.1);
+  border-color: var(--color-white);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 .form-actions {
@@ -639,7 +703,7 @@ const changePassword = async () => {
   justify-content: flex-end;
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--color-gray-200);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* === RESPONSIVE === */
@@ -700,6 +764,29 @@ const changePassword = async () => {
   
   .setting-item {
     padding: 1.5rem 0;
+  }
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>

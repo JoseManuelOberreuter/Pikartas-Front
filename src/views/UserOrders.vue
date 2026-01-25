@@ -1,5 +1,10 @@
 <template>
   <div class="user-orders">
+    <!-- Logo Section - Matching Home Hero Style -->
+    <div class="hero-logo">
+      <img src="@/assets/img/logo.png" alt="Pikartas Logo" class="logo-image" />
+    </div>
+
     <div class="container">
       <div class="orders-header">
         <h1>
@@ -366,26 +371,54 @@ onActivated(() => {
 }
 
 .user-orders {
-  padding-top: 120px;
+  position: relative;
+  padding-top: calc(var(--header-height) + 8rem);
   padding-bottom: 80px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fffe 0%, #f0f7f4 100%);
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+/* Logo Section - Same as Hero */
+.hero-logo {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  animation: fadeInDown 1s ease-out;
+  filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.8));
+  transition: transform 0.3s ease;
+}
+
+.hero-logo:hover {
+  transform: translateX(-50%) scale(1.05);
+}
+
+.logo-image {
+  height: 180px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .orders-header {
   text-align: center;
   margin-bottom: 3rem;
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   padding: 2rem;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   position: relative;
+  animation: slideInUp 0.8s ease-out 0.2s both;
 }
 
 .orders-header h1 {
-  font-size: 2rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
   margin: 0 0 0.5rem 0;
-  color: var(--color-gray-800);
+  color: var(--color-white);
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -397,19 +430,24 @@ onActivated(() => {
   position: absolute;
   top: 2rem;
   right: 2rem;
-  background: var(--color-gray-100);
-  border: 1px solid var(--color-gray-300);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
   padding: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: var(--color-gray-700);
+  color: var(--color-white);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-refresh:hover:not(:disabled) {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
+  background: var(--color-white);
+  border-color: var(--color-white);
+  color: var(--color-black);
   transform: rotate(180deg);
 }
 
@@ -425,11 +463,16 @@ onActivated(() => {
 .loading-state {
   text-align: center;
   padding: 4rem 2rem;
+  color: var(--color-white);
+}
+
+.loading-state p {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .loading-icon {
   font-size: 2.5rem;
-  color: var(--icon-orders-loading);
+  color: var(--color-primary);
   margin: 0 auto 1rem;
   display: block;
   animation: spin 1s linear infinite;
@@ -442,10 +485,13 @@ onActivated(() => {
 
 .empty-state {
   text-align: center;
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   padding: 4rem 2rem;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.8s ease-out 0.4s both;
 }
 
 .empty-icon {
@@ -465,13 +511,13 @@ onActivated(() => {
 
 .empty-state h2 {
   margin: 0 0 1rem 0;
-  color: #333;
+  color: var(--color-white);
   font-size: 1.75rem;
 }
 
 .empty-state p {
   margin: 0 0 2rem 0;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 1.1rem;
 }
 
@@ -490,25 +536,27 @@ onActivated(() => {
 
 .tab {
   padding: 0.75rem 1.5rem;
-  border: 1px solid var(--color-gray-300);
-  background: white;
-  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: var(--color-white);
 }
 
 .tab:hover {
-  background: var(--color-gray-50);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .tab.active {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
+  background: var(--color-white);
+  color: var(--color-black);
+  border-color: var(--color-white);
 }
 
 .count {
@@ -522,15 +570,19 @@ onActivated(() => {
 }
 
 .order-card {
-  background: white;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 1.25rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
 .order-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-primary);
 }
 
 .order-header {
@@ -539,19 +591,19 @@ onActivated(() => {
   align-items: flex-start;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .order-info h3 {
   margin: 0 0 0.25rem 0;
-  color: var(--color-gray-800);
+  color: var(--color-white);
   font-size: 1.125rem;
   font-weight: 600;
 }
 
 .order-date {
   margin: 0;
-  color: var(--color-gray-600);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.8125rem;
 }
 
@@ -561,13 +613,14 @@ onActivated(() => {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
+  border: 1px solid;
 }
 
-.status-pending { background: #fff3cd; color: #856404; }
-.status-processing { background: #d1ecf1; color: #0c5460; }
-.status-shipped { background: #d4edda; color: #155724; }
-.status-delivered { background: #d1ecf1; color: #0c5460; }
-.status-cancelled { background: #f8d7da; color: #721c24; }
+.status-pending { background: rgba(255, 193, 7, 0.2); color: var(--color-warning); border-color: var(--color-warning); }
+.status-processing { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border-color: #3b82f6; }
+.status-shipped { background: rgba(16, 185, 129, 0.2); color: #10b981; border-color: #10b981; }
+.status-delivered { background: rgba(16, 185, 129, 0.2); color: #10b981; border-color: #10b981; }
+.status-cancelled { background: rgba(220, 53, 69, 0.2); color: var(--color-error); border-color: var(--color-error); }
 
 .order-details {
   margin-bottom: 1rem;
@@ -582,7 +635,7 @@ onActivated(() => {
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .order-item:last-child {
@@ -602,26 +655,27 @@ onActivated(() => {
 
 .item-info h4 {
   margin: 0 0 0.125rem 0;
-  color: var(--color-gray-800);
+  color: var(--color-white);
   font-size: 0.9375rem;
   font-weight: 600;
 }
 
 .item-info p {
   margin: 0;
-  color: var(--color-gray-600);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.8125rem;
 }
 
 .item-price {
   font-weight: 600;
-  color: #28a745;
+  color: var(--color-primary);
 }
 
 .order-summary {
-  background: var(--color-gray-50);
+  background: rgba(255, 255, 255, 0.05);
   padding: 1rem;
   border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .summary-line {
@@ -629,11 +683,12 @@ onActivated(() => {
   justify-content: space-between;
   margin-bottom: 0.375rem;
   font-size: 0.875rem;
+  color: var(--color-white);
 }
 
 .summary-divider {
   border: none;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   margin: 0.5rem 0;
 }
 
@@ -641,10 +696,11 @@ onActivated(() => {
   font-weight: 700;
   font-size: 1rem;
   margin-bottom: 0;
+  color: var(--color-white);
 }
 
 .total-amount {
-  color: #007bff;
+  color: var(--color-primary);
   font-size: 1.125rem;
 }
 
@@ -681,14 +737,20 @@ onActivated(() => {
 }
 
 .btn-danger {
-  background: var(--color-error);
-  color: white;
-  border-color: var(--color-error);
+  background: transparent;
+  color: var(--color-error);
+  border: 2px solid var(--color-error);
+  border-radius: 50px;
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: var(--color-error-dark);
-  border-color: var(--color-error-dark);
+  background: var(--color-error);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
 }
 
 .btn:disabled {
@@ -697,22 +759,31 @@ onActivated(() => {
 }
 
 .btn-primary {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
+  background: var(--color-white);
+  color: var(--color-black);
+  border: 2px solid var(--color-white);
+  border-radius: 50px;
+  padding: 1rem 2rem;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
+  background: transparent;
+  color: var(--color-white);
+  border-color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
 }
 
 .help-banner {
   margin-top: var(--spacing-3xl);
-  background: linear-gradient(135deg, var(--color-tertiary) 0%, var(--color-quaternary) 100%);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--border-radius-2xl);
   padding: var(--spacing-3xl);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .help-banner-content {
@@ -749,17 +820,21 @@ onActivated(() => {
 
 .help-banner-btn {
   background: var(--color-white);
-  color: var(--color-tertiary);
-  border-color: var(--color-white);
+  color: var(--color-black);
+  border: 2px solid var(--color-white);
+  border-radius: 50px;
   font-weight: var(--font-weight-semibold);
-  padding: var(--spacing-md) var(--spacing-3xl);
+  padding: 1rem 2rem;
   white-space: nowrap;
+  font-size: var(--font-size-lg);
 }
 
 .help-banner-btn:hover {
-  background: var(--color-gray-100);
+  background: transparent;
+  color: var(--color-white);
+  border-color: var(--color-white);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -816,6 +891,29 @@ onActivated(() => {
 
   .help-banner-btn {
     width: 100%;
+  }
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>
