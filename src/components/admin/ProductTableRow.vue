@@ -177,7 +177,7 @@ defineEmits(['update-stock', 'toggle-featured', 'open-sale', 'edit', 'delete', '
 
 .product-name h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
@@ -185,7 +185,7 @@ defineEmits(['update-stock', 'toggle-featured', 'open-sale', 'edit', 'delete', '
 
 .product-name p {
   margin: 0;
-  color: var(--color-gray-500);
+  color: rgba(255, 255, 255, 0.7);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
 }
@@ -195,14 +195,15 @@ td:nth-child(3) {
 }
 
 .category-badge {
-  background: var(--color-gray-200);
-  color: var(--color-gray-600);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius-xl);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   display: inline-block;
   margin: var(--spacing-xs) 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 td:nth-child(4) {
@@ -238,6 +239,16 @@ td:nth-child(6) {
   padding: var(--spacing-sm) var(--spacing-md);
   text-align: center;
   margin: 0 auto;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+  border-radius: var(--border-radius-md);
+}
+
+.stock-input:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-primary);
+  outline: none;
 }
 
 td:nth-child(8) {
@@ -255,13 +266,15 @@ td:nth-child(8) {
 }
 
 .status-active {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(40, 167, 69, 0.2);
+  color: #90ee90;
+  border: 1px solid rgba(40, 167, 69, 0.3);
 }
 
 .status-inactive {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(220, 53, 69, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(220, 53, 69, 0.3);
 }
 
 td:nth-child(7) {
@@ -276,22 +289,24 @@ td:nth-child(7) {
   border-radius: var(--border-radius-xl);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  background: var(--color-gray-200);
-  color: var(--color-gray-500);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
   transition: all var(--transition-normal);
   white-space: nowrap;
   margin: var(--spacing-xs) 0;
   justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .featured-badge .badge-icon {
   font-size: var(--font-size-xs);
-  color: var(--color-gray-500);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .featured-active {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
 .featured-active .badge-icon {
@@ -310,26 +325,28 @@ td:nth-child(5) {
   border-radius: var(--border-radius-xl);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  background: var(--color-gray-200);
-  color: var(--color-gray-500);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
   transition: all var(--transition-normal);
   white-space: nowrap;
   margin: var(--spacing-xs) 0;
   justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .sale-badge .badge-icon {
   font-size: var(--font-size-xs);
-  color: var(--color-gray-500);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .sale-active {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(220, 53, 69, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(220, 53, 69, 0.3);
 }
 
 .sale-active .badge-icon {
-  color: var(--color-error);
+  color: #ff6b6b;
 }
 
 td:nth-child(9) {

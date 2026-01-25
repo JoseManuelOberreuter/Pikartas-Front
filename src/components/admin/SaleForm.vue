@@ -142,13 +142,39 @@ const handleSubmit = () => {
   padding: 0;
 }
 
+.sale-form .form-label {
+  color: var(--color-white);
+}
+
+.sale-form .form-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+  border-radius: var(--border-radius-md);
+}
+
+.sale-form .form-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sale-form .form-input:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(253, 179, 28, 0.2);
+}
+
+.sale-form .form-help {
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .checkbox-label {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   cursor: pointer;
   font-weight: var(--font-weight-medium);
-  color: var(--color-gray-700);
+  color: var(--color-white);
 }
 
 .checkbox-label span {
@@ -165,16 +191,18 @@ const handleSubmit = () => {
 .sale-fields {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-lg);
-  background: var(--color-gray-100);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border-radius: var(--border-radius-lg);
-  border: var(--border-width-thin) solid var(--color-gray-200);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .price-preview-section {
-  background: var(--color-white);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   padding: var(--spacing-xl);
   border-radius: var(--border-radius-lg);
-  border: var(--border-width-medium) solid var(--color-gray-200);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: var(--spacing-xl);
   display: flex;
   flex-direction: column;
@@ -186,39 +214,39 @@ const handleSubmit = () => {
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-sm) 0;
-  border-bottom: var(--border-width-thin) solid var(--color-gray-100);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .price-preview-item:last-child {
   border-bottom: none;
   padding-top: var(--spacing-md);
   margin-top: var(--spacing-xs);
-  border-top: var(--border-width-medium) solid var(--color-gray-200);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   font-weight: var(--font-weight-semibold);
 }
 
 .price-label {
   font-weight: var(--font-weight-medium);
-  color: var(--color-gray-600);
+  color: var(--color-white);
   font-size: var(--font-size-sm);
 }
 
 .price-original {
   font-weight: var(--font-weight-medium);
-  color: var(--color-gray-500);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: line-through;
   font-size: var(--font-size-sm);
 }
 
 .price-discount {
   font-weight: var(--font-weight-semibold);
-  color: var(--color-error);
+  color: #ff6b6b;
   font-size: var(--font-size-sm);
 }
 
 .price-final {
   font-weight: var(--font-weight-bold);
-  color: var(--color-success);
+  color: #90ee90;
   font-size: var(--font-size-lg);
 }
 

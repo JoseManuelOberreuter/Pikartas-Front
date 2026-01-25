@@ -461,7 +461,9 @@ onMounted(() => {
   padding-top: 120px;
   padding-bottom: 80px;
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--color-black);
+  color: var(--color-white);
+  animation: fadeInDown 1s ease-out;
 }
 
 .orders-header {
@@ -469,19 +471,26 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  padding: var(--spacing-2xl);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.8s ease-out 0.2s both;
 }
 
 .orders-header h1 {
   margin: 0;
   font-size: 2rem;
-  color: #333;
+  color: var(--color-white);
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
 .header-icon {
-  color: var(--icon-admin-orders-header);
+  color: var(--color-primary);
   font-size: 1.2em;
   transition: all var(--transition-normal);
 }
@@ -495,16 +504,26 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+  animation: slideInUp 0.8s ease-out 0.3s both;
 }
 
 .stat-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   gap: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.stat-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
 .stat-icon {
@@ -537,26 +556,29 @@ onMounted(() => {
   margin: 0 0 0.25rem 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #333;
+  color: var(--color-white);
 }
 
 .stat-info p {
   margin: 0;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.875rem;
 }
 
 .loading {
   text-align: center;
   padding: 4rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  color: var(--color-white);
 }
 
 .loading-icon {
   font-size: 2.5rem;
-  color: var(--icon-admin-orders-loading);
+  color: var(--color-primary);
   margin: 0 auto 1rem;
   display: block;
   animation: spin 1s linear infinite;

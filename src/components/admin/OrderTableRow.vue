@@ -170,10 +170,11 @@ const getPaymentStatusLabel = (status) => {
 .order-id {
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
   font-weight: 600;
-  color: #2563eb;
+  color: var(--color-primary);
   font-size: 0.875rem;
   letter-spacing: 0.025em;
-  background: #eff6ff;
+  background: rgba(253, 179, 28, 0.1);
+  border: 1px solid rgba(253, 179, 28, 0.3);
   padding: 0.375rem 0.625rem;
   border-radius: 6px;
   display: inline-block;
@@ -185,7 +186,7 @@ const getPaymentStatusLabel = (status) => {
 
 .customer-info h4 {
   margin: 0 0 0.25rem 0;
-  color: #111827;
+  color: var(--color-white);
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.4;
@@ -193,21 +194,21 @@ const getPaymentStatusLabel = (status) => {
 
 .customer-info p {
   margin: 0;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.8125rem;
   line-height: 1.4;
   word-break: break-word;
 }
 
 .order-date {
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.875rem;
   white-space: nowrap;
 }
 
 .order-total {
   font-weight: 700;
-  color: #059669;
+  color: #90ee90;
   font-size: 0.9375rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -215,17 +216,24 @@ const getPaymentStatusLabel = (status) => {
 .status-select {
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
-  border: 1.5px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 140px;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FDB31C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.5rem center;
   padding-right: 2rem;
+}
+
+.status-select option {
+  background: var(--color-black);
+  color: var(--color-white);
 }
 
 .status-select:hover {
@@ -240,29 +248,29 @@ const getPaymentStatusLabel = (status) => {
 }
 
 .status-select.status-pending { 
-  background-color: #fef3c7; 
-  color: #92400e; 
-  border-color: #fcd34d;
+  background-color: rgba(255, 193, 7, 0.2); 
+  color: #ffc107; 
+  border-color: rgba(255, 193, 7, 0.3);
 }
 .status-select.status-processing { 
-  background-color: #dbeafe; 
-  color: #1e40af; 
-  border-color: #93c5fd;
+  background-color: rgba(59, 130, 246, 0.2); 
+  color: #60a5fa; 
+  border-color: rgba(59, 130, 246, 0.3);
 }
 .status-select.status-shipped { 
-  background-color: #d1fae5; 
-  color: #065f46; 
-  border-color: #6ee7b7;
+  background-color: rgba(34, 197, 94, 0.2); 
+  color: #4ade80; 
+  border-color: rgba(34, 197, 94, 0.3);
 }
 .status-select.status-delivered { 
-  background-color: #d1fae5; 
-  color: #047857; 
-  border-color: #34d399;
+  background-color: rgba(34, 197, 94, 0.2); 
+  color: #4ade80; 
+  border-color: rgba(34, 197, 94, 0.3);
 }
 .status-select.status-cancelled { 
-  background-color: #fee2e2; 
-  color: #991b1b; 
-  border-color: #fca5a5;
+  background-color: rgba(220, 53, 69, 0.2); 
+  color: #ff6b6b; 
+  border-color: rgba(220, 53, 69, 0.3);
 }
 
 .payment-status {
@@ -285,29 +293,34 @@ const getPaymentStatusLabel = (status) => {
 }
 
 .payment-badge.payment-pending { 
-  background: #fef3c7; 
-  color: #92400e; 
+  background: rgba(255, 193, 7, 0.2); 
+  color: #ffc107; 
+  border: 1px solid rgba(255, 193, 7, 0.3);
 }
 .payment-badge.payment-paid { 
-  background: #d1fae5; 
-  color: #065f46; 
+  background: rgba(34, 197, 94, 0.2); 
+  color: #4ade80; 
+  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 .payment-badge.payment-failed { 
-  background: #fee2e2; 
-  color: #991b1b; 
+  background: rgba(220, 53, 69, 0.2); 
+  color: #ff6b6b; 
+  border: 1px solid rgba(220, 53, 69, 0.3);
 }
 .payment-badge.payment-refunded { 
-  background: #dbeafe; 
-  color: #1e40af; 
+  background: rgba(59, 130, 246, 0.2); 
+  color: #60a5fa; 
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .payment-details {
   font-size: 0.6875rem;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.7);
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-  background: #f9fafb;
+  background: rgba(255, 255, 255, 0.05);
   padding: 0.125rem 0.375rem;
   border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .actions {

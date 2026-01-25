@@ -3,11 +3,6 @@
 <!-- TODO: los colores de los botones y de los iconos -->
 
   <div class="admin-dashboard">
-    <!-- Logo Section - Matching Home Hero Style -->
-    <div class="hero-logo">
-      <img src="@/assets/img/logo.png" alt="Pikartas Logo" class="logo-image" />
-    </div>
-
     <!-- Loading State -->
     <div v-if="loading" class="loading-container">
       <div class="loading-content">
@@ -567,30 +562,6 @@ onMounted(() => {
   min-height: 100vh;
   background: var(--color-black);
   color: var(--color-white);
-}
-
-/* Logo Section - Same as Hero */
-.hero-logo {
-  position: absolute;
-  top: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  animation: fadeInDown 1s ease-out;
-  filter: drop-shadow(0 12px 40px rgba(253, 179, 28, 0.8));
-  transition: transform 0.3s ease;
-  margin-top: 1rem;
-}
-
-.hero-logo:hover {
-  transform: translateX(-50%) scale(1.05);
-}
-
-.logo-image {
-  height: 180px;
-  width: auto;
-  object-fit: contain;
-  display: block;
 }
 
 /* Loading State Styles */

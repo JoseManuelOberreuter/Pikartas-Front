@@ -157,7 +157,7 @@ const handleDeleteCategory = (categoryName) => {
 .no-categories {
   text-align: center;
   padding: var(--spacing-2xl);
-  color: var(--color-gray-500);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .categories-grid {
@@ -172,20 +172,21 @@ const handleDeleteCategory = (categoryName) => {
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-lg);
-  background: var(--color-gray-100);
-  border: var(--border-width-thin) solid var(--color-gray-200);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--border-radius-lg);
   transition: all var(--transition-normal);
 }
 
 .category-item:hover {
-  background: var(--color-gray-200);
-  border-color: var(--color-gray-300);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .category-item.category-has-products {
-  background: #e7f3ff;
-  border-color: #b3d9ff;
+  background: rgba(253, 179, 28, 0.1);
+  border-color: rgba(253, 179, 28, 0.3);
 }
 
 .category-info {
@@ -197,7 +198,7 @@ const handleDeleteCategory = (categoryName) => {
 
 .category-name {
   font-weight: var(--font-weight-medium);
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-size: var(--font-size-base);
 }
 
@@ -205,8 +206,8 @@ const handleDeleteCategory = (categoryName) => {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
-  background: var(--color-tertiary);
-  color: var(--color-white);
+  background: var(--color-primary);
+  color: var(--color-black);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius-xl);
   font-size: var(--font-size-sm);
@@ -218,7 +219,7 @@ const handleDeleteCategory = (categoryName) => {
 }
 
 .category-empty {
-  color: var(--color-gray-400);
+  color: rgba(255, 255, 255, 0.5);
   font-size: var(--font-size-sm);
   font-style: italic;
 }

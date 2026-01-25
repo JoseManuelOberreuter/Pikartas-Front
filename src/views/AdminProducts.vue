@@ -986,7 +986,9 @@ onMounted(async () => {
   padding-top: 120px;
   padding-bottom: 80px;
   min-height: 100vh;
-  background: var(--color-gray-100);
+  background: var(--color-black);
+  color: var(--color-white);
+  animation: fadeInDown 1s ease-out;
 }
 
 .products-header {
@@ -995,6 +997,13 @@ onMounted(async () => {
   align-items: center;
   margin-bottom: var(--spacing-2xl);
   gap: var(--spacing-lg);
+  padding: var(--spacing-2xl);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.8s ease-out 0.2s both;
 }
 
 .header-actions {
@@ -1006,14 +1015,14 @@ onMounted(async () => {
 .products-header h1 {
   margin: 0;
   font-size: var(--font-size-3xl);
-  color: var(--color-gray-700);
+  color: var(--color-white);
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
 }
 
 .header-icon {
-  color: var(--color-admin-products);
+  color: var(--color-primary);
   font-size: 1.2em;
   transition: all var(--transition-normal);
 }
@@ -1025,11 +1034,12 @@ onMounted(async () => {
 .loading {
   text-align: center;
   padding: var(--spacing-6xl);
+  color: var(--color-white);
 }
 
 .loading-icon {
   font-size: var(--font-size-4xl);
-  color: var(--color-admin-products);
+  color: var(--color-primary);
   margin: 0 auto var(--spacing-lg);
   display: block;
   animation: spin 1s linear infinite;
@@ -1043,14 +1053,16 @@ onMounted(async () => {
 .offer-details {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-lg);
-  background: var(--color-gray-100);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border-radius: var(--border-radius-lg);
-  border: var(--border-width-thin) solid var(--color-gray-200);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
 }
 
 .offer-details p {
   margin: var(--spacing-sm) 0;
-  color: var(--color-gray-700);
+  color: var(--color-white);
 }
 
 .offer-details p:last-child {

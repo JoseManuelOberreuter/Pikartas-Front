@@ -69,11 +69,13 @@ const handleUpdateStatus = (orderId, newStatus) => {
 
 <style scoped>
 .orders-table {
-  background: #ffffff;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-xl);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideInUp 0.8s ease-out 0.5s both;
 }
 
 .table-responsive {
@@ -94,14 +96,14 @@ th, td {
 }
 
 th {
-  background: linear-gradient(to bottom, #f9fafb 0%, #f3f4f6 100%);
+  background: rgba(255, 255, 255, 0.1);
   font-weight: 600;
-  color: #374151;
+  color: var(--color-white);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 1rem 1.25rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -117,12 +119,12 @@ th:last-child {
 }
 
 tbody tr {
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   transition: background-color 0.15s ease;
 }
 
 tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 tbody tr:last-child {
@@ -131,7 +133,7 @@ tbody tr:last-child {
 
 td {
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--color-white);
 }
 
 td:first-child {
@@ -145,7 +147,7 @@ td:last-child {
 .no-orders {
   padding: 4rem 2rem;
   text-align: center;
-  background: #f9fafb;
+  background: transparent;
 }
 
 .empty-state {
@@ -163,7 +165,7 @@ td:last-child {
 
 .empty-icon-svg {
   font-size: 1em;
-  color: #6b7280;
+  color: var(--color-primary);
   transition: all 0.3s ease;
 }
 
@@ -174,14 +176,14 @@ td:last-child {
 
 .empty-state h3 {
   margin: 0 0 0.5rem 0;
-  color: #374151;
+  color: var(--color-white);
   font-size: 1.125rem;
   font-weight: 600;
 }
 
 .empty-state p {
   margin: 0;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.875rem;
 }
 

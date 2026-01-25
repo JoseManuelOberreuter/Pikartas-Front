@@ -226,7 +226,7 @@ const getPaymentStatusLabel = (status) => {
 .shipping-info-section,
 .order-items-section {
   padding-bottom: var(--spacing-xl);
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .order-items-section:last-child {
@@ -239,7 +239,7 @@ const getPaymentStatusLabel = (status) => {
 .shipping-info-section h3,
 .order-items-section h3 {
   margin: 0 0 var(--spacing-lg) 0;
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
 }
@@ -258,12 +258,12 @@ const getPaymentStatusLabel = (status) => {
 
 .info-item label {
   font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-600);
+  color: rgba(255, 255, 255, 0.7);
   font-size: var(--font-size-sm);
 }
 
 .info-item span {
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-size: var(--font-size-base);
 }
 
@@ -277,11 +277,31 @@ const getPaymentStatusLabel = (status) => {
   min-width: 80px;
 }
 
-.status-badge.status-pending { background: #fff3cd; color: #856404; }
-.status-badge.status-processing { background: #d1ecf1; color: #0c5460; }
-.status-badge.status-shipped { background: #d4edda; color: #155724; }
-.status-badge.status-delivered { background: #d1f2eb; color: #00695c; }
-.status-badge.status-cancelled { background: #f8d7da; color: #721c24; }
+.status-badge.status-pending { 
+  background: rgba(255, 193, 7, 0.2); 
+  color: #ffc107; 
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+.status-badge.status-processing { 
+  background: rgba(59, 130, 246, 0.2); 
+  color: #60a5fa; 
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.status-badge.status-shipped { 
+  background: rgba(34, 197, 94, 0.2); 
+  color: #4ade80; 
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.status-badge.status-delivered { 
+  background: rgba(34, 197, 94, 0.2); 
+  color: #4ade80; 
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.status-badge.status-cancelled { 
+  background: rgba(220, 53, 69, 0.2); 
+  color: #ff6b6b; 
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
 
 .payment-badge {
   padding: 0.25rem 0.5rem;
@@ -293,14 +313,30 @@ const getPaymentStatusLabel = (status) => {
   min-width: 80px;
 }
 
-.payment-badge.payment-pending { background: #fff3cd; color: #856404; }
-.payment-badge.payment-paid { background: #d4edda; color: #155724; }
-.payment-badge.payment-failed { background: #f8d7da; color: #721c24; }
-.payment-badge.payment-refunded { background: #d1ecf1; color: #0c5460; }
+.payment-badge.payment-pending { 
+  background: rgba(255, 193, 7, 0.2); 
+  color: #ffc107; 
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+.payment-badge.payment-paid { 
+  background: rgba(34, 197, 94, 0.2); 
+  color: #4ade80; 
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.payment-badge.payment-failed { 
+  background: rgba(220, 53, 69, 0.2); 
+  color: #ff6b6b; 
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+.payment-badge.payment-refunded { 
+  background: rgba(59, 130, 246, 0.2); 
+  color: #60a5fa; 
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
 
 .amount {
   font-weight: 700;
-  color: #28a745;
+  color: #90ee90;
   font-size: 1.1rem;
 }
 
@@ -315,8 +351,10 @@ const getPaymentStatusLabel = (status) => {
   align-items: center;
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
-  background: var(--color-gray-50);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border-radius: var(--border-radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .item-image-placeholder {
@@ -325,10 +363,11 @@ const getPaymentStatusLabel = (status) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-gray-200);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: var(--border-radius-md);
-  color: var(--color-gray-400);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .item-image {
@@ -344,19 +383,19 @@ const getPaymentStatusLabel = (status) => {
 
 .item-details h4 {
   margin: 0 0 var(--spacing-xs) 0;
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-size: var(--font-size-base);
 }
 
 .item-details p {
   margin: 0 0 var(--spacing-xs) 0;
-  color: var(--color-gray-600);
+  color: rgba(255, 255, 255, 0.7);
   font-size: var(--font-size-sm);
 }
 
 .item-total {
   font-weight: 700;
-  color: #28a745;
+  color: #90ee90;
   font-size: 1.1rem;
 }
 

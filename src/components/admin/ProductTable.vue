@@ -171,10 +171,13 @@ defineEmits(['update-stock', 'toggle-featured', 'open-sale', 'edit', 'delete', '
 
 <style scoped>
 .products-table {
-  background: var(--color-white);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border-radius: var(--border-radius-xl);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideInUp 0.8s ease-out 0.4s both;
 }
 
 .table-responsive {
@@ -193,18 +196,18 @@ th, td {
 }
 
 th {
-  background: var(--color-gray-100);
+  background: rgba(255, 255, 255, 0.1);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-600);
+  color: var(--color-white);
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: var(--spacing-2xl) var(--spacing-xl);
-  border-bottom: 2px solid #dee2e6;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 tbody tr {
-  border-bottom: 2px solid #dee2e6;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 tbody tr:last-child {
@@ -212,11 +215,12 @@ tbody tr:last-child {
 }
 
 td {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--color-white);
 }
 
 tbody tr:not(:last-child) td {
-  border-bottom: 2px solid #dee2e6 !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 tbody tr:last-child td {
@@ -282,7 +286,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background-color: var(--color-gray-50);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sortable {
@@ -292,7 +296,7 @@ tbody tr:hover {
 }
 
 .sortable:hover {
-  background-color: var(--color-gray-200);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .sortable-header {
@@ -314,14 +318,14 @@ tbody tr:hover {
 
 .sort-icon {
   font-size: 10px;
-  color: var(--color-gray-400);
+  color: rgba(255, 255, 255, 0.4);
   transition: all var(--transition-fast);
   opacity: 0.4;
   line-height: 1;
 }
 
 .sort-icon.sort-active {
-  color: var(--color-tertiary);
+  color: var(--color-primary);
   opacity: 1;
   font-size: 11px;
 }
@@ -352,7 +356,7 @@ tbody tr:hover {
 
 .empty-icon-svg {
   font-size: 1em;
-  color: var(--color-gray-400);
+  color: var(--color-primary);
   transition: all var(--transition-normal);
 }
 
@@ -362,14 +366,14 @@ tbody tr:hover {
 
 .empty-state h3 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
 }
 
 .empty-state p {
   margin: 0 0 var(--spacing-2xl) 0;
-  color: var(--color-gray-500);
+  color: rgba(255, 255, 255, 0.7);
   font-size: var(--font-size-base);
 }
 

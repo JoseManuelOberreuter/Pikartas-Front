@@ -66,6 +66,13 @@ defineEmits(['update:searchTerm', 'update:selectedCategory', 'update:productStat
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-2xl);
   flex-wrap: wrap;
+  padding: var(--spacing-xl);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.8s ease-out 0.3s both;
 }
 
 .filter-group {
@@ -74,9 +81,27 @@ defineEmits(['update:searchTerm', 'update:selectedCategory', 'update:productStat
   gap: var(--spacing-sm);
 }
 
+.filter-group .form-label {
+  color: var(--color-white);
+}
+
 .filter-input,
 .filter-select {
   min-width: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+}
+
+.filter-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-primary);
+  outline: none;
 }
 
 @media (max-width: 768px) {

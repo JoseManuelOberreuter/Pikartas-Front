@@ -293,6 +293,37 @@ watch(() => props.show, (newVal) => {
   padding: 0;
 }
 
+.product-form .form-label {
+  color: var(--color-white);
+}
+
+.product-form .form-input,
+.product-form .form-select,
+.product-form .form-textarea {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+  border-radius: var(--border-radius-md);
+}
+
+.product-form .form-input::placeholder,
+.product-form .form-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.product-form .form-input:focus,
+.product-form .form-select:focus,
+.product-form .form-textarea:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(253, 179, 28, 0.2);
+}
+
+.product-form .form-help {
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .form-row {
   display: flex;
   gap: var(--spacing-lg);
@@ -308,7 +339,7 @@ watch(() => props.show, (newVal) => {
   gap: var(--spacing-sm);
   cursor: pointer;
   font-weight: var(--font-weight-medium);
-  color: var(--color-gray-700);
+  color: var(--color-white);
 }
 
 .checkbox-label span {
@@ -349,9 +380,14 @@ watch(() => props.show, (newVal) => {
 
 .new-category-input {
   padding: var(--spacing-lg);
-  background: var(--color-gray-100);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border-radius: var(--border-radius-lg);
-  border: var(--border-width-thin) solid var(--color-gray-200);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.new-category-label {
+  color: var(--color-white);
 }
 
 .new-category-label {
@@ -391,21 +427,22 @@ watch(() => props.show, (newVal) => {
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-lg);
-  border: var(--border-width-medium) dashed var(--color-gray-300);
+  border: var(--border-width-medium) dashed rgba(255, 255, 255, 0.3);
   border-radius: var(--border-radius-lg);
   cursor: pointer;
   transition: all var(--transition-normal);
-  background: var(--color-gray-100);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
 }
 
 .file-input-label:hover {
-  border-color: var(--color-tertiary);
-  background: #e3f2fd;
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .upload-icon {
   font-size: var(--font-size-xl);
-  color: var(--color-tertiary);
+  color: var(--color-primary);
   transition: all var(--transition-normal);
 }
 
@@ -414,7 +451,7 @@ watch(() => props.show, (newVal) => {
 }
 
 .upload-text {
-  color: var(--color-gray-600);
+  color: var(--color-white);
   font-weight: var(--font-weight-medium);
 }
 

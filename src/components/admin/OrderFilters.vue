@@ -67,11 +67,13 @@ defineEmits(['update:searchTerm', 'update:selectedStatus', 'update:selectedPayme
   gap: 1rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
-  background: white;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   padding: 1.25rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e5e7eb;
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.8s ease-out 0.4s both;
 }
 
 .filter-group {
@@ -85,7 +87,7 @@ defineEmits(['update:searchTerm', 'update:selectedStatus', 'update:selectedPayme
 .form-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-white);
   margin: 0;
 }
 
@@ -93,23 +95,29 @@ defineEmits(['update:searchTerm', 'update:selectedStatus', 'update:selectedPayme
 .filter-select {
   width: 100%;
   padding: 0.625rem 0.875rem;
-  border: 1.5px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-md);
   font-size: 0.875rem;
   transition: all 0.2s ease;
-  background: white;
-  color: #111827;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
 }
 
 .filter-input:focus,
 .filter-select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(253, 179, 28, 0.2);
 }
 
 .filter-input::placeholder {
-  color: #9ca3af;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.filter-select option {
+  background: var(--color-black);
+  color: var(--color-white);
 }
 
 .filter-select {
