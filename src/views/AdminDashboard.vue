@@ -577,8 +577,9 @@ onMounted(() => {
   transform: translateX(-50%);
   z-index: 10;
   animation: fadeInDown 1s ease-out;
-  filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.8));
+  filter: drop-shadow(0 12px 40px rgba(253, 179, 28, 0.8));
   transition: transform 0.3s ease;
+  margin-top: 1rem;
 }
 
 .hero-logo:hover {

@@ -1,10 +1,5 @@
 <template>
   <section class="verification-hero">
-    <!-- Logo Section -->
-    <div class="hero-logo">
-      <img src="@/assets/img/logo.png" alt="Pikartas Logo" class="logo-image" />
-    </div>
-    
     <div class="verification-container">
       <div class="verification-content">
         <div v-if="!verifying && !verified && !token" class="check-email">
@@ -208,32 +203,9 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  padding-top: 8rem;
+  padding-top: 4rem;
   color: var(--color-white);
   overflow: hidden;
-}
-
-/* Logo Section - Same as Hero */
-.hero-logo {
-  position: absolute;
-  top: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  animation: fadeInDown 1s ease-out;
-  filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.8));
-  transition: transform 0.3s ease;
-}
-
-.hero-logo:hover {
-  transform: translateX(-50%) scale(1.05);
-}
-
-.logo-image {
-  height: 180px;
-  width: auto;
-  object-fit: contain;
-  display: block;
 }
 
 .verification-container {
@@ -501,15 +473,7 @@ onMounted(async () => {
 @media (max-width: 768px) {
   .verification-hero {
     padding: 1.5rem;
-    padding-top: 6rem;
-  }
-  
-  .hero-logo {
-    top: 1rem;
-  }
-  
-  .logo-image {
-    height: 120px;
+    padding-top: 3rem;
   }
   
   .verification-title {
@@ -536,15 +500,7 @@ onMounted(async () => {
 @media (max-width: 480px) {
   .verification-hero {
     padding: 1rem;
-    padding-top: 5rem;
-  }
-  
-  .hero-logo {
-    top: 0.5rem;
-  }
-  
-  .logo-image {
-    height: 80px;
+    padding-top: 2rem;
   }
   
   .verification-title {
