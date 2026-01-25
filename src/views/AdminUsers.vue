@@ -1324,7 +1324,7 @@ td:nth-child(7) {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-header h2 {
@@ -1350,6 +1350,7 @@ td:nth-child(7) {
 
 .close-btn:hover {
   color: #ff6b6b;
+  background-color: rgba(255, 255, 255, 0.1);
   transform: scale(1.1);
 }
 
@@ -1366,16 +1367,16 @@ td:nth-child(7) {
   justify-content: flex-end;
   gap: 1rem;
   padding: 1.5rem 2rem;
-  border-top: 1px solid #eee;
-  background: #f8f9fa;
-  border-radius: 0 0 12px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
 }
 
 .user-details-section {
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
-  border-bottom: 2px solid #f8f9fa;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .user-avatar-large {

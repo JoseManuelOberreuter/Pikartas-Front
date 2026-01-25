@@ -90,13 +90,15 @@ const handleOverlayClick = () => {
 }
 
 .modal-content {
-  background-color: var(--color-white);
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: var(--border-radius-xl);
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: var(--shadow-2xl);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transform: translateY(20px);
   animation: slideUp var(--transition-normal) forwards;
   z-index: var(--z-modal);
@@ -124,12 +126,12 @@ const handleOverlayClick = () => {
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-2xl);
-  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-header h2 {
   margin: 0;
-  color: var(--color-gray-700);
+  color: var(--color-white);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   display: flex;
@@ -138,7 +140,7 @@ const handleOverlayClick = () => {
 }
 
 .modal-header-icon {
-  color: var(--color-tertiary);
+  color: var(--color-primary);
   font-size: 1.2em;
 }
 
@@ -147,7 +149,7 @@ const handleOverlayClick = () => {
   border: none;
   font-size: var(--font-size-xl);
   cursor: pointer;
-  color: var(--color-gray-500);
+  color: rgba(255, 255, 255, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -157,8 +159,8 @@ const handleOverlayClick = () => {
 }
 
 .close-btn:hover {
-  color: var(--color-error);
-  background-color: var(--color-gray-100);
+  color: #ff6b6b;
+  background-color: rgba(255, 255, 255, 0.1);
   transform: scale(1.1);
 }
 
@@ -168,14 +170,16 @@ const handleOverlayClick = () => {
 
 .modal-body {
   padding: var(--spacing-2xl);
+  color: var(--color-white);
 }
 
 .modal-footer {
   padding: var(--spacing-2xl);
-  border-top: var(--border-width-thin) solid var(--color-gray-200);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   gap: var(--spacing-md);
   justify-content: flex-end;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 @keyframes fadeIn {

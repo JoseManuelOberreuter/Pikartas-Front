@@ -136,7 +136,7 @@ const handleDeleteCategory = (categoryName) => {
 .category-add-section {
   margin-bottom: var(--spacing-2xl);
   padding-bottom: var(--spacing-2xl);
-  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .category-add-input {
