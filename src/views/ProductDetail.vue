@@ -1,127 +1,130 @@
 <template>
-
-<!-- TODO: cambiar logica para bajar a 0 productos en el carrito, el usuario no puede eliminar el producto del carrito en esta vista -->
+  <!-- TODO: cambiar logica para bajar a 0 productos en el carrito, el usuario no puede eliminar el producto del carrito en esta vista -->
 
   <div class="product-detail">
-    <div class="container">
-      <div v-if="loading" class="loading-state">
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-state">
+      <div class="container">
         <font-awesome-icon icon="spinner" spin class="loading-spinner" />
-        <h2>Cargando producto...</h2>
+        <h2 class="text-hero-title">Cargando producto...</h2>
       </div>
+    </div>
 
-      <div v-else-if="!product" class="not-found">
-        <h2>Producto no encontrado</h2>
-        <p>El producto que buscas no existe o no está disponible.</p>
+    <!-- Not Found State -->
+    <div v-else-if="!product" class="not-found">
+      <div class="container">
+        <h2 class="text-hero-title">Producto no encontrado</h2>
+        <p class="text-hero-subtitle">El producto que buscas no existe o no está disponible.</p>
         <router-link to="/shop" class="btn btn-primary">
           <font-awesome-icon icon="arrow-left" class="btn-icon" />
           Volver a la tienda
         </router-link>
       </div>
+    </div>
 
-      <div v-else class="product-content">
-        <div class="product-gallery">
-          <div class="main-image">
-            <img :src="product.image" :alt="product.name" />
-            <div class="product-badges" v-if="isOnSale">
-              <span class="badge badge-sale">
-                <font-awesome-icon icon="tag" class="badge-icon" />
-                {{ discountPercentage }}% OFF
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div class="product-info">
+    <!-- Product Content -->
+    <div v-else>
+      <!-- Hero Section -->
+      <section class="product-hero">
+        <div class="product-hero-background" :style="{ backgroundImage: `url(${product.image})` }"></div>
+        <div class="product-hero-overlay"></div>
+        <div class="container">
           <nav class="breadcrumb">
             <router-link to="/">Inicio</router-link> /
             <router-link to="/shop">Tienda</router-link> /
             <span>{{ product.name }}</span>
           </nav>
-
-          <h1 class="product-title">{{ product.name }}</h1>
           
-          <div class="product-price">
-            <span v-if="isOnSale" class="price-original">${{ formatCLP(product.price) }}</span>
-            <span :class="{ 'price-sale': isOnSale, 'price-normal': !isOnSale }">
-              ${{ formatCLP(displayPrice) }}
-            </span>
-          </div>
-
-          <div class="product-description">
-            <h3>Descripción</h3>
-            <p>{{ product.description }}</p>
-          </div>
-
-          <div class="product-meta">
-            <div class="meta-item">
-              <span class="meta-label">Categoría:</span>
-              <span class="meta-value">{{ product.category }}</span>
+          <div class="product-hero-content">
+            <div class="product-hero-image">
+              <div class="main-image-wrapper">
+                <img :src="product.image" :alt="product.name" class="main-image" />
+                <div class="product-badges" v-if="isOnSale">
+                  <span class="badge badge-sale">
+                    <font-awesome-icon icon="tag" class="badge-icon" />
+                    {{ discountPercentage }}% OFF
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="meta-item">
-              <span class="meta-label">Stock disponible:</span>
-              <span class="meta-value" :class="{ 'low-stock': product.stock <= 10, 'out-of-stock': product.stock === 0 }">
-                {{ product.stock > 0 ? `${product.stock} unidades` : 'Sin stock' }}
-              </span>
-            </div>
-          </div>
+            
+            <div class="product-hero-info">
+              <h1 class="product-title text-hero-title">{{ product.name }}</h1>
+              
+              <div class="product-price">
+                <span v-if="isOnSale" class="price-original">${{ formatCLP(product.price) }}</span>
+                <span :class="{ 'price-sale': isOnSale, 'price-normal': !isOnSale }" class="price-main">
+                  ${{ formatCLP(displayPrice) }}
+                </span>
+              </div>
 
-          <div class="product-actions">
-            <div class="quantity-selector">
-              <label>Cantidad:</label>
-              <div class="quantity-input">
+              <div class="product-description">
+                <p class="description-text">{{ product.description }}</p>
+              </div>
+
+              <div class="product-actions">
+                <div class="quantity-selector">
+                  <label class="quantity-label">Cantidad:</label>
+                  <div class="quantity-input">
+                    <button 
+                      class="qty-btn" 
+                      @click="decreaseQuantity" 
+                      :disabled="quantity <= 1"
+                    >
+                      <font-awesome-icon icon="minus" class="qty-icon" />
+                    </button>
+                    <input 
+                      type="number" 
+                      v-model="quantity" 
+                      :min="1" 
+                      :max="product.stock"
+                      class="qty-input"
+                    />
+                    <button 
+                      class="qty-btn" 
+                      @click="increaseQuantity" 
+                      :disabled="quantity >= product.stock"
+                    >
+                      <font-awesome-icon icon="plus" class="qty-icon" />
+                    </button>
+                  </div>
+                </div>
+
                 <button 
-                  class="qty-btn" 
-                  @click="decreaseQuantity" 
-                  :disabled="quantity <= 1"
+                  class="btn btn-primary add-to-cart"
+                  @click="addToCart"
+                  :disabled="product.stock === 0"
                 >
-                  <font-awesome-icon icon="minus" class="qty-icon" />
+                  <font-awesome-icon icon="shopping-cart" class="btn-icon" />
+                  {{ product.stock === 0 ? 'Sin Stock' : 'Agregar al Carrito' }}
                 </button>
-                <input 
-                  type="number" 
-                  v-model="quantity" 
-                  :min="1" 
-                  :max="product.stock"
-                  class="qty-input"
-                />
-                <button 
-                  class="qty-btn" 
-                  @click="increaseQuantity" 
-                  :disabled="quantity >= product.stock"
-                >
-                  <font-awesome-icon icon="plus" class="qty-icon" />
+
+                <button class="btn btn-outline" @click="goBack">
+                  <font-awesome-icon icon="arrow-left" class="btn-icon" />
+                  Volver
                 </button>
               </div>
             </div>
-
-            <button 
-              class="btn btn-primary add-to-cart"
-              @click="addToCart"
-              :disabled="product.stock === 0"
-            >
-              <font-awesome-icon icon="shopping-cart" class="btn-icon" />
-              {{ product.stock === 0 ? 'Sin Stock' : 'Agregar al Carrito' }}
-            </button>
-
-            <button class="btn btn-outline" @click="goBack">
-              <font-awesome-icon icon="arrow-left" class="btn-icon" />
-              Volver
-            </button>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Related Products -->
-      <div v-if="relatedProducts.length > 0" class="related-products">
-        <h2>Productos Relacionados</h2>
-        <div class="products-grid">
-          <ProductCard 
-            v-for="relatedProduct in relatedProducts" 
-            :key="relatedProduct.id" 
-            :product="relatedProduct"
-            @view-product="viewProduct"
-          />
+      <section v-if="relatedProducts.length > 0" class="related-products-section">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title text-title-quaternary">Productos Relacionados</h2>
+          </div>
+          <div class="products-grid">
+            <ProductCard 
+              v-for="relatedProduct in relatedProducts" 
+              :key="relatedProduct.id" 
+              :product="relatedProduct"
+              @view-product="viewProduct"
+            />
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
@@ -312,27 +315,25 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
 .product-detail {
-  padding-top: 120px;
-  padding-bottom: 80px;
+  position: relative;
   min-height: 100vh;
 }
 
+/* Loading State */
 .loading-state {
+  padding: var(--spacing-6xl) 0;
   text-align: center;
-  padding: 4rem 0;
+  min-height: calc(100vh - var(--header-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .loading-spinner {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: var(--icon-product-loading);
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--spacing-xl);
+  color: var(--color-primary);
   animation: spin 2s linear infinite;
 }
 
@@ -341,402 +342,398 @@ onMounted(async () => {
   100% { transform: rotate(360deg); }
 }
 
-.loading-state h2 {
-  margin: 0;
-  color: #333;
-  font-size: 1.5rem;
-}
-
+/* Not Found State */
 .not-found {
+  padding: var(--spacing-6xl) 0;
   text-align: center;
-  padding: 4rem 0;
-}
-
-.not-found h2 {
-  margin: 0 0 2rem 0;
-  color: #333;
-}
-
-.product-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  margin-bottom: 4rem;
-}
-
-.product-gallery {
-  position: sticky;
-  top: 120px;
-  height: fit-content;
-}
-
-.main-image {
-  position: relative;
-  width: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-.product-badges {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.badge {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(4px);
-  font-size: 0.875rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  white-space: nowrap;
-}
-
-.badge-sale {
-  color: white;
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.95) 0%, rgba(255, 0, 0, 0.95) 100%);
-}
-
-.badge-icon {
-  font-size: 0.75rem;
-}
-
-.main-image img {
-  width: 100%;
-  height: 500px;
-  object-fit: cover;
-}
-
-.product-info {
-  padding: 1rem 0;
-}
-
-.breadcrumb {
-  font-size: 0.875rem;
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-
-.breadcrumb a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.breadcrumb a:hover {
-  text-decoration: underline;
-}
-
-.product-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0 0 1rem 0;
-  color: #333;
-}
-
-.product-price {
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.price-normal {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #28a745;
-}
-
-.price-sale {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #dc3545;
-}
-
-.price-original {
-  font-size: 1.75rem;
-  font-weight: 500;
-  color: #6c757d;
-  text-decoration: line-through;
-}
-
-.product-description {
-  margin-bottom: 2rem;
-}
-
-.product-description h3 {
-  font-size: 1.25rem;
-  margin: 0 0 1rem 0;
-  color: #333;
-}
-
-.product-description p {
-  color: #666;
-  line-height: 1.6;
-  font-size: 1rem;
-  margin: 0;
-}
-
-.product-meta {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.meta-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
-}
-
-.meta-item:last-child {
-  margin-bottom: 0;
-}
-
-.meta-label {
-  font-weight: 600;
-  color: #333;
-}
-
-.meta-value {
-  color: #666;
-}
-
-.meta-value.low-stock {
-  color: #ffc107;
-  font-weight: 600;
-}
-
-.meta-value.out-of-stock {
-  color: #dc3545;
-  font-weight: 600;
-}
-
-.product-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.quantity-selector label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-
-.quantity-input {
-  display: flex;
-  align-items: center;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  overflow: hidden;
-  width: fit-content;
-}
-
-.qty-btn {
-  width: 44px;
-  height: 44px;
-  border: none;
-  background: #f8f9fa;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 1.1rem;
-  transition: all 0.3s;
+  min-height: calc(100vh - var(--header-height));
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.not-found h2 {
+  margin: 0 0 var(--spacing-xl) 0;
+}
+
+/* Product Hero Section */
+.product-hero {
+  position: relative;
+  min-height: calc(100vh - var(--header-height));
+  margin-top: var(--header-height);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.product-hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(20px);
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+.product-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(1, 1, 1, 0.85) 0%,
+    rgba(1, 1, 1, 0.75) 50%,
+    rgba(1, 1, 1, 0.85) 100%
+  );
+  z-index: 2;
+}
+
+.product-hero .container {
+  position: relative;
+  z-index: 3;
+  padding: var(--spacing-6xl) var(--container-padding);
+}
+
+.breadcrumb {
+  font-size: var(--font-size-sm);
+  color: var(--color-white);
+  margin-bottom: var(--spacing-3xl);
+  opacity: 0.8;
+}
+
+.breadcrumb a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: all var(--transition-normal);
+}
+
+.breadcrumb a:hover {
+  color: var(--color-primary-light);
+  text-decoration: underline;
+}
+
+.breadcrumb span {
+  color: var(--color-white);
+  opacity: 0.6;
+}
+
+.product-hero-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-6xl);
+  align-items: center;
+}
+
+.product-hero-image {
+  position: relative;
+}
+
+.main-image-wrapper {
+  position: relative;
+  border-radius: var(--border-radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-2xl);
+  background: var(--color-secondary);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.main-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.product-badges {
+  position: absolute;
+  top: var(--spacing-xl);
+  left: var(--spacing-xl);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  white-space: nowrap;
+}
+
+.badge-sale {
+  color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-quaternary) 0%, var(--color-quaternary-dark) 100%);
+}
+
+.badge-icon {
+  font-size: var(--font-size-xs);
+}
+
+.product-hero-info {
+  color: var(--color-white);
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.product-title {
+  font-size: clamp(var(--font-size-3xl), 5vw, var(--font-size-4xl));
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-3xl) 0;
+  line-height: var(--line-height-tight);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.product-price {
+  margin-bottom: var(--spacing-4xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.price-main {
+  font-size: clamp(var(--font-size-3xl), 4vw, var(--font-size-4xl));
+  font-weight: var(--font-weight-bold);
+}
+
+.price-normal {
+  color: var(--color-primary);
+}
+
+.price-sale {
+  color: var(--color-quaternary);
+}
+
+.price-original {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white);
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.product-description {
+  margin-bottom: var(--spacing-4xl);
+  padding: var(--spacing-3xl);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.description-text {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-white);
+  opacity: 0.95;
+  margin: 0;
+}
+
+.product-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.quantity-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.quantity-label {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+}
+
+.quantity-input {
+  display: flex;
+  align-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.qty-btn {
+  width: 50px;
+  height: 50px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+}
+
 .qty-btn:hover:not(:disabled) {
-  background: #e9ecef;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
 }
 
 .qty-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .qty-icon {
-  font-size: 0.875rem;
-  color: var(--icon-product-plus);
+  font-size: var(--font-size-base);
   transition: all var(--transition-normal);
 }
 
-.qty-btn:hover:not(:disabled) .qty-icon {
-  color: var(--icon-product-plus-hover);
-  transform: scale(1.1);
-}
-
-.qty-btn[disabled] .qty-icon {
-  color: var(--color-gray-400);
-}
-
 .qty-input {
-  width: 80px;
+  width: 100px;
   text-align: center;
   border: none;
-  padding: 0.75rem;
-  font-weight: 600;
-  font-size: 1rem;
+  padding: var(--spacing-md);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  background: transparent;
+  color: var(--color-white);
 }
 
 .qty-input:focus {
   outline: none;
 }
 
-.btn {
-  padding: 1rem 2rem;
-  border: 1px solid;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  transition: all 0.3s;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.btn-icon {
-  font-size: 1rem;
-  transition: all var(--transition-normal);
-}
-
-.btn:hover .btn-icon {
-  transform: scale(1.1);
-}
-
-.btn-primary .btn-icon {
-  color: var(--icon-product-cart);
-}
-
-.btn-outline .btn-icon {
-  color: var(--icon-product-back);
-}
-
-.btn-outline:hover .btn-icon {
-  color: var(--icon-product-back-hover);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #0056b3;
-  border-color: #0056b3;
-  transform: translateY(-2px);
-}
-
-.btn-outline {
-  background: transparent;
-  color: #666;
-  border-color: #ddd;
-}
-
-.btn-outline:hover {
-  background: #f8f9fa;
-  border-color: #007bff;
-  color: #007bff;
-}
-
 .add-to-cart {
-  font-size: 1.25rem;
-  padding: 1.25rem 2rem;
+  font-size: var(--font-size-xl);
+  padding: var(--spacing-xl) var(--spacing-3xl);
+  font-weight: var(--font-weight-bold);
 }
 
-.related-products {
-  margin-top: 4rem;
-  padding-top: 3rem;
-  border-top: 1px solid #eee;
-}
-
-.related-products h2 {
+.section-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-3xl) 0;
   text-align: center;
-  font-size: 2rem;
-  margin: 0 0 3rem 0;
-  color: #333;
+}
+
+/* Related Products Section */
+.related-products-section {
+  padding: var(--spacing-6xl) 0;
+  background: transparent;
+}
+
+.section-header {
+  margin-bottom: var(--spacing-5xl);
+  text-align: center;
 }
 
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  gap: var(--spacing-3xl);
+  justify-items: center;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .product-content {
+  .product-hero-content {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: var(--spacing-4xl);
   }
   
-  .product-gallery {
-    position: static;
-  }
-  
-  .main-image img {
-    height: 400px;
+  .product-hero-image {
+    max-width: 600px;
+    margin: 0 auto;
   }
 }
 
 @media (max-width: 768px) {
-  .product-title {
-    font-size: 2rem;
+  .product-hero {
+    min-height: auto;
+    padding: var(--spacing-5xl) 0;
   }
   
-  .price {
-    font-size: 2rem;
+  .product-hero .container {
+    padding: var(--spacing-4xl) var(--container-padding);
+  }
+  
+  .product-title {
+    font-size: var(--font-size-3xl);
+  }
+  
+  .price-main {
+    font-size: var(--font-size-2xl);
   }
   
   .product-actions {
-    gap: 1rem;
-  }
-  
-  .btn {
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
+    gap: var(--spacing-lg);
   }
   
   .add-to-cart {
-    font-size: 1.1rem;
-    padding: 1rem 1.5rem;
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-lg) var(--spacing-2xl);
+  }
+  
+  .product-description-section,
+  .related-products-section {
+    padding: var(--spacing-5xl) 0;
+  }
+  
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-2xl);
   }
 }
 
 @media (max-width: 480px) {
-  .container {
-    padding: 0 10px;
-  }
-  
-  .main-image img {
-    height: 300px;
+  .product-hero .container {
+    padding: var(--spacing-3xl) var(--spacing-md);
   }
   
   .product-title {
-    font-size: 1.75rem;
+    font-size: var(--font-size-2xl);
+  }
+  
+  .price-main {
+    font-size: var(--font-size-xl);
+  }
+  
+  .price-original {
+    font-size: var(--font-size-lg);
+  }
+  
+  .product-description {
+    padding: var(--spacing-2xl);
+  }
+  
+  .description-text {
+    font-size: var(--font-size-base);
   }
   
   .products-grid {

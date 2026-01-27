@@ -2,7 +2,7 @@
   <div class="shop">
     <div class="container">
       <div class="shop-header">
-        <h1 class="text-hero-title"><font-awesome-icon icon="dice-d20" class="shop-header-icon" /> Nuestra Tienda</h1>
+        <h1 class="text-hero-title"><font-awesome-icon icon="dice" class="shop-header-icon" /> Nuestra Tienda</h1>
         <p class="text-hero-subtitle">Explora nuestra colección de cartas Pokémon</p>
       </div>
 

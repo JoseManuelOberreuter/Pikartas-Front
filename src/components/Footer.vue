@@ -3,7 +3,7 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-section">
-          <h3><font-awesome-icon icon="dice-d20" class="footer-brand-icon" /> Pikartas</h3>
+          <h3><font-awesome-icon icon="dice" class="footer-brand-icon" /> Pikartas</h3>
           <p>Tu tienda online de cartas Pokémon favorita</p>
         </div>
         <div class="footer-section">
