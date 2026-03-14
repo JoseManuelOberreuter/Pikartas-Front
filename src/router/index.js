@@ -12,6 +12,7 @@ import Settings from '../views/Settings.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
 import AdminProducts from '../views/AdminProducts.vue'
 import Contact from '../views/Contact.vue'
+import NotFound from '../views/NotFound.vue'
 // Preloader for intelligent prefetching
 import {
   prefetchShopProducts,
@@ -141,6 +142,11 @@ const routes = [
     path: '/contact',
     name: 'Contact',
     component: Contact
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound
   }
 ]
 
