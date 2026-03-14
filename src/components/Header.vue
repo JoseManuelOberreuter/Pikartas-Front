@@ -101,9 +101,9 @@
           </div>
         </div>
         
-        <!-- Mobile Menu Toggle - Solo visible cuando no hay sesión -->
-        <div class="mobile-menu-toggle" v-if="!authStore.isAuthenticated || authStore.loading">
-          <button class="hamburger" @click="toggleMobileMenu">
+        <!-- Mobile Menu Toggle - Visible en tablet/móvil (CSS controla visibilidad por breakpoint) -->
+        <div class="mobile-menu-toggle">
+          <button class="hamburger" @click="toggleMobileMenu" type="button" aria-label="Abrir menú">
             <font-awesome-icon icon="bars" class="hamburger-icon" />
           </button>
         </div>
@@ -888,26 +888,54 @@ onUnmounted(() => {
   gap: var(--spacing-md);
 }
 
+/* Tablet / intermediate: hide desktop menu, show hamburger + compact bar */
 @media (max-width: 1024px) {
   .nav .container {
     grid-template-columns: auto 1fr auto;
     gap: var(--spacing-xl);
+    align-items: center;
   }
   .nav-center { display: none; }
   .mobile-menu-toggle,
   .mobile-menu { display: block; }
+  .mobile-menu-toggle {
+    order: -1;
+    justify-self: start;
+  }
+  .nav-actions {
+    order: 1;
+    justify-self: end;
+  }
   .auth-section {
     border-left: none;
     padding-left: 0;
   }
-  .auth-buttons { gap: var(--spacing-sm); }
-  .btn-text { display: none; }
-  .btn {
-    min-width: 40px;
-    padding: var(--spacing-sm);
+  /* Auth buttons only in mobile menu from tablet down (avoid empty/squashed buttons in bar) */
+  .hide-auth-buttons-mobile {
+    display: none !important;
   }
   .user-info,
   .dropdown-arrow { display: none; }
+}
+
+/* Intermediate (tablet narrow): consistent spacing so bar doesn't look broken */
+@media (max-width: 900px) {
+  .nav .container {
+    padding: var(--spacing-md) var(--spacing-xl);
+    gap: var(--spacing-lg);
+  }
+  .nav-actions {
+    gap: var(--spacing-lg);
+  }
+  .user-profile {
+    min-width: 44px;
+    min-height: 44px;
+    padding: var(--spacing-sm);
+  }
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 @media (max-width: 768px) {
