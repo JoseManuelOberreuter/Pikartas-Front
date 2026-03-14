@@ -1,23 +1,21 @@
 <template>
-
-<!-- TODO: verificar seguridad de la password y mejorar UI -->
-
+  <!-- TODO: verify password security and improve UI -->
   <div class="reset-container">
     <div class="reset-card">
       <div v-if="!validToken && !loading" class="invalid-token">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h1 style="color: #333; margin-bottom: 10px;">
+        <div class="reset-header">
+          <h1 class="text-title-primary">
             <font-awesome-icon icon="shopping-cart" class="brand-icon" />
             Pikartas
           </h1>
         </div>
-        <h2>
+        <h2 class="text-body-primary">
           <font-awesome-icon icon="times-circle" class="error-icon" />
           Token Inválido
         </h2>
-        <p>El enlace de recuperación es inválido o ha expirado.</p>
-        <div style="background: #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <p style="color: #e74c3c; margin: 0;">
+        <p class="text-body-accent">El enlace de recuperación es inválido o ha expirado.</p>
+        <div class="reset-warning-box">
+          <p class="text-body-accent">
             <font-awesome-icon icon="exclamation-triangle" class="warning-icon" />
             <strong>Importante:</strong> Los enlaces de recuperación son válidos por 1 hora solamente.
           </p>
@@ -27,51 +25,83 @@
           Volver al Inicio
         </router-link>
       </div>
-      
+
       <div v-if="loading" class="loading">
         <font-awesome-icon icon="spinner" spin class="loading-icon" />
-        <h2>Cargando...</h2>
+        <h2 class="text-body-primary">Cargando...</h2>
       </div>
-      
+
       <div v-if="validToken && !resetSuccess && !loading" class="reset-form-container">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h1 style="color: #333; margin-bottom: 10px;">
+        <div class="reset-header">
+          <h1 class="text-title-primary">
             <font-awesome-icon icon="shopping-cart" class="brand-icon" />
             Pikartas
           </h1>
-          <h2 style="color: #ff6b35;">
+          <h2 class="text-body-primary">
             <font-awesome-icon icon="lock" class="lock-icon" />
             Restablecer Contraseña
           </h2>
         </div>
-        <p>Ingresa tu nueva contraseña para restablecer el acceso a tu cuenta.</p>
-        
+        <p class="text-body-accent">Ingresa tu nueva contraseña para restablecer el acceso a tu cuenta.</p>
+
         <form @submit.prevent="handleResetPassword" class="reset-form">
           <div class="form-group">
-            <label for="newPassword">Nueva Contraseña</label>
-            <input 
-              type="password" 
-              id="newPassword"
-              v-model="resetForm.password" 
-              placeholder="Mínimo 6 caracteres" 
-              required
-              minlength="6"
-            >
+            <label for="newPassword" class="form-label-reset">Nueva Contraseña</label>
+            <div class="password-input-wrapper">
+              <input
+                :type="showNewPassword ? 'text' : 'password'"
+                id="newPassword"
+                v-model="resetForm.password"
+                placeholder="Mínimo 6 caracteres"
+                required
+                minlength="6"
+                class="reset-input"
+              >
+              <button
+                type="button"
+                class="password-toggle-btn"
+                @mousedown.prevent="showNewPassword = true"
+                @mouseup="showNewPassword = false"
+                @mouseleave="showNewPassword = false"
+                @touchstart.prevent="showNewPassword = true"
+                @touchend="showNewPassword = false"
+                title="Mantén presionado para ver la contraseña"
+                aria-label="Toggle password visibility"
+              >
+                <font-awesome-icon :icon="showNewPassword ? 'eye-slash' : 'eye'" class="password-icon" />
+              </button>
+            </div>
           </div>
-          
+
           <div class="form-group">
-            <label for="confirmNewPassword">Confirmar Nueva Contraseña</label>
-            <input 
-              type="password" 
-              id="confirmNewPassword"
-              v-model="resetForm.confirmPassword" 
-              placeholder="Repite tu nueva contraseña" 
-              required
-            >
+            <label for="confirmNewPassword" class="form-label-reset">Confirmar Nueva Contraseña</label>
+            <div class="password-input-wrapper">
+              <input
+                :type="showConfirmPassword ? 'text' : 'password'"
+                id="confirmNewPassword"
+                v-model="resetForm.confirmPassword"
+                placeholder="Repite tu nueva contraseña"
+                required
+                class="reset-input"
+              >
+              <button
+                type="button"
+                class="password-toggle-btn"
+                @mousedown.prevent="showConfirmPassword = true"
+                @mouseup="showConfirmPassword = false"
+                @mouseleave="showConfirmPassword = false"
+                @touchstart.prevent="showConfirmPassword = true"
+                @touchend="showConfirmPassword = false"
+                title="Mantén presionado para ver la contraseña"
+                aria-label="Toggle confirm password visibility"
+              >
+                <font-awesome-icon :icon="showConfirmPassword ? 'eye-slash' : 'eye'" class="password-icon" />
+              </button>
+            </div>
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             class="btn btn-primary btn-full"
             :disabled="authStore.loading"
           >
@@ -79,31 +109,31 @@
           </button>
         </form>
       </div>
-      
+
       <div v-if="resetSuccess" class="success">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h1 style="color: #333; margin-bottom: 10px;">
+        <div class="reset-header">
+          <h1 class="text-title-primary">
             <font-awesome-icon icon="shopping-cart" class="brand-icon" />
             Pikartas
           </h1>
         </div>
-        <h2>
+        <h2 class="text-body-primary">
           <font-awesome-icon icon="check-circle" class="success-icon" />
           ¡Contraseña Restablecida!
         </h2>
-        <p>Tu contraseña ha sido restablecida exitosamente en <strong>Pikartas</strong>. Ya puedes iniciar sesión con tu nueva contraseña.</p>
+        <p class="text-body-accent">Tu contraseña ha sido restablecida exitosamente en <strong>Pikartas</strong>. Ya puedes iniciar sesión con tu nueva contraseña.</p>
         <router-link to="/" class="btn btn-primary">
           <font-awesome-icon icon="home" class="btn-icon" />
           Ir al Inicio
         </router-link>
       </div>
-      
+
       <div v-if="error" class="error">
-        <h2>
+        <h2 class="text-title-quaternary">
           <font-awesome-icon icon="times-circle" class="error-icon" />
           Error
         </h2>
-        <p>{{ error }}</p>
+        <p class="text-body-accent">{{ error }}</p>
         <button @click="tryAgain" class="btn btn-outline">
           <font-awesome-icon icon="redo" class="btn-icon" />
           Intentar Nuevamente
@@ -131,6 +161,10 @@ const validToken = ref(false)
 const resetSuccess = ref(false)
 const error = ref(null)
 const token = ref(null)
+
+// Password visibility (hold to show, like login)
+const showNewPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 const resetForm = reactive({
   password: '',
@@ -194,29 +228,53 @@ const tryAgain = () => {
 </script>
 
 <style scoped>
+/* Same feel as Home: video background shows through, card like Features section */
 .reset-container {
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height));
+  margin-top: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-primary-light) 100%);
+  background: rgba(0, 0, 0, 0.5);
   padding: var(--spacing-3xl);
 }
 
 .reset-card {
-  background: var(--color-white);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
   padding: var(--spacing-5xl);
-  border-radius: var(--border-radius-2xl);
+  border-radius: var(--border-radius-xl);
   box-shadow: var(--shadow-lg);
   text-align: center;
   max-width: 500px;
   width: 100%;
-  border: var(--border-width-thin) solid var(--color-gray-200);
+  border: var(--border-width-thin) solid var(--color-primary);
+  position: relative;
+  overflow: hidden;
 }
 
-.reset-card h1 {
-  color: var(--color-tertiary);
-  font-weight: var(--font-weight-bold);
+.reset-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-quaternary);
+  transform: translateX(-100%);
+  transition: transform var(--transition-normal);
+}
+
+.reset-card:hover::before {
+  transform: translateX(0);
+}
+
+.reset-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.reset-header h1 {
   margin-bottom: var(--spacing-sm);
   display: flex;
   align-items: center;
@@ -224,8 +282,16 @@ const tryAgain = () => {
   gap: 0.5rem;
 }
 
+.reset-header h2 {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 .brand-icon {
-  color: var(--icon-reset-brand);
+  color: var(--color-primary);
   font-size: 1.2em;
   transition: all var(--transition-normal);
 }
@@ -234,37 +300,27 @@ const tryAgain = () => {
   transform: scale(1.1) rotate(5deg);
 }
 
-.reset-card h2 {
-  margin-bottom: var(--spacing-lg);
-  color: var(--color-tertiary);
-  font-weight: var(--font-weight-semibold);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
 .error-icon {
-  color: var(--icon-reset-error);
+  color: var(--color-quaternary);
   font-size: 1.1em;
   transition: all var(--transition-normal);
 }
 
 .warning-icon {
-  color: var(--icon-reset-warning);
+  color: var(--color-warning);
   font-size: 1em;
   margin-right: 0.5rem;
   transition: all var(--transition-normal);
 }
 
 .lock-icon {
-  color: var(--icon-reset-lock);
+  color: var(--color-primary);
   font-size: 1.1em;
   transition: all var(--transition-normal);
 }
 
 .success-icon {
-  color: var(--icon-reset-success);
+  color: var(--color-success);
   font-size: 1.1em;
   transition: all var(--transition-normal);
 }
@@ -278,9 +334,16 @@ const tryAgain = () => {
 
 .reset-card p {
   margin-bottom: var(--spacing-3xl);
-  color: var(--color-gray-600);
   line-height: var(--line-height-relaxed);
   font-size: var(--font-size-base);
+}
+
+.reset-warning-box {
+  background: rgba(253, 179, 28, 0.2);
+  border: 1px solid var(--color-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-lg);
+  margin: var(--spacing-2xl) 0;
 }
 
 .reset-form {
@@ -292,51 +355,85 @@ const tryAgain = () => {
   margin-bottom: var(--spacing-xl);
 }
 
-.form-group label {
+.form-label-reset {
   display: block;
   margin-bottom: var(--spacing-sm);
   font-family: var(--font-family-primary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-700);
+  color: var(--color-primary);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-.form-group input {
+.reset-input {
   width: 100%;
   padding: var(--spacing-md);
-  border: var(--border-width-thin) solid var(--color-gray-300);
+  border: 2px solid var(--color-primary);
   border-radius: var(--border-radius-md);
   font-family: var(--font-family-primary);
   font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  color: var(--color-gray-700);
-  background-color: var(--color-white);
+  color: var(--color-white);
+  background: rgba(0, 0, 0, 0.4);
   transition: all var(--transition-normal);
 }
 
-.form-group input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(221, 235, 157, 0.15);
+.reset-input::placeholder {
+  color: var(--color-gray-400);
 }
 
-.form-group input::placeholder {
+.reset-input:focus {
+  outline: none;
+  border-color: var(--color-quaternary);
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper .reset-input {
+  padding-right: 2.75rem;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-gray-400);
+  transition: color var(--transition-normal);
+  z-index: 10;
+}
+
+.password-toggle-btn:hover {
+  color: var(--color-primary);
+}
+
+.password-icon {
+  font-size: 1rem;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--border-radius-md);
+  padding: 1rem 2rem;
+  border-radius: 50px;
   text-decoration: none;
   font-family: var(--font-family-primary);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   margin: var(--spacing-sm);
-  transition: all var(--transition-normal);
-  border: var(--border-width-thin) solid;
+  transition: all 0.3s ease;
+  border: 2px solid;
   cursor: pointer;
   gap: 0.5rem;
 }
@@ -350,25 +447,22 @@ const tryAgain = () => {
   transform: scale(1.1);
 }
 
-.btn-outline:hover .btn-icon {
-  color: var(--icon-reset-home);
-}
-
-.btn-primary:hover .btn-icon {
-  color: var(--color-quaternary);
-}
-
 .btn-primary {
-  background: var(--color-primary);
-  color: var(--color-quaternary);
-  border-color: var(--color-primary);
+  background: var(--color-white);
+  color: var(--color-black);
+  border-color: var(--color-white);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  background: transparent;
+  color: var(--color-white);
+  border-color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) .btn-icon {
+  color: var(--color-white);
 }
 
 .btn-primary:disabled {
@@ -381,15 +475,19 @@ const tryAgain = () => {
 
 .btn-outline {
   background: transparent;
-  color: var(--color-tertiary);
-  border-color: var(--color-tertiary);
+  color: var(--color-white);
+  border-color: var(--color-white);
 }
 
 .btn-outline:hover {
-  background: var(--color-tertiary);
-  color: var(--color-white);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-white);
+  color: var(--color-black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+}
+
+.btn-outline:hover .btn-icon {
+  color: var(--color-black);
 }
 
 .btn-full {
@@ -399,7 +497,7 @@ const tryAgain = () => {
 
 .loading-icon {
   font-size: 2rem;
-  color: var(--icon-reset-loading);
+  color: var(--color-primary);
   margin: 0 auto var(--spacing-lg);
   display: block;
   animation: spin 1s linear infinite;
@@ -410,48 +508,32 @@ const tryAgain = () => {
   100% { transform: rotate(360deg); }
 }
 
-.success {
-  color: var(--color-success);
-}
-
 .success h2 {
-  color: var(--color-success);
-}
-
-.error {
-  color: var(--color-error);
+  margin-bottom: var(--spacing-lg);
 }
 
 .error h2 {
-  color: var(--color-error);
-}
-
-.loading {
-  color: var(--color-tertiary);
+  margin-bottom: var(--spacing-lg);
 }
 
 .loading h2 {
-  color: var(--color-tertiary);
-}
-
-.invalid-token {
-  color: var(--color-error);
+  margin-top: var(--spacing-lg);
 }
 
 .invalid-token h2 {
-  color: var(--color-error);
+  margin-bottom: var(--spacing-lg);
 }
 
 @media (max-width: 768px) {
   .reset-container {
     padding: var(--spacing-lg);
   }
-  
+
   .reset-card {
     padding: var(--spacing-3xl);
     margin: var(--spacing-lg);
   }
-  
+
   .btn {
     width: 100%;
     margin: var(--spacing-sm) 0;
