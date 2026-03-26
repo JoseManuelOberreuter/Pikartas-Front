@@ -72,16 +72,30 @@
                 />
               </div>
 
+              <div class="form-group">
+                <label for="cityDest">Ciudad de envío (Starken) *</label>
+                <select
+                  id="cityDest"
+                  v-model="selectedCodigoCiudad"
+                  class="form-select"
+                  required
+                  :disabled="loadingDestinations"
+                >
+                  <option value="" disabled>
+                    {{ loadingDestinations ? 'Cargando ciudades...' : 'Selecciona una ciudad' }}
+                  </option>
+                  <option
+                    v-for="c in cityOptions"
+                    :key="c.codigoCiudad"
+                    :value="c.codigoCiudad"
+                  >
+                    {{ c.nombreCiudad }}
+                  </option>
+                </select>
+                <p v-if="quoteError" class="quote-warning">{{ quoteError }}</p>
+              </div>
+
               <div class="form-row">
-                <div class="form-group">
-                  <label for="city">Ciudad *</label>
-                  <input 
-                    type="text" 
-                    id="city"
-                    v-model="shippingForm.city" 
-                    required
-                  />
-                </div>
                 <div class="form-group">
                   <label for="zipCode">Código Postal *</label>
                   <input 
@@ -155,13 +169,13 @@
                 <font-awesome-icon icon="arrow-left" class="btn-icon" />
                 Volver al Carrito
               </router-link>
-              <button type="submit" class="btn btn-primary" :disabled="isProcessing">
+              <button type="submit" class="btn btn-primary" :disabled="isProcessing || finalTotal === null || loadingQuote || loadingDestinations">
                 <font-awesome-icon 
                   :icon="isProcessing ? 'spinner' : 'credit-card'" 
                   :spin="isProcessing"
                   class="btn-icon" 
                 />
-                {{ isProcessing ? 'Procesando...' : `Pagar $${formatCLP(finalTotal)}` }}
+                {{ isProcessing ? 'Procesando...' : (finalTotal !== null ? `Pagar $${formatCLP(finalTotal)}` : 'Selecciona ciudad de envío') }}
               </button>
             </div>
           </form>
@@ -195,20 +209,22 @@
               
               <div class="summary-line">
                 <span>Envío:</span>
-                <span v-if="cartTotal >= 500" class="free-shipping">Gratis</span>
-                <span v-else>${{ formatCLP(25) }}</span>
+                <span v-if="loadingQuote" class="muted">Cotizando…</span>
+                <span v-else-if="displayShippingAmount !== null && cartTotal >= FREE_SHIPPING_MIN_SUBTOTAL" class="free-shipping">Gratis</span>
+                <span v-else-if="displayShippingAmount !== null">${{ formatCLP(displayShippingAmount) }}</span>
+                <span v-else class="muted">—</span>
               </div>
               
               <div class="summary-line">
                 <span>Impuestos:</span>
-                <span>${{ formatCLP(tax) }}</span>
+                <span>${{ formatCLP(taxAmount) }}</span>
               </div>
               
               <hr class="summary-divider">
               
               <div class="summary-line total-line">
                 <span>Total:</span>
-                <span class="total-amount">${{ formatCLP(finalTotal) }}</span>
+                <span class="total-amount">${{ finalTotal !== null ? formatCLP(finalTotal) : '—' }}</span>
               </div>
             </div>
 
@@ -234,12 +250,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart.js'
 import { useAuthStore } from '../stores/auth.js'
 import { storeToRefs } from 'pinia'
 import { useNotifications } from '../composables/useNotifications'
+import { useCheckoutShipping } from '../composables/useCheckoutShipping.js'
 import { formatCLP } from '../utils/formatters.js'
 
 const router = useRouter()
@@ -248,6 +265,19 @@ const cartStore = useCartStore()
 const authStore = useAuthStore()
 const { cartItems, cartTotal, cartItemCount } = storeToRefs(cartStore)
 const { user, isAuthenticated } = storeToRefs(authStore)
+
+const {
+  cityOptions,
+  selectedCodigoCiudad,
+  loadingDestinations,
+  loadingQuote,
+  quoteError,
+  taxAmount,
+  displayShippingAmount,
+  finalTotal,
+  fetchDestinations,
+  FREE_SHIPPING_MIN_SUBTOTAL
+} = useCheckoutShipping(cartTotal)
 
 // Form data
 const shippingForm = reactive({
@@ -264,10 +294,14 @@ const shippingForm = reactive({
 const orderNotes = ref('')
 const isProcessing = ref(false)
 
-// Computed properties
-const tax = computed(() => cartTotal.value * 0.08) // 8% tax
-const shipping = computed(() => cartTotal.value >= 500 ? 0 : 25)
-const finalTotal = computed(() => cartTotal.value + tax.value + shipping.value)
+watch(selectedCodigoCiudad, (id) => {
+  if (id === '' || id == null) {
+    shippingForm.city = ''
+    return
+  }
+  const o = cityOptions.value.find((x) => String(x.codigoCiudad) === String(id))
+  shippingForm.city = o ? o.nombreCiudad : ''
+})
 
 // Methods
 
@@ -292,8 +326,16 @@ const submitOrder = async () => {
   try {
     // Validate shipping form
     if (!shippingForm.name || !shippingForm.email || 
-        !shippingForm.phone || !shippingForm.address || !shippingForm.city || !shippingForm.zipCode) {
+        !shippingForm.phone || !shippingForm.address || !shippingForm.zipCode) {
       throw new Error('Por favor completa todos los campos obligatorios')
+    }
+
+    if (selectedCodigoCiudad.value === '' || selectedCodigoCiudad.value == null) {
+      throw new Error('Selecciona una ciudad de destino para el envío')
+    }
+
+    if (finalTotal.value === null || displayShippingAmount.value === null) {
+      throw new Error('Espera la cotización de envío o revisa el mensaje de error arriba')
     }
 
     // Redirect to payment processing
@@ -308,7 +350,9 @@ const submitOrder = async () => {
           address: shippingForm.address,
           city: shippingForm.city,
           zipCode: shippingForm.zipCode,
-          orderNotes: orderNotes.value
+          orderNotes: orderNotes.value,
+          codigoCiudadDestino: Number(selectedCodigoCiudad.value),
+          clientShippingAmount: displayShippingAmount.value
         })
       }
     })
@@ -323,6 +367,7 @@ const submitOrder = async () => {
 // Load user data when component mounts
 onMounted(() => {
   loadUserData()
+  fetchDestinations()
 })
 </script>
 
@@ -482,7 +527,8 @@ onMounted(() => {
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select.form-select {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid rgba(253, 179, 28, 0.5);
@@ -492,6 +538,17 @@ onMounted(() => {
   background: rgba(0, 0, 0, 0.3);
   color: var(--color-white);
   font-family: var(--font-family-primary);
+}
+
+.quote-warning {
+  margin-top: 0.35rem;
+  font-size: var(--font-size-sm);
+  color: #ffb4b4;
+}
+
+.muted {
+  opacity: 0.75;
+  font-style: italic;
 }
 
 .form-group input::placeholder,

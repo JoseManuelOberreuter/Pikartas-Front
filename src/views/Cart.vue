@@ -84,8 +84,7 @@
             
             <div class="summary-line">
               <span>Envío</span>
-              <span v-if="cartTotal >= 500" class="free-shipping">Gratis</span>
-              <span v-else>${{ formatCLP(25) }}</span>
+              <span class="muted">En checkout (Starken)</span>
             </div>
             
             <div class="summary-line">
@@ -96,12 +95,14 @@
             <hr>
             
             <div class="summary-line total">
-              <span>Total</span>
-              <span>${{ formatCLP(finalTotal) }}</span>
+              <span>Subtotal + impuestos</span>
+              <span>${{ formatCLP(subtotalWithTax) }}</span>
             </div>
             
-            <div v-if="cartTotal < 500" class="shipping-notice">
-              Agrega ${{ formatCLP(500 - cartTotal) }} más para envío gratis
+            <p class="cart-shipping-hint">El envío se cobra según ciudad al finalizar la compra.</p>
+            
+            <div v-if="cartTotal < FREE_SHIPPING_MIN" class="shipping-notice">
+              Agrega ${{ formatCLP(FREE_SHIPPING_MIN - cartTotal) }} más para envío gratis (sobre el subtotal)
             </div>
             
             <div class="cart-actions">
@@ -124,14 +125,15 @@ import { computed } from 'vue'
 import { useCartStore } from '../stores/cart.js'
 import { storeToRefs } from 'pinia'
 import { formatCLP } from '../utils/formatters.js'
+import { computeTaxAmount, FREE_SHIPPING_MIN_SUBTOTAL } from '../utils/checkoutTotals.js'
 
 const cartStore = useCartStore()
 const { cartItems, cartTotal, cartItemCount } = storeToRefs(cartStore)
 
-// Computed properties
-const tax = computed(() => cartTotal.value * 0.08) // 8% tax
-const shipping = computed(() => cartTotal.value >= 500 ? 0 : 25)
-const finalTotal = computed(() => cartTotal.value + tax.value + shipping.value)
+const FREE_SHIPPING_MIN = FREE_SHIPPING_MIN_SUBTOTAL
+
+const tax = computed(() => computeTaxAmount(cartTotal.value))
+const subtotalWithTax = computed(() => cartTotal.value + tax.value)
 
 // Methods
 const removeFromCart = async (productId) => {
@@ -410,6 +412,17 @@ const updateItemQuantity = async (productId, newQuantity) => {
   font-size: 1.125rem;
   font-weight: 700;
   margin-top: 0.5rem;
+}
+
+.muted {
+  color: #888;
+  font-size: 0.875rem;
+}
+
+.cart-shipping-hint {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0.5rem 0 0 0;
 }
 
 .shipping-notice {

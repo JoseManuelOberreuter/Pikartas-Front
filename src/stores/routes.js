@@ -135,6 +135,12 @@ export const useRoutesStore = defineStore('routes', () => {
   // Ruta de contacto
   const contactRoute = ref('/api/contact');
 
+  // Envío (Starken)
+  const shippingRoutes = ref({
+    destinations: '/api/shipping/destinations',
+    quote: '/api/shipping/quote'
+  });
+
   // Computed para obtener URLs completas
   const fullUserRoutes = computed(() => {
     const routes = {};
@@ -178,6 +184,14 @@ export const useRoutesStore = defineStore('routes', () => {
 
   const fullContactRoute = computed(() => {
     return `${baseURL.value}${contactRoute.value}`;
+  });
+
+  const fullShippingRoutes = computed(() => {
+    const routes = {};
+    Object.keys(shippingRoutes.value).forEach((key) => {
+      routes[key] = `${baseURL.value}${shippingRoutes.value[key]}`;
+    });
+    return routes;
   });
 
   // Métodos para construir URLs dinámicas
@@ -254,7 +268,8 @@ export const useRoutesStore = defineStore('routes', () => {
       products: fullProductRoutes.value,
       orders: fullOrderRoutes.value,
       cart: fullCartRoutes.value,
-      payments: fullPaymentRoutes.value
+      payments: fullPaymentRoutes.value,
+      shipping: fullShippingRoutes.value
     };
   });
 
@@ -267,6 +282,7 @@ export const useRoutesStore = defineStore('routes', () => {
     cartRoutes,
     paymentRoutes,
     contactRoute,
+    shippingRoutes,
     
     // Computed
     fullUserRoutes,
@@ -275,6 +291,7 @@ export const useRoutesStore = defineStore('routes', () => {
     fullCartRoutes,
     fullPaymentRoutes,
     fullContactRoute,
+    fullShippingRoutes,
     getAllRoutes,
     
     // Métodos

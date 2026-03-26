@@ -485,12 +485,37 @@ export const cartService = {
   }
 };
 
-// Servicios de pagos
-export const paymentService = {
-  async initiatePayment(shippingAddress) {
+/** Cotización y destinos Starken (rutas públicas) */
+export const shippingService = {
+  async getDestinations() {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.post(routesStore.fullPaymentRoutes.initiate, { shippingAddress });
+      const response = await axios.get(routesStore.fullShippingRoutes.destinations);
+      return response.data?.data ?? response.data;
+    } catch (error) {
+      logger.error('Shipping destinations error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async getQuote(body) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(routesStore.fullShippingRoutes.quote, body);
+      return response.data?.data ?? response.data;
+    } catch (error) {
+      logger.error('Shipping quote error:', error);
+      throw formatApiError(error);
+    }
+  }
+};
+
+// Servicios de pagos
+export const paymentService = {
+  async initiatePayment(paymentPayload) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(routesStore.fullPaymentRoutes.initiate, paymentPayload);
       return response.data;
     } catch (error) {
       logger.error('Initiate payment error:', error);

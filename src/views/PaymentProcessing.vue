@@ -130,14 +130,14 @@ const initiatePayment = async () => {
       country: "Chile"
     }
 
-    // Try to get shipping data from route query
+    let shippingData = null
     if (route.query.shippingData) {
       try {
-        const shippingData = JSON.parse(route.query.shippingData)
+        shippingData = JSON.parse(route.query.shippingData)
         shippingAddress = {
           street: shippingData.address,
           city: shippingData.city,
-          state: "Metropolitana", // Default state
+          state: "Metropolitana",
           zipCode: shippingData.zipCode,
           country: "Chile"
         }
@@ -146,7 +146,14 @@ const initiatePayment = async () => {
       }
     }
 
-    const data = await transbankService.initiatePayment(shippingAddress)
+    const paymentPayload = {
+      shippingAddress,
+      notes: shippingData?.orderNotes || undefined,
+      codigoCiudadDestino: shippingData?.codigoCiudadDestino,
+      clientShippingAmount: shippingData?.clientShippingAmount
+    }
+
+    const data = await transbankService.initiatePayment(paymentPayload)
 
     // Store payment data
     orderId.value = data.data.orderId
