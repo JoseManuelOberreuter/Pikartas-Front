@@ -15,7 +15,7 @@
         </div>
         <h2>Tu carrito está vacío</h2>
         <p>¡Empieza a agregar productos increíbles!</p>
-        <router-link to="/shop" class="btn btn-primary">
+        <router-link to="/shop" class="btn btn-primary btn-lg">
           <font-awesome-icon icon="store" class="btn-icon" />
           Ir a la Tienda
         </router-link>
@@ -106,10 +106,10 @@
             </div>
             
             <div class="cart-actions">
-              <router-link to="/checkout" class="btn btn-primary">
+              <router-link to="/checkout" class="btn btn-primary btn-full btn-lg">
                 Comprar
               </router-link>
-              <router-link to="/shop" class="btn btn-secondary">
+              <router-link to="/shop" class="btn btn-outline btn-full btn-lg">
                 Seguir Comprando
               </router-link>
             </div>
@@ -172,52 +172,88 @@ const updateItemQuantity = async (productId, newQuantity) => {
 }
 
 .cart {
-  padding: 100px 0 60px;
+  position: relative;
+  padding-top: calc(var(--header-height) + 8rem);
+  padding-bottom: 80px;
   min-height: 100vh;
-  background: #f8f9fa;
+  background: transparent;
+  color: var(--color-white);
+  font-family: var(--font-family-primary);
 }
 
 .cart-header {
   text-align: center;
   margin-bottom: 2rem;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid var(--color-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  animation: slideInUp 0.8s ease-out 0.2s both;
 }
 
 .cart-header h1 {
-  font-size: 2rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: var(--color-white);
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: var(--icon-cart-header);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 
 .cart-header p {
-  color: #666;
   margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.05rem;
 }
 
 .empty-cart {
   text-align: center;
-  background: white;
-  padding: 3rem 2rem;
-  border-radius: 8px;
+  padding: 4rem 2rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid var(--color-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  animation: slideInUp 0.8s ease-out 0.35s both;
 }
 
 .empty-cart-icon {
   font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.3;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-cart-icon-svg {
+  color: var(--icon-cart-empty);
+  opacity: 0.85;
 }
 
 .empty-cart h2 {
-  margin: 0 0 0.5rem 0;
-  color: #333;
+  margin: 0 0 0.75rem 0;
+  color: var(--color-white);
+  font-size: 1.75rem;
+  font-weight: 600;
 }
 
 .empty-cart p {
-  margin: 0 0 1.5rem 0;
-  color: #666;
+  margin: 0 0 2rem 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+}
+
+.btn-icon {
+  margin-right: 0.5rem;
 }
 
 .cart-content {
@@ -227,9 +263,13 @@ const updateItemQuantity = async (productId, newQuantity) => {
 }
 
 .cart-items {
-  background: white;
-  border-radius: 8px;
-  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 1.25rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.8s ease-out 0.35s both;
 }
 
 .cart-item {
@@ -237,7 +277,7 @@ const updateItemQuantity = async (productId, newQuantity) => {
   grid-template-columns: 80px 1fr auto;
   gap: 1rem;
   padding: 1rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   align-items: center;
 }
 
@@ -248,8 +288,10 @@ const updateItemQuantity = async (productId, newQuantity) => {
 .item-image {
   width: 80px;
   height: 80px;
-  border-radius: 6px;
+  border-radius: 10px;
   object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .item-info {
@@ -259,7 +301,8 @@ const updateItemQuantity = async (productId, newQuantity) => {
 .item-name {
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
-  color: #333;
+  font-weight: 600;
+  color: var(--color-white);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -274,24 +317,24 @@ const updateItemQuantity = async (productId, newQuantity) => {
 
 .price {
   font-weight: 600;
-  color: #28a745;
+  color: var(--color-primary);
 }
 
 .price-sale {
-  color: #dc3545;
+  color: var(--color-error);
 }
 
 .price-original {
   font-size: 0.875rem;
-  color: #999;
+  color: rgba(255, 255, 255, 0.45);
   text-decoration: line-through;
 }
 
 .discount-badge {
-  background: #dc3545;
-  color: white;
-  padding: 0.125rem 0.375rem;
-  border-radius: 3px;
+  background: var(--color-error);
+  color: var(--color-white);
+  padding: 0.125rem 0.5rem;
+  border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 600;
 }
@@ -305,29 +348,32 @@ const updateItemQuantity = async (productId, newQuantity) => {
 .quantity-controls {
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  overflow: hidden;
 }
 
 .qty-btn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: none;
   background: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
+  transition: background var(--transition-fast);
 }
 
 .qty-btn:hover:not(:disabled) {
-  background: #f0f0f0;
-  color: #333;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-white);
 }
 
 .qty-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
@@ -337,7 +383,9 @@ const updateItemQuantity = async (productId, newQuantity) => {
   border: none;
   padding: 0.25rem;
   font-size: 0.875rem;
+  font-family: var(--font-family-primary);
   background: transparent;
+  color: var(--color-white);
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -351,7 +399,7 @@ const updateItemQuantity = async (productId, newQuantity) => {
 .item-total {
   font-weight: 600;
   font-size: 1rem;
-  color: #333;
+  color: var(--color-white);
   min-width: 80px;
   text-align: right;
 }
@@ -359,35 +407,42 @@ const updateItemQuantity = async (productId, newQuantity) => {
 .remove-btn {
   background: transparent;
   border: none;
-  color: #dc3545;
+  color: var(--color-error);
   cursor: pointer;
   padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 8px;
+  transition: background var(--transition-fast);
 }
 
 .remove-btn:hover {
-  background: #fee;
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--color-white);
 }
 
 .cart-summary {
   position: sticky;
-  top: 100px;
+  top: calc(var(--header-height) + 1.5rem);
   height: fit-content;
 }
 
 .summary-card {
-  background: white;
-  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
   padding: 1.5rem;
+  border: 1px solid var(--color-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  animation: slideInUp 0.8s ease-out 0.45s both;
 }
 
 .summary-card h3 {
   margin: 0 0 1rem 0;
-  font-size: 1.125rem;
-  color: #333;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-white);
 }
 
 .summary-line {
@@ -395,16 +450,17 @@ const updateItemQuantity = async (productId, newQuantity) => {
   justify-content: space-between;
   margin-bottom: 0.75rem;
   font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .free-shipping {
-  color: #28a745;
+  color: var(--color-success);
   font-weight: 600;
 }
 
 .summary-card hr {
   border: none;
-  border-top: 1px solid #eee;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   margin: 1rem 0;
 }
 
@@ -412,69 +468,54 @@ const updateItemQuantity = async (productId, newQuantity) => {
   font-size: 1.125rem;
   font-weight: 700;
   margin-top: 0.5rem;
+  color: var(--color-white);
 }
 
 .muted {
-  color: #888;
+  color: rgba(255, 255, 255, 0.55);
   font-size: 0.875rem;
 }
 
 .cart-shipping-hint {
   font-size: 0.8rem;
-  color: #666;
+  color: rgba(255, 255, 255, 0.65);
   margin: 0.5rem 0 0 0;
+  line-height: var(--line-height-relaxed);
 }
 
 .shipping-notice {
-  background: #e7f3ff;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.35);
   padding: 0.75rem;
-  border-radius: 4px;
+  border-radius: 10px;
   margin-bottom: 1rem;
   font-size: 0.875rem;
-  color: #0056b3;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .cart-actions {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
 }
 
-.btn {
-  padding: 0.75rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  transition: background 0.2s;
-}
-
-.btn-primary {
-  background: #667eea;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #5568d3;
-}
-
-.btn-secondary {
-  background: transparent;
-  color: #666;
-  border: 1px solid #ddd;
-}
-
-.btn-secondary:hover {
-  background: #f8f9fa;
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 1024px) {
   .cart-content {
     grid-template-columns: 1fr;
   }
-  
+
   .cart-summary {
     position: static;
   }
@@ -485,14 +526,15 @@ const updateItemQuantity = async (productId, newQuantity) => {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .item-image {
     width: 100%;
     height: 200px;
   }
-  
+
   .item-actions {
     flex-wrap: wrap;
+    justify-content: space-between;
   }
 }
 </style> 
