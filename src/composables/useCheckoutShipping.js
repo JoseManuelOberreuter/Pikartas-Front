@@ -3,8 +3,7 @@ import { shippingService } from '../services/api.js'
 import {
   computeTaxAmount,
   effectiveShippingAmount,
-  computeFinalTotal,
-  FREE_SHIPPING_MIN_SUBTOTAL
+  computeFinalTotal
 } from '../utils/checkoutTotals.js'
 
 let destinationsPromise = null
@@ -34,7 +33,7 @@ export function useCheckoutShipping(cartTotalRef) {
 
   const displayShippingAmount = computed(() => {
     if (quotedShippingRaw.value === null || quotedShippingRaw.value === undefined) return null
-    return effectiveShippingAmount(quotedShippingRaw.value, cartTotalRef.value)
+    return effectiveShippingAmount(quotedShippingRaw.value)
   })
 
   const finalTotal = computed(() => {
@@ -112,7 +111,6 @@ export function useCheckoutShipping(cartTotalRef) {
     taxAmount,
     displayShippingAmount,
     finalTotal,
-    fetchDestinations,
-    FREE_SHIPPING_MIN_SUBTOTAL
+    fetchDestinations
   }
 }

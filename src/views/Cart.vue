@@ -101,10 +101,6 @@
             
             <p class="cart-shipping-hint">El envío se cobra según ciudad al finalizar la compra.</p>
             
-            <div v-if="cartTotal < FREE_SHIPPING_MIN" class="shipping-notice">
-              Agrega ${{ formatCLP(FREE_SHIPPING_MIN - cartTotal) }} más para envío gratis (sobre el subtotal)
-            </div>
-            
             <div class="cart-actions">
               <router-link to="/checkout" class="btn btn-primary btn-full btn-lg">
                 Comprar
@@ -125,12 +121,10 @@ import { computed } from 'vue'
 import { useCartStore } from '../stores/cart.js'
 import { storeToRefs } from 'pinia'
 import { formatCLP } from '../utils/formatters.js'
-import { computeTaxAmount, FREE_SHIPPING_MIN_SUBTOTAL } from '../utils/checkoutTotals.js'
+import { computeTaxAmount } from '../utils/checkoutTotals.js'
 
 const cartStore = useCartStore()
 const { cartItems, cartTotal, cartItemCount } = storeToRefs(cartStore)
-
-const FREE_SHIPPING_MIN = FREE_SHIPPING_MIN_SUBTOTAL
 
 const tax = computed(() => computeTaxAmount(cartTotal.value))
 const subtotalWithTax = computed(() => cartTotal.value + tax.value)

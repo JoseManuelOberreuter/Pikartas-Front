@@ -210,7 +210,6 @@
               <div class="summary-line">
                 <span>Envío:</span>
                 <span v-if="loadingQuote" class="muted">Cotizando…</span>
-                <span v-else-if="displayShippingAmount !== null && cartTotal >= FREE_SHIPPING_MIN_SUBTOTAL" class="free-shipping">Gratis</span>
                 <span v-else-if="displayShippingAmount !== null">${{ formatCLP(displayShippingAmount) }}</span>
                 <span v-else class="muted">—</span>
               </div>
@@ -275,8 +274,7 @@ const {
   taxAmount,
   displayShippingAmount,
   finalTotal,
-  fetchDestinations,
-  FREE_SHIPPING_MIN_SUBTOTAL
+  fetchDestinations
 } = useCheckoutShipping(cartTotal)
 
 // Form data
@@ -775,11 +773,6 @@ onMounted(() => {
   margin-bottom: 0.75rem;
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.95);
-}
-
-.free-shipping {
-  color: var(--color-success);
-  font-weight: var(--font-weight-semibold);
 }
 
 .summary-divider {
