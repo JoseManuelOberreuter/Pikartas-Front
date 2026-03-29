@@ -8,7 +8,6 @@ import Checkout from '../views/Checkout.vue'
 import EmailVerification from '../views/EmailVerification.vue'
 import ResetPassword from '../views/ResetPassword.vue'
 import Profile from '../views/Profile.vue'
-import Settings from '../views/Settings.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
 import AdminProducts from '../views/AdminProducts.vue'
 import Contact from '../views/Contact.vue'
@@ -73,9 +72,7 @@ const routes = [
   },
   {
     path: '/settings',
-    name: 'Settings',
-    component: Settings,
-    meta: { requiresAuth: true }
+    redirect: '/profile'
   },
   {
     path: '/admin',

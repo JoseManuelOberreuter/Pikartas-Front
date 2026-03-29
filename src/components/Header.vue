@@ -68,12 +68,6 @@
                       <span>Panel Admin</span>
                     </button>
                   </li>
-                  <li>
-                    <button class="user-menu-item" @click="goToSettings">
-                      <font-awesome-icon icon="cog" class="menu-icon" />
-                      <span>Configuración</span>
-                    </button>
-                  </li>
                 </ul>
                 <div class="user-menu-separator"></div>
                 <button class="user-menu-item logout-btn" @click="handleLogout">
@@ -141,9 +135,6 @@
               <button v-if="isAdmin" class="btn btn-admin btn-full" @click="goToAdmin(); closeMobileMenu()">
                 <font-awesome-icon icon="tools" class="btn-icon" />
                 Panel Admin
-              </button>
-              <button class="btn btn-outline btn-full" @click="goToSettings(); closeMobileMenu()">
-                Configuración
               </button>
               <button class="btn btn-tertiary btn-full" @click="handleLogout(); closeMobileMenu()">
                 Cerrar Sesión
@@ -285,12 +276,6 @@ const goToOrders = () => {
   closeUserMenu()
   closeMobileMenu()
   router.push('/orders')
-}
-
-const goToSettings = () => {
-  closeUserMenu()
-  closeMobileMenu()
-  router.push('/settings')
 }
 
 const goToAdmin = () => {

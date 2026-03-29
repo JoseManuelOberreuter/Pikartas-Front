@@ -39,8 +39,9 @@
               <h2>Información Personal</h2>
               <button 
                 v-if="!editMode" 
+                type="button"
                 @click="enableEditMode" 
-                class="btn btn-outline btn-sm"
+                class="btn btn-primary btn-sm"
               >
                 <font-awesome-icon icon="edit" class="btn-icon" />
                 Editar
@@ -230,11 +231,25 @@ const saveProfile = async () => {
       direccion: profileForm.direccion
     }
     
-    const response = await authService.updateProfile(profileDataToUpdate)
-    
-    // Actualizar el store con los nuevos datos
-    Object.assign(authStore.user, profileForm)
-    
+    const payload = await authService.updateProfile(profileDataToUpdate)
+    const userData = payload?.data
+
+    if (userData && authStore.user) {
+      Object.assign(authStore.user, {
+        name: userData.name ?? profileForm.name,
+        email: userData.email ?? profileForm.email,
+        telefono: userData.telefono ?? profileForm.telefono,
+        fechaNacimiento: userData.fecha_nacimiento ?? userData.fechaNacimiento ?? profileForm.fechaNacimiento,
+        direccion: userData.direccion ?? profileForm.direccion,
+        isVerified: userData.is_verified ?? authStore.user.isVerified,
+        role: userData.role ?? authStore.user.role
+      })
+    } else if (authStore.user) {
+      Object.assign(authStore.user, profileForm)
+    }
+
+    loadUserData()
+
     success('Perfil actualizado exitosamente')
     editMode.value = false
   } catch (err) {
@@ -435,6 +450,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 2rem 2rem 1rem 2rem;
+  /* Anula .card-header global (fondo claro) para que título y acciones contrasten */
+  background: rgba(0, 0, 0, 0.45);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
