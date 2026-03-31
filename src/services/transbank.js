@@ -4,7 +4,7 @@
 import { paymentService } from './api';
 
 class TransbankService {
-  // Initiate payment with Transbank (shippingAddress + codigoCiudadDestino + clientShippingAmount, etc.)
+  // Initiate payment with Transbank (shippingAddress + codigoCiudadDestino + clientShippingAmount)
   async initiatePayment(paymentPayload) {
     return paymentService.initiatePayment(paymentPayload);
   }

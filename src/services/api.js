@@ -485,7 +485,7 @@ export const cartService = {
   }
 };
 
-/** Cotización y destinos Starken (rutas públicas) */
+/** Cotización y destinos de envío (estimado o Starken según backend; rutas públicas) */
 export const shippingService = {
   async getDestinations() {
     try {

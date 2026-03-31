@@ -73,7 +73,7 @@
               </div>
 
               <div class="form-group">
-                <label for="cityDest">Ciudad de envío (Starken) *</label>
+                <label for="cityDest">Comuna o ciudad de destino *</label>
                 <select
                   id="cityDest"
                   v-model="selectedCodigoCiudad"

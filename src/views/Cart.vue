@@ -84,7 +84,7 @@
             
             <div class="summary-line">
               <span>Envío</span>
-              <span class="muted">En checkout (Starken)</span>
+              <span class="muted">En checkout (según destino)</span>
             </div>
             
             <hr>

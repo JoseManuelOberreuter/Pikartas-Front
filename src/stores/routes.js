@@ -135,7 +135,7 @@ export const useRoutesStore = defineStore('routes', () => {
   // Ruta de contacto
   const contactRoute = ref('/api/contact');
 
-  // Envío (Starken)
+  // Envío (cotización)
   const shippingRoutes = ref({
     destinations: '/api/shipping/destinations',
     quote: '/api/shipping/quote'
