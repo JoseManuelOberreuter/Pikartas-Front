@@ -21,6 +21,12 @@ export const useCartStore = defineStore('cart', () => {
     if (err?.verificationRequired) {
       return verificationRequiredMessage;
     }
+    if (typeof err?.message === 'string' && err.message.toLowerCase().includes('agotado')) {
+      return err.message;
+    }
+    if (typeof err?.message === 'string' && err.message.toLowerCase().includes('stock insuficiente')) {
+      return err.message;
+    }
     return err?.message || err?.error || fallbackMessage;
   };
 

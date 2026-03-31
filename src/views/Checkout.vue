@@ -155,7 +155,7 @@
                 <font-awesome-icon icon="arrow-left" class="btn-icon" />
                 Volver al Carrito
               </router-link>
-              <button type="submit" class="btn btn-primary" :disabled="isProcessing || finalTotal === null || loadingQuote || loadingDestinations">
+              <button type="submit" class="btn btn-primary" :disabled="isProcessing || finalTotal === null || loadingQuote || loadingDestinations || invalidStockItems.length > 0">
                 <font-awesome-icon 
                   :icon="isProcessing ? 'spinner' : 'credit-card'" 
                   :spin="isProcessing"
@@ -188,6 +188,7 @@
             </div>
 
             <div class="summary-totals">
+              <p v-if="stockWarningMessage" class="checkout-stock-warning">{{ stockWarningMessage }}.</p>
               <div class="summary-line">
                 <span>Subtotal:</span>
                 <span>${{ formatCLP(cartTotal) }}</span>
@@ -216,7 +217,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted } from 'vue'
+import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart.js'
 import { useAuthStore } from '../stores/auth.js'
@@ -258,6 +259,26 @@ const shippingForm = reactive({
 const orderNotes = ref('')
 const isProcessing = ref(false)
 
+const invalidStockItems = computed(() => cartItems.value.filter((item) => {
+  const stock = Number(item.stock ?? 0)
+  const quantity = Number(item.quantity ?? 0)
+  return stock <= 0 || quantity > stock
+}))
+
+const stockWarningMessage = computed(() => {
+  if (invalidStockItems.value.length === 0) return ''
+
+  return invalidStockItems.value
+    .map((item) => {
+      if ((item.stock ?? 0) <= 0) {
+        return `${item.name} está agotado`
+      }
+
+      return `${item.name} solo tiene ${item.stock} unidades disponibles`
+    })
+    .join('. ')
+})
+
 watch(selectedCodigoCiudad, (id) => {
   if (id === '' || id == null) {
     shippingForm.city = ''
@@ -296,6 +317,10 @@ const submitOrder = async () => {
 
     if (selectedCodigoCiudad.value === '' || selectedCodigoCiudad.value == null) {
       throw new Error('Selecciona una ciudad de destino para el envío')
+    }
+
+    if (invalidStockItems.value.length > 0) {
+      throw new Error(stockWarningMessage.value || 'Hay productos sin stock en tu carrito')
     }
 
     if (finalTotal.value === null || displayShippingAmount.value === null) {
@@ -721,6 +746,7 @@ onMounted(() => {
   font-size: var(--font-size-sm);
   color: var(--color-white);
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -741,6 +767,12 @@ onMounted(() => {
 
 .summary-totals {
   padding-top: 1rem;
+}
+
+.checkout-stock-warning {
+  margin: 0 0 1rem 0;
+  color: #ffb4b4;
+  font-size: var(--font-size-sm);
 }
 
 .summary-line {

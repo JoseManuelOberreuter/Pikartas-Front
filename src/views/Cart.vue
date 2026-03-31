@@ -28,6 +28,10 @@
             
             <div class="item-info">
               <h3 class="item-name">{{ item.name }}</h3>
+              <p v-if="item.stock === 0" class="stock-warning">Agotado. Elimina este producto o vuelve a la tienda.</p>
+              <p v-else-if="item.quantity > item.stock" class="stock-warning">
+                Stock disponible: {{ item.stock }}. Ajusta la cantidad para continuar.
+              </p>
               <div class="item-price-row">
                 <span v-if="item.isOnSale && item.originalPrice" class="price-original">
                   ${{ formatCLP(item.originalPrice) }}
@@ -55,9 +59,11 @@
                   :value="item.quantity" 
                   @change="updateItemQuantity(item.id, $event.target.value)"
                   min="1"
+                  :max="item.stock > 0 ? item.stock : 1"
                   class="qty-input"
+                  :disabled="item.stock === 0"
                 >
-                <button class="qty-btn" @click="increaseQuantity(item.id)">
+                <button class="qty-btn" @click="increaseQuantity(item.id)" :disabled="!canIncreaseQuantity(item)">
                   <font-awesome-icon icon="plus" />
                 </button>
               </div>
@@ -127,7 +133,7 @@ const removeFromCart = async (productId) => {
 
 const increaseQuantity = async (productId) => {
   const item = cartItems.value.find(item => item.id === productId)
-  if (item) {
+  if (item && canIncreaseQuantity(item)) {
     await cartStore.updateQuantity(productId, item.quantity + 1)
   }
 }
@@ -144,6 +150,11 @@ const updateItemQuantity = async (productId, newQuantity) => {
   if (quantity > 0) {
     await cartStore.updateQuantity(productId, quantity)
   }
+}
+
+const canIncreaseQuantity = (item) => {
+  if (!item || item.stock === 0) return false
+  return item.quantity < item.stock
 }
 </script>
 
@@ -296,6 +307,12 @@ const updateItemQuantity = async (productId, newQuantity) => {
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
+}
+
+.stock-warning {
+  margin: 0 0 0.5rem 0;
+  color: var(--color-error);
+  font-size: 0.85rem;
 }
 
 .price {

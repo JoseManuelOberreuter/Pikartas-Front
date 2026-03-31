@@ -64,6 +64,11 @@
                   -{{ item.discountPercentage }}%
                 </span>
               </div>
+
+              <p v-if="item.stock === 0" class="stock-warning">Agotado. Elimina este producto para continuar.</p>
+              <p v-else-if="item.quantity > item.stock" class="stock-warning">
+                Stock disponible: {{ item.stock }}.
+              </p>
               
               <div class="item-actions">
                 <div class="quantity-controls">
@@ -75,9 +80,11 @@
                     :value="item.quantity" 
                     @change="updateItemQuantity(item.id, $event.target.value)"
                     min="1"
+                    :max="item.stock > 0 ? item.stock : 1"
                     class="qty-input"
+                    :disabled="item.stock === 0"
                   >
-                  <button class="qty-btn" @click="increaseQuantity(item.id)">
+                  <button class="qty-btn" @click="increaseQuantity(item.id)" :disabled="!canIncreaseQuantity(item)">
                     <font-awesome-icon icon="plus" />
                   </button>
                 </div>
@@ -158,7 +165,7 @@ const removeFromCart = async (productId) => {
 
 const increaseQuantity = async (productId) => {
   const item = cartItems.value.find(item => item.id === productId)
-  if (item) {
+  if (item && canIncreaseQuantity(item)) {
     await cartStore.updateQuantity(productId, item.quantity + 1)
   }
 }
@@ -175,6 +182,11 @@ const updateItemQuantity = async (productId, newQuantity) => {
   if (quantity > 0) {
     await cartStore.updateQuantity(productId, quantity)
   }
+}
+
+const canIncreaseQuantity = (item) => {
+  if (!item || item.stock === 0) return false
+  return item.quantity < item.stock
 }
 
 const clearCart = async () => {
@@ -443,6 +455,12 @@ const openLoginModal = () => {
   gap: 0.5rem;
   flex-wrap: wrap;
   margin-bottom: 0.5rem;
+}
+
+.stock-warning {
+  margin: 0 0 0.5rem 0;
+  color: #dc3545;
+  font-size: 0.75rem;
 }
 
 .price {
