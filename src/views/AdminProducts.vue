@@ -222,6 +222,13 @@ import ConfirmationModal from '../components/ConfirmationModal.vue'
 
 const { success, error } = useNotifications()
 
+/** IDs numéricos o UUID/string (misma lógica que validateProductId en el backend). */
+function isValidProductId(id) {
+  if (id === undefined || id === null) return false
+  const s = String(id).trim()
+  return s.length > 0
+}
+
 // State
 const products = ref([])
 const loading = ref(false)
@@ -593,13 +600,12 @@ const confirmSaveOffer = async () => {
       formDataToSend.append('saleEndDate', '')
     }
     
-    const id = parseInt(currentProductId.value)
-    if (!id || isNaN(id)) {
+    if (!isValidProductId(currentProductId.value)) {
       error('Error: ID de producto inválido')
       return
     }
-    
-    await adminService.updateProduct(id, formDataToSend)
+
+    await adminService.updateProduct(currentProductId.value, formDataToSend)
     success(formData.isOnSale ? 'Oferta configurada exitosamente' : 'Oferta desactivada exitosamente')
     await loadProducts()
     closeSaleModal()
@@ -640,6 +646,21 @@ const formatDate = (dateString) => {
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit'
+  })
+}
+
+/** Actualiza la fila local con la respuesta del PUT (fuente de verdad) por si el GET siguiente llega cacheado. */
+const mergeProductFromServer = (updated) => {
+  if (!updated) return
+  const uid = updated.id ?? updated._id
+  if (uid === undefined || uid === null) return
+  const idStr = String(uid)
+  products.value = products.value.map((p) => {
+    const pid = p.id ?? p._id
+    if (String(pid) === idStr) {
+      return { ...p, ...updated }
+    }
+    return p
   })
 }
 
@@ -740,7 +761,10 @@ const submitProduct = async (formData) => {
         throw new Error('ID de producto no encontrado')
       }
       
-      await adminService.updateProduct(formData._id, formDataToSend)
+      const updateRes = await adminService.updateProduct(formData._id, formDataToSend)
+      if (updateRes?.success && updateRes?.data) {
+        mergeProductFromServer(updateRes.data)
+      }
       success('Producto actualizado correctamente')
     } else {
       await adminService.createProduct(formDataToSend)
@@ -825,13 +849,12 @@ const cancelUpdateStock = () => {
 }
 
 const deleteProduct = async (productId) => {
-  const id = parseInt(productId)
-  if (!id || isNaN(id)) {
+  if (!isValidProductId(productId)) {
     error('Error: ID de producto inválido')
     return
   }
-  
-  pendingProductId.value = id
+
+  pendingProductId.value = productId
   showDeleteProductModal.value = true
 }
 
@@ -852,13 +875,12 @@ const cancelDeleteProduct = () => {
 }
 
 const reactivateProduct = async (productId) => {
-  const id = parseInt(productId)
-  if (!id || isNaN(id)) {
+  if (!isValidProductId(productId)) {
     error('Error: ID de producto inválido')
     return
   }
-  
-  pendingProductId.value = id
+
+  pendingProductId.value = productId
   showReactivateProductModal.value = true
 }
 
@@ -911,14 +933,13 @@ const getFinalPrice = (product) => {
 }
 
 const toggleFeatured = async (productId, currentState) => {
-  const id = parseInt(productId)
-  if (!id || isNaN(id)) {
+  if (!isValidProductId(productId)) {
     error('Error: ID de producto inválido')
     return
   }
-  
+
   const newState = !currentState
-  pendingProductId.value = id
+  pendingProductId.value = productId
   pendingFeaturedState.value = newState
   showToggleFeaturedModal.value = true
 }

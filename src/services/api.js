@@ -629,7 +629,15 @@ export const adminService = {
   async getAllProducts() {
     try {
       const routesStore = useRoutesStore();
-      const response = await axios.get(routesStore.fullProductRoutes.getAllAdmin);
+      // Evitar respuestas GET cacheadas (proxy/navegador): el listado debe coincidir con el último PUT/PATCH.
+      const url = `${routesStore.fullProductRoutes.getAllAdmin}?_t=${Date.now()}`;
+      const response = await axios.get(url, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0'
+        }
+      });
       return response.data;
     } catch (error) {
       logger.error('Admin get all products error:', error);

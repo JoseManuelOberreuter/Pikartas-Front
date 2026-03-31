@@ -70,7 +70,7 @@
         <!-- Para productos inactivos, solo mostrar opción de reactivar -->
         <template v-if="product.is_active === false">
           <button 
-            @click="$emit('reactivate', product.id)" 
+            @click="$emit('reactivate', product._id || product.id)" 
             class="btn btn-sm btn-success"
             title="Reactivar producto"
           >
@@ -103,7 +103,7 @@
             <font-awesome-icon icon="edit" class="action-icon" />
           </button>
           <button 
-            @click="$emit('delete', product.id)" 
+            @click="$emit('delete', product._id || product.id)" 
             class="btn btn-sm btn-error" 
             title="Eliminar producto"
           >
