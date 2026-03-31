@@ -298,7 +298,7 @@ onMounted(() => {
   min-height: 100vh;
   background: var(--color-black);
   color: var(--color-white);
-  --input-autofill-bg: rgba(38, 38, 44, 0.9);
+  --input-autofill-bg: rgba(255, 255, 255, 0.1);
   --input-autofill-text: #ffffff;
 }
 

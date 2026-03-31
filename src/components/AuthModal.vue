@@ -390,7 +390,7 @@ const handleForgotPassword = async () => {
 .auth-form {
   padding: var(--spacing-3xl);
   background: var(--color-black);
-  --input-autofill-bg: rgba(0, 0, 0, 0.45);
+  --input-autofill-bg: rgba(0, 0, 0, 0.35);
   --input-autofill-text: #ffffff;
 }
 
@@ -457,7 +457,7 @@ const handleForgotPassword = async () => {
 .form-group input:focus {
   outline: none;
   border-color: var(--color-quaternary);
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.35);
   box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
   color: var(--color-white);
 }
