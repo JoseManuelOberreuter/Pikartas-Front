@@ -321,6 +321,16 @@ watch(() => props.show, (newVal) => {
   box-shadow: 0 0 0 3px rgba(253, 179, 28, 0.2);
 }
 
+/* Lista nativa del select: sin esto, en Windows/Chromium el fondo claro + texto heredado blanco = ilegible */
+.product-form .form-select {
+  color-scheme: dark;
+}
+
+.product-form .form-select option {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
 .product-form .form-help {
   color: rgba(255, 255, 255, 0.6);
 }
