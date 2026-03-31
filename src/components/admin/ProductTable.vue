@@ -97,8 +97,8 @@
         </thead>
         <tbody>
           <ProductTableRow
-            v-for="product in products"
-            :key="product._id || product.id"
+            v-for="(product, index) in products"
+            :key="getProductRowId(product) ?? `p-${index}`"
             :product="product"
             :isProductOnSale="isProductOnSale"
             :getFinalPrice="getFinalPrice"
@@ -133,6 +133,7 @@
 
 <script setup>
 import ProductTableRow from './ProductTableRow.vue'
+import { getProductRowId } from '../../utils/productIds.js'
 
 defineProps({
   products: {

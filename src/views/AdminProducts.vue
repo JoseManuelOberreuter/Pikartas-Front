@@ -213,6 +213,7 @@ import { ref, computed, onMounted } from 'vue'
 import { adminService, productService } from '../services/api'
 import { useNotifications } from '../composables/useNotifications'
 import { formatCLP } from '../utils/formatters.js'
+import { getProductRowId } from '../utils/productIds.js'
 import ProductFilters from '../components/admin/ProductFilters.vue'
 import ProductTable from '../components/admin/ProductTable.vue'
 import CategoryManager from '../components/admin/CategoryManager.vue'
@@ -503,7 +504,7 @@ const closeCategoryModal = () => {
 
 // Sale Modal Functions
 const openSaleModal = (product) => {
-  const productId = product._id || product.id
+  const productId = getProductRowId(product)
   if (!productId) {
     error('Error: Producto sin ID válido')
     return
@@ -658,7 +659,10 @@ const mergeProductFromServer = (updated) => {
   products.value = products.value.map((p) => {
     const pid = p.id ?? p._id
     if (String(pid) === idStr) {
-      return { ...p, ...updated }
+      const merged = { ...p, ...updated }
+      // No sobrescribir id con null/undefined si el JSON del PUT traía id nulo
+      if (merged.id == null || merged.id === '') merged.id = p.id ?? p._id
+      return merged
     }
     return p
   })
@@ -703,7 +707,7 @@ const openCreateModal = () => {
 }
 
 const editProduct = (product) => {
-  const productId = product._id || product.id
+  const productId = getProductRowId(product)
   if (!productId) {
     error('Error: Producto sin ID válido')
     return

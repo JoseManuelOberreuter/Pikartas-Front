@@ -38,7 +38,7 @@
       <div class="stock-control">
         <input 
           :value="product.stock" 
-          @change="$emit('update-stock', product._id || product.id, $event.target.value)"
+          @change="$emit('update-stock', getProductRowId(product), $event.target.value)"
           type="number" 
           min="0" 
           class="stock-input form-input"
@@ -70,7 +70,7 @@
         <!-- Para productos inactivos, solo mostrar opción de reactivar -->
         <template v-if="product.is_active === false">
           <button 
-            @click="$emit('reactivate', product._id || product.id)" 
+            @click="$emit('reactivate', getProductRowId(product))" 
             class="btn btn-sm btn-success"
             title="Reactivar producto"
           >
@@ -80,7 +80,7 @@
         <!-- Para productos activos, mostrar todas las opciones -->
         <template v-else>
           <button 
-            @click="$emit('toggle-featured', product._id || product.id, product.is_featured)" 
+            @click="$emit('toggle-featured', getProductRowId(product), product.is_featured)" 
             class="btn btn-sm"
             :class="product.is_featured ? 'btn-featured-active' : 'btn-featured'"
             :title="product.is_featured ? 'Quitar de destacados' : 'Marcar como destacado'"
@@ -103,7 +103,7 @@
             <font-awesome-icon icon="edit" class="action-icon" />
           </button>
           <button 
-            @click="$emit('delete', product._id || product.id)" 
+            @click="$emit('delete', getProductRowId(product))" 
             class="btn btn-sm btn-error" 
             title="Eliminar producto"
           >
@@ -116,6 +116,8 @@
 </template>
 
 <script setup>
+import { getProductRowId } from '../../utils/productIds.js'
+
 defineProps({
   product: {
     type: Object,
