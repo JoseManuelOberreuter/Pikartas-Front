@@ -376,6 +376,8 @@ onMounted(() => {
   min-height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   font-family: var(--font-family-primary);
+  --input-autofill-bg: rgba(0, 0, 0, 0.5);
+  --input-autofill-text: #ffffff;
 }
 
 .checkout-header {
@@ -549,10 +551,19 @@ onMounted(() => {
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select.form-select:focus {
   outline: none;
   border-color: var(--color-primary);
+  background: rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 0 3px rgba(253, 179, 28, 0.2);
+  color: var(--color-white);
+}
+
+.form-group input:hover:not(:focus),
+.form-group textarea:hover:not(:focus),
+.form-group select.form-select:hover:not(:focus) {
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .form-group textarea {

@@ -209,6 +209,8 @@ const handleSubmit = async () => {
   padding-bottom: 80px;
   min-height: 100vh;
   background: transparent;
+  --input-autofill-bg: rgba(0, 0, 0, 0.5);
+  --input-autofill-text: #ffffff;
 }
 
 .container {

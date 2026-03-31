@@ -48,4 +48,8 @@
     --color-gray-800: #212529;
     --color-gray-900: #0d0e10;
     --color-black: #000000;
+
+    /* Superficie de inputs en UI oscura (evita autofill blanco/amarillo del navegador) */
+    --input-autofill-bg: rgba(0, 0, 0, 0.45);
+    --input-autofill-text: #ffffff;
 }

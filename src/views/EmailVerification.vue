@@ -206,6 +206,8 @@ onMounted(async () => {
   padding-top: 4rem;
   color: var(--color-white);
   overflow: hidden;
+  --input-autofill-bg: rgba(36, 36, 42, 0.92);
+  --input-autofill-text: #ffffff;
 }
 
 .verification-container {

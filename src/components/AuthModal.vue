@@ -390,6 +390,8 @@ const handleForgotPassword = async () => {
 .auth-form {
   padding: var(--spacing-3xl);
   background: var(--color-black);
+  --input-autofill-bg: rgba(0, 0, 0, 0.45);
+  --input-autofill-text: #ffffff;
 }
 
 .form-group {
@@ -413,8 +415,9 @@ const handleForgotPassword = async () => {
   font-family: var(--font-family-primary);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
-  color: var(--color-black);
-  background-color: var(--color-white);
+  color: var(--color-white);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
   transition: all var(--transition-normal);
 }
 
@@ -438,7 +441,7 @@ const handleForgotPassword = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-gray-500);
+  color: rgba(255, 255, 255, 0.65);
   transition: color var(--transition-normal);
   z-index: 10;
 }
@@ -454,11 +457,13 @@ const handleForgotPassword = async () => {
 .form-group input:focus {
   outline: none;
   border-color: var(--color-quaternary);
+  background: rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
+  color: var(--color-white);
 }
 
 .form-group input::placeholder {
-  color: var(--color-gray-400);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .auth-switch {
