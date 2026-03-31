@@ -130,20 +130,6 @@
                 </div>
               </div>
 
-              <div class="payment-info-card">
-                <div class="info-item">
-                  <font-awesome-icon icon="shield-alt" class="info-icon" />
-                  <span>Pago 100% seguro con Transbank</span>
-                </div>
-                <div class="info-item">
-                  <font-awesome-icon icon="credit-card" class="info-icon" />
-                  <span>Acepta todas las tarjetas principales</span>
-                </div>
-                <div class="info-item">
-                  <font-awesome-icon icon="bolt" class="info-icon" />
-                  <span>Procesamiento instantáneo</span>
-                </div>
-              </div>
             </div>
 
             <!-- Order Notes -->
@@ -222,20 +208,6 @@
               </div>
             </div>
 
-            <div class="security-info">
-              <div class="security-item">
-                <font-awesome-icon icon="shield-alt" class="security-icon" />
-                <span>Pago 100% seguro</span>
-              </div>
-              <div class="security-item">
-                <font-awesome-icon icon="truck" class="security-icon" />
-                <span>Envío asegurado</span>
-              </div>
-              <div class="security-item">
-                <font-awesome-icon icon="undo" class="security-icon" />
-                <span>30 días de garantía</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
