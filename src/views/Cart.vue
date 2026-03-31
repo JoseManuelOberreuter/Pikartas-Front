@@ -87,16 +87,11 @@
               <span class="muted">En checkout (Starken)</span>
             </div>
             
-            <div class="summary-line">
-              <span>Impuestos</span>
-              <span>${{ formatCLP(tax) }}</span>
-            </div>
-            
             <hr>
             
             <div class="summary-line total">
-              <span>Subtotal + impuestos</span>
-              <span>${{ formatCLP(subtotalWithTax) }}</span>
+              <span>Subtotal</span>
+              <span>${{ formatCLP(cartTotal) }}</span>
             </div>
             
             <p class="cart-shipping-hint">El envío se cobra según ciudad al finalizar la compra.</p>
@@ -117,17 +112,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useCartStore } from '../stores/cart.js'
 import { storeToRefs } from 'pinia'
 import { formatCLP } from '../utils/formatters.js'
-import { computeTaxAmount } from '../utils/checkoutTotals.js'
-
 const cartStore = useCartStore()
 const { cartItems, cartTotal, cartItemCount } = storeToRefs(cartStore)
-
-const tax = computed(() => computeTaxAmount(cartTotal.value))
-const subtotalWithTax = computed(() => cartTotal.value + tax.value)
 
 // Methods
 const removeFromCart = async (productId) => {

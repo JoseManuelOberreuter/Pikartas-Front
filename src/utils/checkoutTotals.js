@@ -1,9 +1,6 @@
-/** Alineado con Pikartas-back (shippingPricing.js) */
-export const TAX_RATE = 0.08
-
-export function computeTaxAmount(subtotal) {
-  return Math.round(subtotal * TAX_RATE)
-}
+/**
+ * Totales de checkout (sin impuesto; precios con IVA incluido).
+ */
 
 /**
  * @param {number} quotedShipping - costo domicilio API
@@ -13,7 +10,6 @@ export function effectiveShippingAmount(quotedShipping) {
 }
 
 export function computeFinalTotal(subtotal, quotedShipping) {
-  const tax = computeTaxAmount(subtotal)
   const ship = effectiveShippingAmount(quotedShipping)
-  return subtotal + tax + ship
+  return subtotal + ship
 }

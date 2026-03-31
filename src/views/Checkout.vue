@@ -214,11 +214,6 @@
                 <span v-else class="muted">—</span>
               </div>
               
-              <div class="summary-line">
-                <span>Impuestos:</span>
-                <span>${{ formatCLP(taxAmount) }}</span>
-              </div>
-              
               <hr class="summary-divider">
               
               <div class="summary-line total-line">
@@ -271,7 +266,6 @@ const {
   loadingDestinations,
   loadingQuote,
   quoteError,
-  taxAmount,
   displayShippingAmount,
   finalTotal,
   fetchDestinations

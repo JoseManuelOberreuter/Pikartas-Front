@@ -1,10 +1,6 @@
 import { ref, computed, watch } from 'vue'
 import { shippingService } from '../services/api.js'
-import {
-  computeTaxAmount,
-  effectiveShippingAmount,
-  computeFinalTotal
-} from '../utils/checkoutTotals.js'
+import { effectiveShippingAmount, computeFinalTotal } from '../utils/checkoutTotals.js'
 
 let destinationsPromise = null
 
@@ -28,8 +24,6 @@ export function useCheckoutShipping(cartTotalRef) {
   const loadingDestinations = ref(false)
   const loadingQuote = ref(false)
   const quoteError = ref('')
-
-  const taxAmount = computed(() => computeTaxAmount(cartTotalRef.value))
 
   const displayShippingAmount = computed(() => {
     if (quotedShippingRaw.value === null || quotedShippingRaw.value === undefined) return null
@@ -108,7 +102,6 @@ export function useCheckoutShipping(cartTotalRef) {
     loadingDestinations,
     loadingQuote,
     quoteError,
-    taxAmount,
     displayShippingAmount,
     finalTotal,
     fetchDestinations
